@@ -1,15 +1,15 @@
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
-import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.1';
-import { normalizar, derivar } from './regras.js?v=0.1';
-import { carregarFichas, salvarFichas, carregarTema, salvarTema, espacoUsado } from './armazenamento.js?v=0.1';
-import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.1';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.1';
-import { telaFicha, acoesFicha, checksFicha } from './fichaUI.js?v=0.1';
-import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.1';
-import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.1';
+import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.3';
+import { normalizar, derivar } from './regras.js?v=0.3';
+import { carregarFichas, salvarFichas, carregarTema, salvarTema, espacoUsado } from './armazenamento.js?v=0.3';
+import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.3';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.3';
+import { telaFicha, acoesFicha, checksFicha } from './fichaUI.js?v=0.3';
+import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.3';
+import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.3';
 
-export const VERSAO = '0.1';
+export const VERSAO = '0.3';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -53,7 +53,7 @@ addEventListener('hashchange', () => {
 function topo() {
   const r = estado.rota.tela;
   const link = (href, nome, ativo) => `<a href="${href}" ${ativo ? 'aria-current="page"' : ''}>${nome}</a>`;
-  return `<header class="topo"><a class="marca" href="#/"><img src="assets/favicon.svg" alt=""><span>Ficha <b>Oculta</b> RPG</span></a>
+  return `<header class="topo"><span class="gotas" aria-hidden="true"><i></i><i></i><i></i></span><a class="marca" href="#/"><img src="assets/favicon.svg" alt=""><span>Ficha <b>Oculta</b> RPG</span></a>
     <nav>${link('#/agentes', 'Agentes', ['agentes', 'ficha', 'novo'].includes(r))}${link('#/mestre', 'Mestre', r === 'mestre')}${link('#/sobre', 'Sobre', r === 'sobre')}
     <button data-acao="tema" title="Trocar tema" aria-label="Trocar tema claro/escuro">${estado.tema === 'papel' ? '☾ Noite' : '☼ Papel'}</button></nav></header>`;
 }

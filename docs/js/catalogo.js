@@ -243,6 +243,25 @@ export const ORIGENS = [
   O('psicologo', 'Psicólogo', ['intuicao', 'profissao'], 'Terapia', 'Usa Profissão (psicólogo) como Diplomacia; 2 PE para trocar uma resistência falha contra dano mental (sua ou de aliado).', 'SaH'),
   O('reporter', 'Repórter Investigativo', ['atualidades', 'investigacao'], 'Encontrar a Verdade', 'Usa Investigação para persuadir; 2 PE para +5 em Investigação.', 'SaH'),
 ];
+// Origens que permitem GASTAR PE numa rolagem para ganhar bônus (aparece na janela "Gastar PE" ao rolar).
+// atr: perícias baseadas nesses atributos; pericias: só essas; exceto: menos essas.
+const GASTOS_ORIGEM = {
+  academico: { custo: 2, bonus: 5, atr: ['int'] },
+  atleta: { custo: 2, bonus: 5, atr: ['for', 'agi'], exceto: ['luta', 'pontaria'] },
+  executivo: { custo: 2, bonus: 5, pericias: ['diplomacia', 'profissao', 'investigacao'], nota: 'testes estendidos e revisar documentos' },
+  investigador: { custo: 1, bonus: 5, pericias: ['investigacao', 'percepcao'], nota: 'uma vez por cena, ao procurar pistas' },
+  rural: { custo: 2, bonus: 5, pericias: ['adestramento', 'sobrevivencia'] },
+  explorador: { custo: 2, bonus: 5, pericias: ['fortitude', 'sobrevivencia'], nota: 'contra clima, fome, sede, veneno, armadilhas…' },
+  fotografo: { custo: 2, bonus: 5, pericias: ['investigacao', 'percepcao'], nota: 'olhando por uma câmera ou fotos' },
+  legista: { custo: 2, bonus: 5, pericias: ['medicina'], nota: 'primeiros socorros ou necropsia' },
+  motorista: { custo: 2, bonus: 5, pericias: ['pilotagem', 'fortitude', 'reflexos', 'vontade'], nota: 'pilotando' },
+  reporter: { custo: 2, bonus: 5, pericias: ['investigacao'] },
+};
+for (const [id, g] of Object.entries(GASTOS_ORIGEM)) { const o = ORIGENS.find(x => x.id === id); if (o) o.gasto = g; }
+// efeitos automáticos extras de origens
+Object.assign(ORIGENS.find(o => o.id === 'teorico'), { ef: { rdMentalInt: true } });
+Object.assign(ORIGENS.find(o => o.id === 'experimento'), { ef: { rd: 2, experimento: true } });
+Object.assign(ORIGENS.find(o => o.id === 'operario'), { ef: { ferramenta: true } });
 export const ORIGEM = Object.fromEntries(ORIGENS.map(o => [o.id, o]));
 
 // ---------- Trilhas ----------
@@ -297,7 +316,7 @@ export const TRILHAS = [
     [8, 'Ser Maldito', 'A transformação avança: novos benefícios ligados ao elemento.'],
     [13, 'Ser Assustador', 'A transformação avança ainda mais.'],
     [20, 'Ser Aterrorizante', 'Transformação completa. Agentes que chegam aqui costumam perder o controle.'],
-  ], 'SaH', { aviso: 'Usa a progressão de NEX da regra opcional NEX & Experiência (SaH p. 98). Veja os detalhes de cada elemento no livro.' }),
+  ], 'SaH', { aviso: 'Usa a Progressão de NEX (Sobrevivendo ao Horror, p. 98–102), mesmo sem a regra opcional. Detalhes de cada elemento: livro Sobrevivendo ao Horror, p. 17–21.' }),
   // Especialista (LR)
   T('atirador', 'Atirador de Elite', 'especialista', [
     [2, 'Mira de Elite', 'Proficiência com armas de fogo de balas longas e soma o Intelecto no dano delas.'],
@@ -341,13 +360,13 @@ export const TRILHAS = [
     [8, 'Fuga Obstinada', 'Bônus para fugir e se esconder em perseguições e cenas de furtividade.'],
     [13, 'Determinação Inquestionável', 'Resiste melhor a condições e efeitos que o derrubariam.'],
     [20, 'Só Mais um Passo', 'Mesmo à beira da morte, continua de pé por mais um pouco.'],
-  ], 'SaH', { aviso: 'Resumos aproximados: confira os efeitos exatos no livro (SaH p. 24).' }),
+  ], 'SaH', { aviso: 'Resumos aproximados: confira os efeitos exatos no livro Sobrevivendo ao Horror, p. 24.' }),
   T('muambeiro', 'Muambeiro', 'especialista', [
     [2, 'Mascate', 'Treina uma Profissão (armeiro, engenheiro ou químico), +5 de carga e fabrica itens improvisados mais fácil.', { carga: 5 }],
     [8, 'Fabricação Própria', 'Fabrica itens mundanos na metade do tempo.'],
     [13, 'Laboratório de Campo', 'Pode fabricar e consertar itens paranormais em campo.'],
     [20, 'Achado Conveniente', 'Consegue o item certo na hora certa, com mais frequência.'],
-  ], 'SaH', { aviso: 'Habilidades de NEX 65% e 99% resumidas de forma aproximada (SaH p. 25).' }),
+  ], 'SaH', { aviso: 'Habilidades de NEX 65% e 99% resumidas de forma aproximada: confira no livro Sobrevivendo ao Horror, p. 25.' }),
   // Ocultista (LR)
   T('conduite', 'Conduíte', 'ocultista', [
     [2, 'Ampliar Ritual', '+2 PE para aumentar alcance ou alvos de um ritual.'],
@@ -391,13 +410,13 @@ export const TRILHAS = [
     [8, 'As Sombras Dentro de Mim', 'A entidade ajuda em combate e em testes, com um custo.'],
     [13, 'Ele Me Ensina', 'A entidade lhe ensina poderes paranormais.'],
     [20, 'Tornamo-nos Um', 'Você e a entidade se fundem, por um tempo, num ser mais poderoso.'],
-  ], 'SaH', { aviso: 'Trilha com regras próprias (pontos de possessão). Confira no livro (SaH p. 28).' }),
+  ], 'SaH', { aviso: 'Trilha com regras próprias (pontos de possessão): confira no livro Sobrevivendo ao Horror, p. 28.' }),
   T('parapsicologo', 'Parapsicólogo', 'ocultista', [
     [2, 'Terapia', 'Usa Profissão (psicólogo) para ajudar aliados a resistir e se recuperar de dano mental.'],
     [8, 'Palavras-chave', 'Combina psicologia e paranormal para acalmar ou desestabilizar mentes.'],
     [13, 'Reprogramação Mental', 'Pode remover ou implantar condições mentais com sessões de terapia.'],
     [20, 'A Sanidade Está Lá Fora', 'Grande poder de proteger e restaurar a sanidade do grupo.'],
-  ], 'SaH', { aviso: 'Resumos aproximados: confira no livro (SaH p. 29).' }),
+  ], 'SaH', { aviso: 'Resumos aproximados: confira no livro Sobrevivendo ao Horror, p. 29.' }),
   // Sobrevivente (SaH): só 2 habilidades (estágios 2 e 4)
   T('durao', 'Durão', 'sobrevivente', [
     [2, 'Durão', '+4 PV (e +2 PV ao chegar no estágio 3).', { pvDurao: true }],
@@ -744,4 +763,182 @@ export const RITUAIS = [
   R('Tremeluzir', 'energia', 2, 'Seu corpo vira luz e atravessa objetos.', 'SaH'),
   R('Mutar', 'energia', 3, 'Nenhum som sai de você: furtividade enorme.', 'SaH'),
   R('Milagre Ionizante', 'energia', 3, 'Cura condições e venenos do alvo, com um preço.', 'SaH'),
+];
+
+// ---------- Progressão de NEX (Sobrevivendo ao Horror, p. 99–102) ----------
+// Vale quando o NEX é separado da experiência (regras NEX & Experiência, Patentes, Sobrevivente) e na trilha Monstruoso.
+// ef: dados a mais/menos em perícias (+1 = +1D). Resumos curtos; os detalhes estão no livro.
+export const EXPOSICOES = [
+  { nome: 'Exposição moderada', nex: 1, resumo: 'Contato concreto: manusear algo paranormal, estar onde a Membrana está danificada.' },
+  { nome: 'Exposição profunda', nex: 2, resumo: 'Contato direto com criaturas de até VD 300 ou manifestações parecidas.' },
+  { nome: 'Exposição total', nex: 5, resumo: 'Membrana arruinada ou criaturas acima de VD 300.' },
+];
+export const ALTERACOES_GERAIS = [
+  { nex: 25, nome: 'Arrepios e déjà vus', resumo: 'Pode usar Ocultismo sem ser treinado (se for treinado, +2). Mas sofre −5 em uma perícia à escolha: Diplomacia, Enganação ou Intimidação.', escolha: 'pen25', opcoes: ['diplomacia', 'enganacao', 'intimidacao'] },
+  { nex: 35, nome: 'Escolhido pelo Outro Lado', resumo: 'Soma um atributo (menos Presença) no total de PE. Mas sofre −5 em uma perícia à escolha: Atletismo, Fortitude ou Reflexos.', escolha: 'pen35', opcoes: ['atletismo', 'fortitude', 'reflexos'], escolhaAtr: 'atr35' },
+  { nex: 50, nome: 'Mais Outro Lado que Realidade', resumo: 'Na próxima vez que Transcender, ganha afinidade com Conhecimento, Energia, Morte ou Sangue, e passa a sofrer as alterações desse elemento.' },
+];
+export const ALTERACOES_ELEMENTO = {
+  sangue: [
+    { nex: 60, resumo: '+1 dado em Sobrevivência; imune a calor e frio extremos; não pode "escolher 10".', ef: { sobrevivencia: 1 } },
+    { nex: 75, resumo: 'Pode conjurar Aprimorar Físico em si mesmo (−1 PE se já conhece). −1 dado em Ciências, Medicina e Tecnologia.', ef: { ciencias: -1, medicina: -1, tecnologia: -1 } },
+    { nex: 90, resumo: 'A penalidade vira −2 dados. Pode conjurar Forma Monstruosa (−1 PE se já conhece).', ef: { ciencias: -1, medicina: -1, tecnologia: -1 } },
+  ],
+  morte: [
+    { nex: 60, resumo: '+1 dado em Iniciativa e Reflexos; −1 dado em Diplomacia e Intuição.', ef: { iniciativa: 1, reflexos: 1, diplomacia: -1, intuicao: -1 } },
+    { nex: 75, resumo: 'Ganha um ritual de Morte; a penalidade vira −2 dados e passa a valer também em Enganação e Intimidação.', ef: { diplomacia: -1, intuicao: -1, enganacao: -2, intimidacao: -2 } },
+    { nex: 90, resumo: 'O tempo se distorce ainda mais (veja o Sobrevivendo ao Horror, p. 101).' },
+  ],
+  conhecimento: [
+    { nex: 60, resumo: 'Vê auras paranormais o tempo todo (como Terceiro Olho; −1 PE se já conhece), mas a luz forte o deixa ofuscado.' },
+    { nex: 75, resumo: 'Sente perigos o tempo todo (como Detecção de Ameaças; −1 PE se já conhece).' },
+    { nex: 90, resumo: 'Na luz fica cego em vez de ofuscado. Pode conjurar Vidência.' },
+  ],
+  energia: [
+    { nex: 60, resumo: 'Pode conjurar Coincidência Forçada. O mestre rola um efeito colateral caótico (tiques, convulsões, sorte…), que piora em 75% e 90%.' },
+    { nex: 75, resumo: 'Os efeitos colaterais de Energia ficam mais fortes.' },
+    { nex: 90, resumo: 'Os efeitos colaterais de Energia ficam no máximo.' },
+  ],
+};
+
+// ---------- Poderes paranormais (Transcender; Livro de Regras p. 114–116; Sobrevivendo ao Horror p. 46–47) ----------
+// req: { elemento: quantos poderes desse elemento já precisa ter } ou { nex }. afinidade: o que muda ao escolher de novo com afinidade.
+// ef: efeitos automáticos (por: 'nivel' = vezes o nível/NEX). repete: pode escolher várias vezes.
+const PP = (nome, elemento, resumo, afinidade, extra = {}) => ({ id: nome.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-'), nome, elemento, resumo, afinidade, fonte: 'LR', req: {}, ...extra });
+export const PODERES_PARANORMAIS = [
+  PP('Aprender Ritual', 'variavel', 'Aprende um ritual de 1º círculo (2º a partir de NEX 45%, 3º a partir de 75%) e pode trocar um ritual conhecido. Conta como poder do elemento do ritual.', '', { repete: true, acao: 'aprender-ritual' }),
+  PP('Resistir a Elemento', 'variavel', 'Resistência 10 contra Conhecimento, Energia, Morte ou Sangue (escolha). Conta como poder desse elemento.', 'A resistência sobe para 20.', { repete: true, escolheElemento: true }),
+  PP('Expansão de Conhecimento', 'conhecimento', 'Aprende um poder de classe de outra classe (cumprindo os pré-requisitos).', 'Aprende um segundo poder de outra classe.', { req: { conhecimento: 1 } }),
+  PP('Percepção Paranormal', 'conhecimento', 'Ao procurar pistas, pode rolar de novo um dado abaixo de 10 (fica com o novo).', 'Até dois dados.'),
+  PP('Precognição', 'conhecimento', '+2 na Defesa e nos testes de resistência.', 'Fica imune a ser desprevenido.', { req: { conhecimento: 1 }, ef: { defesa: 2, resistencia: 2 } }),
+  PP('Sensitivo', 'conhecimento', '+5 em Diplomacia, Intimidação e Intuição.', 'Em testes opostos com essas perícias, o oponente sofre −1 dado.', { ef: { pericia: { diplomacia: 5, intimidacao: 5, intuicao: 5 } } }),
+  PP('Visão do Oculto', 'conhecimento', '+5 em Percepção e enxerga no escuro.', 'Ignora camuflagem.', { ef: { pericia: { percepcao: 5 } } }),
+  PP('Afortunado', 'energia', 'Uma vez por rolagem, rola de novo um 1 em dados que não sejam d20.', 'Também uma vez por teste em um 1 no d20.'),
+  PP('Campo Protetor', 'energia', 'Ao esquivar, 1 PE para +5 na Defesa.', 'Também +5 em Reflexos e, se passar num Reflexos que reduz à metade, não sofre dano.', { req: { energia: 1 } }),
+  PP('Causalidade Fortuita', 'energia', 'Em investigações, a DT para procurar pistas cai 5 até achar uma pista.', 'A DT sempre cai 5.'),
+  PP('Golpe de Sorte', 'energia', '+1 na margem de ameaça dos ataques.', '+1 no multiplicador de crítico.', { req: { energia: 1 }, ef: { margemTodas: 1 }, efAfinidade: { multTodas: 1 } }),
+  PP('Manipular Entropia', 'energia', '2 PE: um ser em alcance curto rola de novo um dado de um teste de perícia.', 'Rola de novo todos os dados que você escolher.', { req: { energia: 1 } }),
+  PP('Encarar a Morte', 'morte', 'Em cenas de ação, o limite de PE por turno aumenta em +1 (não muda DTs).', 'Aumenta em +3 no total.', { ef: { limiteAcao: 1 }, efAfinidade: { limiteAcao: 2 } }),
+  PP('Escapar da Morte', 'morte', 'Uma vez por cena, um dano que o deixaria com 0 PV o deixa com 1 PV (não vale contra dano massivo).', 'Evita o dano todo; contra dano massivo fica com 1 PV.', { req: { morte: 1 } }),
+  PP('Potencial Aprimorado', 'morte', '+1 PE por NEX (cresce quando o NEX sobe).', '+2 PE por NEX no total.', { ef: { pePorNivel: 1 }, efAfinidade: { pePorNivel: 1 } }),
+  PP('Potencial Reaproveitado', 'morte', 'Uma vez por rodada, ao passar num teste de resistência, ganha 2 PE temporários (somem no fim da cena).', 'Ganha 3 PE temporários.'),
+  PP('Surto Temporal', 'morte', 'Uma vez por cena, no seu turno, 3 PE para uma ação padrão extra.', 'Uma vez por turno.', { req: { morte: 2 } }),
+  PP('Anatomia Insana', 'sangue', '50% de chance (par em 1d4) de ignorar o dano extra de crítico ou ataque furtivo.', 'Imune a críticos e ataques furtivos.', { req: { sangue: 2 } }),
+  PP('Arma de Sangue', 'sangue', 'Movimento e 2 PE: cria uma arma de sangue (simples, corpo a corpo, leve, 1d6 de Sangue) até o fim da cena; 1 PE por ataque extra com ela ao agredir.', 'A arma vira parte de você e causa 1d10.'),
+  PP('Sangue de Ferro', 'sangue', '+2 PV por NEX (cresce quando o NEX sobe).', '+5 em Fortitude e imune a venenos e doenças.', { ef: { pvPorNivel: 2 }, efAfinidade: { pericia: { fortitude: 5 } } }),
+  PP('Sangue Fervente', 'sangue', 'Machucado: +1 em Agilidade ou Força (escolha a cada vez).', 'O bônus vira +2.', { req: { sangue: 2 } }),
+  PP('Sangue Vivo', 'sangue', 'Na primeira vez que fica machucado na cena, ganha cura acelerada 2 (nunca passa da metade dos PV).', 'Cura acelerada 5.', { req: { sangue: 1 } }),
+  // Sobrevivendo ao Horror
+  PP('Espreitar da Besta', 'sangue', '+5 em Furtividade; pode usá-la no lugar de Atletismo ao caçar em perseguições; sem penalidade em ações discretas.', 'O bônus vira +10.', { fonte: 'SaH', ef: { pericia: { furtividade: 5 } }, efAfinidade: { pericia: { furtividade: 5 } } }),
+  PP('Instintos Sanguinários', 'sangue', 'Visão no escuro e faro.', 'Não pode ser flanqueado nem fica desprevenido; +5 contra armadilhas.', { fonte: 'SaH' }),
+  PP('Antecipar Vitalidade', 'morte', 'Num teste, acumula uma carga para ganhar +1 dado (máximo de cargas = Vigor). Cada carga faz o próximo "dormir" não recuperar PV.', '+2 cargas máximas, mas perde 2 por noite.', { fonte: 'SaH' }),
+  PP('Aura de Pavor', 'morte', 'Movimento e 2 PE: uma pessoa ou animal em alcance médio fica apavorado (Vontade DT Pre reduz para abalado).', 'DT +5 e afeta quantos alvos quiser.', { fonte: 'SaH' }),
+  PP('Absorver Conhecimento', 'conhecimento', 'Segurando um texto, ação completa e 1 PE para fazer uma pergunta a ele; melhora o dado da ação "ler".', 'Rituais de Conhecimento em 1 pessoa que você toca custam −1 PE.', { fonte: 'SaH' }),
+  PP('Apatia Herege', 'conhecimento', 'Contra condições de medo, 2 PE para rolar de novo (fica com o novo).', 'Pode decidir depois de ver o resultado e fica com o melhor.', { fonte: 'SaH', req: { conhecimento: 1 } }),
+  PP('Conexão Empática', 'energia', 'Ação completa e 2 PE: conversa com um aparelho elétrico ligado até o fim da cena.', '+5 em perícias de Int/Pre com o aparelho.', { fonte: 'SaH', req: { energia: 1 } }),
+  PP('Valer-se do Caos', 'energia', 'Num teste, rola +1 dado (de outra cor). Se falhar ou esse dado der 5 ou menos, perde 1d4 de Sanidade.', 'Só perde Sanidade se falhar ou se o dado extra der 1 ou 2.', { fonte: 'SaH' }),
+];
+export const PODER_PARANORMAL = Object.fromEntries(PODERES_PARANORMAIS.map(p => [p.id, p]));
+
+// ---------- Habilidades USÁVEIS (botão "Usar") ----------
+// Chave = nome da habilidade/poder/origem. custo: PE (ou PD); 'aliados' = 1 por aliado; 'pv' = paga com PV.
+// dura: 'instante' (só gasta), 'rodada', 'cena' (vira efeito ativo até o jogador desligar ou "Fim da cena"), 'proxima' (vale na próxima rolagem).
+// ef: bônus enquanto ativo — defesa, resistencia, rd, rdMental, desl, todasPericias, dadosTodas, pericia:{id:n}, dadosPericia:{id:n},
+//     ataque, ataqueDados, dano, margemTodas, dtRitual. Valores 'int'/'pre'/'vig'/'agi'/'for' = o atributo.
+// ganhaPeTemp: PE temporários ganhos. rolar: fórmula rolada ao usar. nivelMin: só a partir desse nível da trilha/NEX.
+export const USAVEIS = {
+  // Combatente (trilhas)
+  'Inspirar Confiança': { custo: 2, dura: 'instante', nota: 'reação: um aliado rola de novo' },
+  'Estrategista': { custo: 'aliados', dura: 'instante', nota: 'aliados ganham ação de movimento' },
+  'Brecha na Guarda': { custo: 2, dura: 'instante' },
+  'Oficial Comandante': { custo: 5, dura: 'instante' },
+  'Revidar': { custo: 2, dura: 'instante' },
+  'Força Opressora': { custo: 1, dura: 'instante' },
+  'Ataque Extra': { custo: 2, dura: 'instante' },
+  'Surto de Adrenalina': { custo: 5, dura: 'instante' },
+  'Cai Dentro': { custo: 1, dura: 'instante' },
+  'Técnica Secreta': { custo: 2, dura: 'instante', nota: '+2 PE por efeito extra' },
+  // Especialista (trilhas)
+  'Disparo Letal': { custo: 1, dura: 'proxima', ef: { margemTodas: 2 }, nota: 'próximo ataque: +2 na margem' },
+  'Disparo Impactante': { custo: 2, dura: 'instante' },
+  'Assassinar': { custo: 3, dura: 'instante' },
+  'Sombra Fugaz': { custo: 3, dura: 'instante' },
+  'Paramédico': { custo: 2, dura: 'instante', rolarCura: true },
+  'Equipe de Trauma': { custo: 2, dura: 'instante' },
+  'Reanimação': { custo: 10, dura: 'instante' },
+  'Eloquência': { custo: 'aliados', dura: 'instante', nota: '1 PE por alvo' },
+  'Discurso Motivador': { custo: 4, dura: 'cena', ef: { dadosTodas: 1 }, nota: 'você e aliados: +1 dado em perícias' },
+  'Remendão': { custo: 1, dura: 'instante' },
+  // Ocultista (trilhas)
+  'Anular Ritual': { custo: 'var', dura: 'instante', nota: 'PE igual ao custo do ritual inimigo' },
+  'Abraçar a Dor': { custo: 2, dura: 'instante', nota: 'reduz um dano não paranormal à metade' },
+  'Conjuração Marcial': { custo: 2, dura: 'instante' },
+  // Poderes de classe
+  'Ataque de Oportunidade': { custo: 1, dura: 'instante' },
+  'Golpe Demolidor': { custo: 1, dura: 'instante' },
+  'Incansável': { custo: 2, dura: 'instante' },
+  'Presteza Atlética': { custo: 1, dura: 'instante' },
+  'Sentido Tático': { custo: 2, dura: 'cena', ef: { defesa: 'int', resistencia: 'int' } },
+  'Combate Defensivo': { custo: 0, dura: 'rodada', ef: { defesa: 5, ataqueDados: -1 } },
+  'Tiro de Cobertura': { custo: 1, dura: 'instante' },
+  'Mãos Rápidas': { custo: 1, dura: 'instante' },
+  'Movimento Tático': { custo: 1, dura: 'rodada' },
+  'Na Trilha Certa': { custo: 1, dura: 'proxima', ef: { dadosPericia: { investigacao: 1, percepcao: 1 } }, nota: 'próximo teste de procurar pistas: +1 dado' },
+  'Nerd': { custo: 2, dura: 'instante' },
+  'Pensamento Ágil': { custo: 2, dura: 'instante' },
+  'Guiado pelo Paranormal': { custo: 2, dura: 'instante' },
+  'Paranoia Defensiva': { custo: 3, dura: 'cena', ef: { defesa: 5 }, nota: '+5 na Defesa contra o próximo ataque (desligue depois)' },
+  'Valentão': { custo: 1, dura: 'instante' },
+  'Sacrificar os Joelhos': { custo: 2, dura: 'instante' },
+  'Disfarce Sutil': { custo: 1, dura: 'instante' },
+  'Remoer Memórias': { custo: 2, dura: 'instante' },
+  'Resistir à Pressão': { custo: 5, dura: 'cena', ef: { todasPericias: 2 }, nota: 'rodada extra de investigação com +2' },
+  'Deixe os Sussurros Guiarem': { custo: 2, dura: 'cena', ef: { pericia: { investigacao: 2, percepcao: 2, intuicao: 2, ocultismo: 2 } }, nota: 'cada falha custa 1 de Sanidade' },
+  'Estalos Macabros': { custo: 1, dura: 'instante' },
+  'Nos Olhos do Monstro': { custo: 3, dura: 'cena', ef: { todasPericias: 5 }, nota: 'só contra a criatura encarada (não vale em ataques)' },
+  'Sentido Premonitório': { custo: 3, dura: 'cena', nota: '+1 PE no início de cada rodada para manter' },
+  'Sincronia Paranormal': { custo: 2, dura: 'cena', nota: '1 PE por rodada para manter' },
+  'Traçado Conjuratório': { custo: 1, dura: 'cena', ef: { pericia: { ocultismo: 2 }, resistencia: 2, dtRitual: 2 }, nota: 'enquanto estiver dentro do símbolo' },
+  'Palavras de Devoção': { custo: 3, dura: 'cena', ef: { rdMental: 5 }, nota: 'você e quem rezou junto' },
+  'Teimosia Obstinada': { custo: 2, dura: 'proxima', ef: { pericia: { vontade: 5 } }, nota: 'contra efeito mental' },
+  'Resposta Rápida': { custo: 2, dura: 'instante' },
+  // SaH trilhas
+  'O Sorriso': { custo: 2, dura: 'instante', nota: 'repete Diplomacia/Enganação' },
+  'Método Investigativo': { custo: 2, dura: 'instante' },
+  'Conhecimento Prático': { custo: 2, dura: 'instante' },
+  'Poder da Fé': { custo: 2, dura: 'instante', nota: 'repete uma resistência com Religião' },
+  'Pancada Forte': { custo: 1, dura: 'instante' },
+  'Esotérico': { custo: 1, dura: 'instante' },
+  // Origens
+  'Posição de Combate': { custo: 2, dura: 'instante', nota: 'ação de movimento extra na 1ª rodada' },
+  'Espírito Cívico': { custo: 1, dura: 'instante', nota: '+2 no bônus de ajuda' },
+  'Motor de Busca': { custo: 2, dura: 'instante' },
+  'Impostor': { custo: 2, dura: 'instante' },
+  'Conexões': { custo: 2, dura: 'instante' },
+  'A Culpa é das Estrelas': { custo: 1, dura: 'instante', rolarSorte: true },
+  'Poder da Amizade': { custo: 0, dura: 'cena', ef: { todasPericias: 2 }, nota: 'perto do melhor amigo' },
+  'Não é Fantasia, é Cosplay!': { custo: 0, dura: 'cena', ef: { todasPericias: 2 }, nota: 'testes ligados ao cosplay' },
+  'Conhecimento Oculto': { custo: 0, dura: 'cena', ef: { todasPericias: 2 }, nota: 'contra a criatura identificada (vale a missão toda)' },
+  'Luta ou Fuga': { custo: 0, dura: 'cena', ganhaPeTemp: 2, nota: 'quando surge um sinal da premonição' },
+  'Acalentar': { custo: 0, dura: 'proxima', ef: { pericia: { religiao: 5 } }, nota: 'para acalmar' },
+  // Poderes paranormais
+  'Campo Protetor': { custo: 1, dura: 'rodada', ef: { defesa: 5 } },
+  'Manipular Entropia': { custo: 2, dura: 'instante' },
+  'Surto Temporal': { custo: 3, dura: 'instante' },
+  'Arma de Sangue': { custo: 2, dura: 'cena', arma: true },
+  'Potencial Reaproveitado': { custo: 0, dura: 'instante', ganhaPeTemp: 2, nota: 'passou numa resistência' },
+  'Aura de Pavor': { custo: 2, dura: 'instante' },
+  'Absorver Conhecimento': { custo: 1, dura: 'instante' },
+  'Apatia Herege': { custo: 2, dura: 'instante' },
+  'Conexão Empática': { custo: 2, dura: 'cena' },
+  'Escapar da Morte': { custo: 0, dura: 'instante', nota: 'uma vez por cena' },
+};
+// Trocar a perícia de um teste (aparece na janela "Gastar PE" ao rolar). de: perícias de origem (vazio = qualquer). para: perícia usada.
+export const TROCAS_PERICIA = [
+  { fonte: 'origem:ti', nome: 'Motor de Busca', custo: 2, para: 'tecnologia', nota: 'com internet' },
+  { fonte: 'origem:trambiqueiro', nome: 'Impostor', custo: 2, para: 'enganacao', nota: 'uma vez por cena' },
+  { fonte: 'origem:psicologo', nome: 'Terapia', custo: 0, de: ['diplomacia'], para: 'profissao' },
+  { fonte: 'origem:reporter', nome: 'Encontrar a Verdade', custo: 0, de: ['diplomacia'], para: 'investigacao', nota: 'persuadir' },
+  { fonte: 'origem:cosplayer', nome: 'Disfarce com Artes', custo: 0, de: ['enganacao'], para: 'artes', nota: 'disfarce' },
+  { fonte: 'origem:diplomata', nome: 'Conexões', custo: 2, para: 'diplomacia', nota: 'contato que entende do assunto' },
 ];

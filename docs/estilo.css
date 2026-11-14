@@ -216,7 +216,8 @@ input[type="checkbox"], input[type="radio"] { width: 18px; height: 18px; min-hei
 .contador.erro { color: var(--perigo); }
 
 /* ---------- Atributos em círculo ritual ---------- */
-.pentagrama { position: relative; width: min(360px, 100%); aspect-ratio: 1; margin: 6px auto 4px; }
+.pentagrama { position: relative; width: min(380px, 100%); aspect-ratio: 400 / 380; margin: 10px auto 4px; }
+.pentagrama .simbolo, .pentagrama .centro-simbolo { display: none; }
 .pentagrama .fundo { position: absolute; inset: 9%; background: var(--sangue); opacity: .5; -webkit-mask: url(assets/circulo-ritual.svg) center / contain no-repeat; mask: url(assets/circulo-ritual.svg) center / contain no-repeat; }
 .atr {
   position: absolute; width: 92px; transform: translate(-50%, -50%); text-align: center; display: grid; justify-items: center; gap: 2px;
@@ -227,7 +228,9 @@ input[type="checkbox"], input[type="radio"] { width: 18px; height: 18px; min-hei
 }
 :root[data-tema="papel"] .atr .valor { background: radial-gradient(circle at 40% 35%, #fffaf0, #e7d9bd 70%); color: var(--tinta); }
 .atr .valor:hover { box-shadow: 0 0 26px #b3121f99, inset 0 0 12px #000; }
-.atr .nome { font: 700 .72rem var(--fonte-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--osso); background: var(--fundo); padding: 0 6px; }
+.atr .nome { font: 700 .72rem var(--fonte-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--osso); background: var(--fundo); padding: 0 6px; display: grid; justify-items: center; line-height: 1.1; }
+.atr .nome small { font: 500 .5rem var(--fonte-ui); letter-spacing: .12em; color: var(--apagado); }
+.atr-pre .nome, .atr-vig .nome { order: 2; } /* nos círculos de baixo, o nome fica embaixo */
 .atr .ajuste { display: flex; gap: 4px; }
 .atr .ajuste button { width: 28px; height: 26px; border: 1px solid var(--linha-forte); background: var(--painel); color: var(--tinta); border-radius: 3px; cursor: pointer; font: 700 .95rem var(--fonte-ui); }
 .atr input { width: 64px; text-align: center; font: 700 1.6rem var(--fonte-titulo); height: 64px; border-radius: 50%; border: 2px solid var(--sangue); background: #0d0606; padding: 0; }
@@ -423,3 +426,181 @@ input:focus-visible + .caixa-check { outline: 2px solid var(--vela); outline-off
 .caixa-mini { position: relative; display: inline-grid; cursor: pointer; }
 .ritual { border-color: color-mix(in srgb, var(--el) 55%, transparent); border-left: 4px solid var(--el); background: linear-gradient(90deg, var(--el-fundo), transparent 60%), #00000022; }
 .ritual .sigilo { --cor: var(--el); }
+
+/* =====================================================================
+   TEMA PAPEL — ficha de papel velho: bordas rasgadas e queimadas, faixas
+   pretas com letra branca, letra de mão e respingos de sangue.
+   ===================================================================== */
+:root[data-tema="papel"] {
+  --fundo: #2b1d12; --painel: #e3cd9f; --pergaminho: #ead7ad; --osso: #2a1c12;
+  --tinta: #1c130c; --apagado: #6e5233; --linha: #a98a5c; --linha-forte: #4a3420;
+  --sangue: #8e1b12; --sangue-escuro: #5e0f09; --vela: #7a4e12; --san: #2f4a8a; --pd: #5b2a86; --pv: #8e1b12; --pe: #7a4e12;
+  --ok: #2f6b2a; --perigo: #9a1a10;
+  --sombra: 0 14px 30px #0008;
+  --fonte-titulo: 'Special Elite', 'Courier New', monospace;
+  --fonte-texto: 'Special Elite', 'Courier New', monospace;
+  --fonte-mao: 'Cabin Sketch', 'Special Elite', cursive;
+  --fonte-ui: 'Special Elite', 'Courier New', monospace;
+}
+:root[data-tema="papel"] body { background: radial-gradient(ellipse at 50% 0%, #4a3220, #22160d 70%); font-size: 16px; }
+:root[data-tema="papel"] body::before { background: url(assets/papel-manchas.svg) center / 700px; opacity: .25; }
+:root[data-tema="papel"] body::after { opacity: .2; }
+/* topo como uma tira de papel */
+:root[data-tema="papel"] .topo { background: #1c130c; border-bottom: 3px solid #000; }
+:root[data-tema="papel"] .marca, :root[data-tema="papel"] .topo nav a, :root[data-tema="papel"] .topo nav button { color: #ead7ad; }
+:root[data-tema="papel"] .topo nav a[aria-current="page"] { background: #ead7ad22; }
+:root[data-tema="papel"] .rodape { color: #c9b28a; }
+/* painéis = folhas de papel velho com borda rasgada e queimada */
+:root[data-tema="papel"] .painel, :root[data-tema="papel"] .porta, :root[data-tema="papel"] .modo, :root[data-tema="papel"] .ficha-cartao, :root[data-tema="papel"] .ameaca-bloco, :root[data-tema="papel"] .vazio {
+  border: 0; border-radius: 0; color: var(--tinta);
+  background:
+    radial-gradient(circle at 12% 18%, #8e1b1222 0 2px, transparent 3px),
+    radial-gradient(ellipse at center, #f0dfb6 0%, #e2c993 55%, #c9a467 85%, #8a5f2c 100%);
+  box-shadow: inset 0 0 40px #7a4a1a99, inset 0 0 8px #4a2a0c;
+  -webkit-mask: url(assets/papel-borda.svg) center / 100% 100% no-repeat; mask: url(assets/papel-borda.svg) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 8px 14px #000a);
+}
+:root[data-tema="papel"] .painel:nth-of-type(2n), :root[data-tema="papel"] .ficha-cartao:nth-child(2n) { -webkit-mask-image: url(assets/papel-borda-2.svg); mask-image: url(assets/papel-borda-2.svg); }
+:root[data-tema="papel"] .painel::after { /* respingos de sangue e manchas */
+  inset: 0; border: 0; background: url(assets/pingos.svg) 85% 70% / 260px no-repeat, url(assets/papel-manchas.svg) center / 520px; opacity: .55; mix-blend-mode: multiply;
+}
+:root[data-tema="papel"] .painel { padding: 22px 20px; }
+:root[data-tema="papel"] .painel > * { position: relative; z-index: 1; }
+/* faixas = barras pretas com letra branca (como "habilidades", "inventário") */
+:root[data-tema="papel"] .faixa { color: #f3e6c8; font: 400 1.15rem var(--fonte-titulo); letter-spacing: .03em; text-transform: lowercase; padding: .3em .8em; margin-left: 0; }
+:root[data-tema="papel"] .faixa::before, :root[data-tema="papel"] .faixa.sangue::before { inset: 0; background: #111; -webkit-mask: none; mask: none; }
+:root[data-tema="papel"] h1.faixa { font-size: 1.6rem; }
+:root[data-tema="papel"] .titulo-vermelho { font: 400 1.5rem var(--fonte-mao); text-transform: lowercase; color: #1c130c; letter-spacing: .02em; }
+:root[data-tema="papel"] .capa h1 { font-family: var(--fonte-mao); color: #ead7ad; text-shadow: 0 3px 0 #000; letter-spacing: .06em; }
+:root[data-tema="papel"] .capa h1 b { color: #c23a2c; }
+:root[data-tema="papel"] .capa p { color: #e9d6ad; }
+:root[data-tema="papel"] .capa .circulo { background: #e9d6ad; opacity: .08; }
+:root[data-tema="papel"] .porta h2, :root[data-tema="papel"] .modo h2 { font-family: var(--fonte-mao); text-transform: lowercase; font-size: 1.7rem; }
+:root[data-tema="papel"] .porta p, :root[data-tema="papel"] .modo ul { color: #4a3420; }
+:root[data-tema="papel"] .modo[aria-pressed="true"] { box-shadow: inset 0 0 0 4px #111, inset 0 0 40px #7a4a1a99; }
+/* campos = caixas desenhadas a tinta; rótulos sublinhados (NOME DO PERSONAGEM) */
+:root[data-tema="papel"] input, :root[data-tema="papel"] select, :root[data-tema="papel"] textarea {
+  background: #f3e3bd99; border: 2px solid #1c130c; border-radius: 0; color: #1c130c; font-family: var(--fonte-texto);
+}
+:root[data-tema="papel"] textarea { background: repeating-linear-gradient(transparent 0 25px, #4a342066 25px 26px), #f3e3bd66; line-height: 26px; }
+:root[data-tema="papel"] .campo > span, :root[data-tema="papel"] .rotulo { color: #1c130c; text-decoration: underline; text-underline-offset: 3px; font-size: .7rem; }
+:root[data-tema="papel"] .btn { background: #f3e3bd; color: #1c130c; border: 2px solid #1c130c; border-radius: 0; box-shadow: 2px 2px 0 #1c130c; }
+:root[data-tema="papel"] .btn:hover { background: #fff2d0; }
+:root[data-tema="papel"] .btn.sangue { background: #1c130c; color: #f3e6c8; border-color: #1c130c; text-shadow: none; }
+:root[data-tema="papel"] .btn.fantasma { background: none; box-shadow: none; border-color: transparent; color: #4a3420; }
+:root[data-tema="papel"] .etiqueta { border: 2px solid #1c130c; color: #1c130c; border-radius: 0; background: #f3e3bd88; }
+:root[data-tema="papel"] .etiqueta.sah { border-color: #5b2a86; color: #5b2a86; }
+:root[data-tema="papel"] .etiqueta.alerta { border-color: #8e1b12; color: #8e1b12; }
+:root[data-tema="papel"] .selo { color: #8e1b12; }
+:root[data-tema="papel"] .abas { border-bottom: 3px solid #000; }
+:root[data-tema="papel"] .abas button { color: #c9b28a; }
+:root[data-tema="papel"] .abas button[aria-selected="true"] { color: #f3e6c8; background: #111; border-color: #111; }
+:root[data-tema="papel"] .ficha-cabeca h1, :root[data-tema="papel"] .ficha-cabeca h1 input { color: #ead7ad; font-family: var(--fonte-mao); text-transform: none; border-bottom-color: #ead7ad66; background: none; border-top: 0; border-left: 0; border-right: 0; }
+:root[data-tema="papel"] .ficha-cabeca .etiqueta { background: #ead7ad; }
+:root[data-tema="papel"] .retrato { border: 3px solid #111; background-color: #e3cd9f; color: #4a3420; }
+:root[data-tema="papel"] .retrato::after { box-shadow: inset 0 0 18px #7a4a1a; }
+/* recursos: rótulo preto + caixa (como PV / XP) */
+:root[data-tema="papel"] .recurso, :root[data-tema="papel"] .chave, :root[data-tema="papel"] .hab, :root[data-tema="papel"] .ritual, :root[data-tema="papel"] .cartao, :root[data-tema="papel"] .ini-linha, :root[data-tema="papel"] .caixa-ritual {
+  background: #f3e3bd55; border: 2px solid #1c130c; border-radius: 0;
+}
+:root[data-tema="papel"] .recurso .sigla { background: #111; color: #f3e6c8; padding: 2px 10px; }
+:root[data-tema="papel"] .barra { background: #1c130c22; border: 1px solid #1c130c; border-radius: 0; height: 10px; }
+:root[data-tema="papel"] .barra b { box-shadow: none; }
+:root[data-tema="papel"] .chave b { font-family: var(--fonte-mao); font-size: 1.9rem; }
+:root[data-tema="papel"] .cartao[aria-pressed="true"] { background: #1c130c14; box-shadow: inset 4px 0 0 #1c130c, 3px 3px 0 #1c130c; }
+:root[data-tema="papel"] .hab { border-left-width: 6px; }
+/* tabela de perícias: lista com caixinhas (perícias //☆// níveis) */
+:root[data-tema="papel"] .tabela th { background: #111; color: #f3e6c8; font-family: var(--fonte-titulo); letter-spacing: .04em; text-transform: lowercase; font-size: .85rem; }
+:root[data-tema="papel"] .tabela td { border-bottom: 1px dashed #4a342066; text-transform: uppercase; font-size: .85rem; }
+:root[data-tema="papel"] .tabela tr:nth-child(even) td { background: transparent; }
+:root[data-tema="papel"] .tabela select, :root[data-tema="papel"] .tabela input { min-height: 28px; background: #f3e3bd55; }
+:root[data-tema="papel"] .rolavel .d { border: 2px solid #1c130c; border-radius: 0; background: #f3e3bd88; }
+:root[data-tema="papel"] .rolavel:hover .d { background: #1c130c; color: #f3e6c8; }
+:root[data-tema="papel"] .condicoes button { border: 2px solid #1c130c; border-radius: 0; color: #1c130c; }
+:root[data-tema="papel"] .condicoes button[aria-pressed="true"] { background: #1c130c; color: #f3e6c8; }
+:root[data-tema="papel"] .modal { background: radial-gradient(ellipse at center, #f0dfb6, #d9bb83); border: 3px solid #111; border-radius: 0; color: #1c130c; }
+:root[data-tema="papel"] .historico { background: #e9d6ab; border: 3px solid #111; border-radius: 0; }
+:root[data-tema="papel"] .aviso { background: #111; color: #f3e6c8; border-left-color: #8e1b12; }
+:root[data-tema="papel"] .resultado-grande .total { color: #1c130c; text-shadow: none; font-family: var(--fonte-mao); }
+:root[data-tema="papel"] .passos button { color: #c9b28a; }
+:root[data-tema="papel"] .passos button[aria-current="step"] { color: #f3e6c8; border-color: #f3e6c8; }
+:root[data-tema="papel"] .pagina > .titulo-secao > .apagado, :root[data-tema="papel"] .pagina > .apagado, :root[data-tema="papel"] .pagina > .linha .apagado { color: #c9b28a; }
+:root[data-tema="papel"] .pagina > .titulo-secao h1:not(.faixa) { color: #ead7ad; }
+:root[data-tema="papel"] .contador { color: #7a4e12; }
+/* SÍMBOLO DOS ATRIBUTOS no papel: círculos de tinta ligados e a mancha "ATRIBUTOS" no centro */
+:root[data-tema="papel"] .pentagrama .fundo { display: none; }
+:root[data-tema="papel"] .pentagrama .simbolo { display: block; position: absolute; inset: 0; background: #111; -webkit-mask: url(assets/simbolo-atributos.svg) center / 100% 100% no-repeat; mask: url(assets/simbolo-atributos.svg) center / 100% 100% no-repeat; }
+:root[data-tema="papel"] .pentagrama .centro-simbolo { display: block; position: absolute; left: 50%; top: 52.6%; transform: translate(-50%, -50%) rotate(-4deg); color: #f3e6c8; font: 400 1.05rem var(--fonte-mao); text-transform: uppercase; letter-spacing: .04em; pointer-events: none; }
+:root[data-tema="papel"] .atr .valor {
+  width: 72px; height: 72px; background: radial-gradient(circle at 45% 40%, #f6e6c0, #dcc08a 80%); color: #1c130c; border: 5px solid #111;
+  box-shadow: inset 0 0 10px #7a4a1a88; font: 400 2rem var(--fonte-mao);
+}
+:root[data-tema="papel"] .atr .valor:hover { box-shadow: inset 0 0 10px #7a4a1a88, 0 0 0 3px #8e1b12; }
+:root[data-tema="papel"] .atr .nome { background: none; color: #1c130c; font: 400 .95rem var(--fonte-mao); }
+:root[data-tema="papel"] .atr .nome small { color: #4a3420; font-family: var(--fonte-texto); }
+:root[data-tema="papel"] .atr .ajuste button { background: #f3e3bd; border: 2px solid #111; border-radius: 0; color: #111; }
+/* sigilos claros (Medo) continuam visíveis no papel */
+:root[data-tema="papel"] .el-medo { --el: #3d3d48; }
+@media (max-width: 640px) {
+  :root[data-tema="papel"] .atr .valor { width: 58px; height: 58px; font-size: 1.6rem; border-width: 4px; }
+  :root[data-tema="papel"] .pentagrama .centro-simbolo { font-size: .8rem; }
+}
+
+/* =====================================================================
+   EFEITOS DE SANGUE — só no tema Noite
+   ===================================================================== */
+:root:not([data-tema="papel"]) .topo::after { /* sangue escorrendo da barra do topo */
+  content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 46px; pointer-events: none;
+  background: linear-gradient(#8a0b14, #5e060c);
+  -webkit-mask: url(assets/sangue-escorrendo.svg) top / 100% 100% no-repeat; mask: url(assets/sangue-escorrendo.svg) top / 100% 100% no-repeat;
+  filter: drop-shadow(0 2px 2px #0008);
+}
+.gotas { position: absolute; left: 0; right: 0; top: 100%; height: 0; pointer-events: none; }
+.gotas i { position: absolute; top: 10px; width: 7px; height: 11px; background: #8a0b14; opacity: 0;
+  -webkit-mask: url(assets/gota.svg) center / contain no-repeat; mask: url(assets/gota.svg) center / contain no-repeat; animation: pingar 7s ease-in infinite; }
+.gotas i:nth-child(1) { left: 12%; animation-delay: 1s; }
+.gotas i:nth-child(2) { left: 47%; animation-delay: 3.6s; animation-duration: 9s; }
+.gotas i:nth-child(3) { left: 81%; animation-delay: 5.2s; animation-duration: 8s; }
+@keyframes pingar { 0%, 55% { opacity: 0; transform: translateY(0) scaleY(.6); } 60% { opacity: .95; transform: translateY(18px) scaleY(1); } 100% { opacity: 0; transform: translateY(70vh) scaleY(1.4); } }
+:root[data-tema="papel"] .gotas { display: none; }
+/* respingos nos cantos dos painéis */
+:root:not([data-tema="papel"]) .painel::before {
+  content: ''; position: absolute; width: 150px; aspect-ratio: 400 / 420; top: -34px; right: -26px; pointer-events: none; z-index: 0;
+  background: #7d0a12; opacity: .22; transform: rotate(18deg);
+  -webkit-mask: url(assets/respingo-2.svg) center / contain no-repeat; mask: url(assets/respingo-2.svg) center / contain no-repeat;
+}
+:root:not([data-tema="papel"]) .painel:nth-of-type(2n)::before { right: auto; left: -30px; top: auto; bottom: -40px; transform: rotate(-140deg); width: 120px; opacity: .18; }
+:root:not([data-tema="papel"]) .painel:nth-of-type(3n)::before { -webkit-mask-image: url(assets/respingo.svg); mask-image: url(assets/respingo.svg); width: 100px; opacity: .16; }
+:root:not([data-tema="papel"]) .painel { overflow: hidden; }
+:root:not([data-tema="papel"]) .painel > * { position: relative; z-index: 1; }
+/* títulos de pincel vermelho pingam */
+:root:not([data-tema="papel"]) .faixa.sangue::after {
+  content: ''; position: absolute; left: 8%; right: 20%; top: 88%; height: 26px; background: var(--sangue); z-index: -1;
+  -webkit-mask: url(assets/sangue-escorrendo.svg) top / 100% 100% no-repeat; mask: url(assets/sangue-escorrendo.svg) top / 100% 100% no-repeat;
+}
+/* barra de PV parece sangue */
+:root:not([data-tema="papel"]) .recurso[style*="--pv"] .barra b { background: linear-gradient(90deg, #5e060c, #c8141f 60%, #e0303c); }
+/* levou dano: a tela pisca vermelho nas bordas */
+body.levou-dano #app::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 80; box-shadow: inset 0 0 120px 40px #b3121fcc; animation: sumir .7s ease-out forwards; }
+@keyframes sumir { from { opacity: 1; } to { opacity: 0; } }
+/* crítico: respingo de sangue atrás do resultado */
+.respingo-critico { position: absolute; left: 50%; top: 42%; width: 260px; aspect-ratio: 400 / 420; transform: translate(-50%, -50%) scale(.2) rotate(-20deg); background: #b3121f; opacity: 0; pointer-events: none;
+  -webkit-mask: url(assets/respingo.svg) center / contain no-repeat; mask: url(assets/respingo.svg) center / contain no-repeat; animation: splash .45s cubic-bezier(.2, 1.6, .4, 1) forwards; }
+@keyframes splash { to { opacity: .35; transform: translate(-50%, -50%) scale(1) rotate(-20deg); } }
+.resultado-grande { position: relative; isolation: isolate; }
+.resultado-grande > *:not(.respingo-critico) { position: relative; z-index: 1; }
+:root[data-tema="papel"] .respingo-critico { background: #8e1b12; }
+@media (prefers-reduced-motion: reduce) {
+  .gotas i { animation: none; display: none; }
+  .respingo-critico { animation: none; opacity: .3; transform: translate(-50%, -50%) rotate(-20deg); }
+  body.levou-dano #app::after { animation: none; display: none; }
+}
+
+/* Ações rápidas e efeitos ativos */
+.acoes-rapidas { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+.acao-rapida { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border: 1px solid var(--linha); border-radius: var(--raio); background: #00000026; }
+:root[data-tema="papel"] .acao-rapida { border: 2px solid #1c130c; border-radius: 0; background: #f3e3bd55; }
+.acao-rapida .btn { align-self: flex-start; }
+.hab .meta .usar { margin-left: 4px; }
+.efeitos-ativos .efeito { padding: 6px 0; border-bottom: 1px dashed var(--linha); }
+.efeitos-ativos .efeito:last-of-type { border-bottom: 0; }

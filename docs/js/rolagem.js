@@ -1,9 +1,9 @@
 // rolagem.js — rolar testes, ataques e dano; mostrar o resultado; guardar o histórico.
 // Os dados 3D (do Arcana) só MOSTRAM um resultado já sorteado: a animação não decide nada.
-import { rolarTeste, rolar, comSinal } from './dados.js?v=0.1';
-import { animateDice, diceAnimationsEnabled, setDiceAnimations } from './dice3d.js?v=0.1';
-import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.1';
-import { esc, avisar } from './util.js?v=0.1';
+import { rolarTeste, rolar, comSinal } from './dados.js?v=0.3';
+import { animateDice, diceAnimationsEnabled, setDiceAnimations } from './dice3d.js?v=0.3';
+import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.3';
+import { esc, avisar } from './util.js?v=0.3';
 
 let historico = carregarRolagens();
 // modificadores da PRÓXIMA rolagem (bandeja): dados a mais/menos e bônus fixo
@@ -94,7 +94,7 @@ function mostrarResultado(item) {
   let corpo;
   if (item.valores) {
     const [classe, texto] = vereditoTexto(item);
-    corpo = `<div class="resultado-grande"><div class="total">${item.total}</div>
+    corpo = `<div class="resultado-grande">${item.critico ? '<span class="respingo-critico" aria-hidden="true"></span>' : ''}<div class="total">${item.total}</div>
       <div class="dados-d20" aria-label="Dados rolados">${htmlDadosD20(item)} ${item.bonus ? `<b>${comSinal(item.bonus)}</b>` : ''}</div>
       <p class="apagado dossie-txt" style="margin-top:6px">${item.pior ? 'Atributo 0: fica com o PIOR dado.' : `${item.valores.length}d20, fica com o MELHOR.`}${item.tipo === 'ataque' ? ` Crítico em ${item.margem}+ (×${item.mult}).` : ''}</p>
       ${texto ? `<div class="veredito ${classe}">${texto}</div>` : ''}</div>`;

@@ -1,8 +1,8 @@
 // criador.js — criação de agente em passos.
 // PASSO 0 (pedido do projeto): escolher as regras ANTES de criar a ficha — Regras Padrão ou Sobrevivendo ao Horror.
-import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.1';
-import { novaFicha, normalizar, derivar } from './regras.js?v=0.1';
-import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.1';
+import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.3';
+import { novaFicha, normalizar, derivar } from './regras.js?v=0.3';
+import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.3';
 
 export const PASSOS = [
   ['modo', 'Regras'], ['conceito', 'Conceito'], ['classe', 'Classe'], ['atributos', 'Atributos'], ['origem', 'Origem'], ['pericias', 'Perícias'], ['revisao', 'Revisão'],
@@ -125,19 +125,20 @@ function passoAtributos(r) {
 }
 
 export function pentagramaAtributos(at, editavel, rolavel = false) {
-  // 5 posições em círculo (como nas fichas de Ordem), sobre o círculo ritual
-  const pos = { agi: [50, 9], for: [89, 38], int: [74, 86], pre: [26, 86], vig: [11, 38] };
-  return `<div class="pentagrama"><div class="fundo" aria-hidden="true"></div>
-  ${ATRIBUTOS.map(a => `<div class="atr" style="left:${pos[a.id][0]}%;top:${pos[a.id][1]}%">
+  // 5 círculos ligados (AGI em cima, INT à direita, VIG e PRE embaixo, FOR à esquerda).
+  // Tema Noite: sobre o círculo ritual. Tema Papel: ligados por traços de tinta, com a mancha "ATRIBUTOS" no meio.
+  const pos = { agi: [50, 13.7], int: [84.5, 40], vig: [71.5, 83.7], pre: [28.5, 83.7], for: [15.5, 40] };
+  return `<div class="pentagrama"><div class="fundo" aria-hidden="true"></div><div class="simbolo" aria-hidden="true"></div><span class="centro-simbolo" aria-hidden="true">Atributos</span>
+  ${ATRIBUTOS.map(a => `<div class="atr atr-${a.id}" style="left:${pos[a.id][0]}%;top:${pos[a.id][1]}%">
+    <span class="nome">${a.sigla}<small>${a.nome}</small></span>
     ${rolavel ? `<button class="valor" data-acao="rolar-atributo" data-atr="${a.id}" title="Rolar ${a.nome}" aria-label="Rolar ${a.nome}: ${at[a.id]}">${at[a.id]}</button>` : `<div class="valor" aria-label="${a.nome}: ${at[a.id]}">${at[a.id]}</div>`}
-    <span class="nome">${a.sigla}</span>
     ${editavel ? `<span class="ajuste"><button data-acao="cri-atr" data-atr="${a.id}" data-d="-1" aria-label="Diminuir ${a.nome}">−</button><button data-acao="cri-atr" data-atr="${a.id}" data-d="1" aria-label="Aumentar ${a.nome}">+</button></span>` : ''}
   </div>`).join('')}</div>`;
 }
 
 function passoOrigem(r) {
   const f = r.ficha;
-  const lista = ORIGENS.filter(o => (o.fonte !== 'SaH' || r.modo === 'sah') && (!r.filtro || semAcento(o.nome + ' ' + o.poder).includes(semAcento(r.filtro))));
+  const lista = ORIGENS.filter(o => (o.fonte !== 'SaH' || r.modo === 'sah') && (!r.filtro || semAcento(o.nome + ' ' + o.poder).includes(semAcento(r.filtro)))).sort((a, b) => a.nome.localeCompare(b.nome, 'pt'));
   const o = ORIGEM[f.origem];
   const escolhaLivre = o ? o.pericias.map((p, i) => p === '*' ? `<label class="campo"><span>Perícia da origem ${i + 1}</span><select data-cri-origem-livre="${i}"><option value="">Escolha…</option>${PERICIAS.map(x => `<option value="${x.id}" ${r.origemLivres[i] === x.id ? 'selected' : ''}>${x.nome}</option>`).join('')}</select></label>` : '').join('') : '';
   return `<div class="linha" style="margin-bottom:10px"><input class="filtro" type="search" placeholder="Procurar origem…" data-cri-filtro id="cri-filtro" value="${esc(r.filtro)}" aria-label="Procurar origem"><span class="apagado">${lista.length} origens</span></div>
