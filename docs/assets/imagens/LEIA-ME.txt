@@ -1,0 +1,14 @@
+IMAGENS OPCIONAIS DO SITE
+=========================
+Coloque aqui suas imagens (JPG). Se o arquivo existir, aparece no site; se não existir, o espaço some.
+
+  capa.jpg                      -> tela inicial
+  classe-combatente.jpg         -> cartão da classe no criador
+  classe-especialista.jpg
+  classe-ocultista.jpg
+  classe-sobrevivente.jpg
+  origem-<id>.jpg               -> cartão da origem (ex.: origem-academico.jpg, origem-legista.jpg)
+                                   (os ids estão em js/catalogo.js, lista ORIGENS)
+
+Dicas: largura de 600 a 900 px, até ~150 KB cada. Lembre que o site no GitHub Pages é público:
+use imagens que você tem direito de publicar.
