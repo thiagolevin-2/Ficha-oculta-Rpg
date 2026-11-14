@@ -1,15 +1,15 @@
 // criador.js — criação de agente em passos.
 // PASSO 0 (pedido do projeto): escolher as regras ANTES de criar a ficha — Regras Padrão ou Sobrevivendo ao Horror.
-import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.3';
-import { novaFicha, normalizar, derivar } from './regras.js?v=0.3';
-import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.3';
+import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.5';
+import { novaFicha, normalizar, derivar } from './regras.js?v=0.5';
+import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.5';
 
 export const PASSOS = [
   ['modo', 'Regras'], ['conceito', 'Conceito'], ['classe', 'Classe'], ['atributos', 'Atributos'], ['origem', 'Origem'], ['pericias', 'Perícias'], ['revisao', 'Revisão'],
 ];
 
 export function novoRascunho() {
-  return { passo: 0, modo: '', opcionais: { determinacao: false, nivelExp: false, patentes: false, ferimentos: false }, ficha: novaFicha('padrao'), fixas: {}, livres: [], origemLivres: ['', ''], filtro: '' };
+  return { passo: 0, modo: '', opcionais: { determinacao: false, nivelExp: false, patentes: false, ferimentos: false, progressaoNex: false }, ficha: novaFicha('padrao'), fixas: {}, livres: [], origemLivres: ['', ''], filtro: '' };
 }
 
 const fonteTag = f => f === 'SaH' ? '<span class="etiqueta sah">SaH</span>' : '<span class="etiqueta lr">Livro</span>';
@@ -125,15 +125,17 @@ function passoAtributos(r) {
 }
 
 export function pentagramaAtributos(at, editavel, rolavel = false) {
-  // 5 círculos ligados (AGI em cima, INT à direita, VIG e PRE embaixo, FOR à esquerda).
-  // Tema Noite: sobre o círculo ritual. Tema Papel: ligados por traços de tinta, com a mancha "ATRIBUTOS" no meio.
-  const pos = { agi: [50, 13.7], int: [84.5, 40], vig: [71.5, 83.7], pre: [28.5, 83.7], for: [15.5, 40] };
-  return `<div class="pentagrama"><div class="fundo" aria-hidden="true"></div><div class="simbolo" aria-hidden="true"></div><span class="centro-simbolo" aria-hidden="true">Atributos</span>
-  ${ATRIBUTOS.map(a => `<div class="atr atr-${a.id}" style="left:${pos[a.id][0]}%;top:${pos[a.id][1]}%">
-    <span class="nome">${a.sigla}<small>${a.nome}</small></span>
-    ${rolavel ? `<button class="valor" data-acao="rolar-atributo" data-atr="${a.id}" title="Rolar ${a.nome}" aria-label="Rolar ${a.nome}: ${at[a.id]}">${at[a.id]}</button>` : `<div class="valor" aria-label="${a.nome}: ${at[a.id]}">${at[a.id]}</div>`}
-    ${editavel ? `<span class="ajuste"><button data-acao="cri-atr" data-atr="${a.id}" data-d="-1" aria-label="Diminuir ${a.nome}">−</button><button data-acao="cri-atr" data-atr="${a.id}" data-d="1" aria-label="Aumentar ${a.nome}">+</button></span>` : ''}
-  </div>`).join('')}</div>`;
+  // Roda dos atributos: 5 círculos de borda irregular em volta de uma engrenagem ornamentada (desenhos originais).
+  // AGI em cima, INT à direita, VIG e PRE embaixo, FOR à esquerda. O nome fica DENTRO do círculo, com o valor grande.
+  const pos = { agi: [50, 17], int: [83, 41], vig: [69.5, 80], pre: [30.5, 80], for: [17, 41] };
+  return `<div class="roda-atr"><div class="roda-engrenagem" aria-hidden="true"></div>
+  ${ATRIBUTOS.map(a => {
+    const miolo = `<span class="roda-nome">${a.nome}<b>${a.sigla}</b></span><span class="roda-valor">${at[a.id]}</span>`;
+    return `<div class="roda-item" style="left:${pos[a.id][0]}%;top:${pos[a.id][1]}%">
+      ${rolavel ? `<button class="roda-circulo" data-acao="rolar-atributo" data-atr="${a.id}" title="Rolar ${a.nome}" aria-label="Rolar ${a.nome}: ${at[a.id]}">${miolo}</button>` : `<div class="roda-circulo" aria-label="${a.nome}: ${at[a.id]}">${miolo}</div>`}
+      ${editavel ? `<span class="roda-ajuste"><button data-acao="cri-atr" data-atr="${a.id}" data-d="-1" aria-label="Diminuir ${a.nome}">−</button><button data-acao="cri-atr" data-atr="${a.id}" data-d="1" aria-label="Aumentar ${a.nome}">+</button></span>` : ''}
+    </div>`;
+  }).join('')}</div>`;
 }
 
 function passoOrigem(r) {

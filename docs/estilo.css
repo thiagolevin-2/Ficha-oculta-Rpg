@@ -4,13 +4,14 @@
 :root {
   --fundo: #0b0707;
   --fundo-2: #140c0b;
-  --painel: #1a1110;
+  --painel: #1d1412;
   --painel-2: #22161400;
   --pergaminho: #e8dcc4;
   --osso: #d9cbb0;
-  --tinta: #f1e6cf;          /* texto principal */
-  --apagado: #a8977f;        /* texto secundário */
-  --linha: #4a3530;
+  --tinta: #f4ecdc;          /* texto principal (15:1) */
+  --apagado: #c7b79e;        /* texto secundário (9:1) */
+  --sangue-texto: #ff6b6b;   /* vermelho para LETRAS (6,5:1) — o --sangue fica para fundos */
+  --linha: #5a423b;
   --linha-forte: #7a4a40;
   --sangue: #b3121f;
   --sangue-escuro: #6d0a12;
@@ -21,7 +22,7 @@
   --sombra: 0 10px 30px #000a;
   --raio: 4px;
   --fonte-titulo: 'Cinzel', 'Times New Roman', serif;
-  --fonte-texto: 'IM Fell English', Georgia, serif;
+  --fonte-texto: 'Spectral', Georgia, serif;
   --fonte-dossie: 'Special Elite', 'Courier New', monospace;
   --fonte-ui: 'Oswald', 'Arial Narrow', sans-serif;
   color-scheme: dark;
@@ -428,121 +429,137 @@ input:focus-visible + .caixa-check { outline: 2px solid var(--vela); outline-off
 .ritual .sigilo { --cor: var(--el); }
 
 /* =====================================================================
-   TEMA PAPEL — ficha de papel velho: bordas rasgadas e queimadas, faixas
-   pretas com letra branca, letra de mão e respingos de sangue.
+   TEMA PAPEL — ficha de papel amarelo, pensada para LEITURA.
+   Contraste (WCAG): texto 15,6:1 · texto secundário 8,1:1 · vermelho 7,2:1 · faixas 14,6:1.
+   Fonte do texto: Atkinson Hyperlegible (feita para legibilidade). Títulos à mão: Cabin Sketch.
    ===================================================================== */
 :root[data-tema="papel"] {
-  --fundo: #2b1d12; --painel: #e3cd9f; --pergaminho: #ead7ad; --osso: #2a1c12;
-  --tinta: #1c130c; --apagado: #6e5233; --linha: #a98a5c; --linha-forte: #4a3420;
-  --sangue: #8e1b12; --sangue-escuro: #5e0f09; --vela: #7a4e12; --san: #2f4a8a; --pd: #5b2a86; --pv: #8e1b12; --pe: #7a4e12;
-  --ok: #2f6b2a; --perigo: #9a1a10;
-  --sombra: 0 14px 30px #0008;
+  --fundo: #efe3c2; --painel: #fbf4de; --pergaminho: #fbf4de; --osso: #231a12;
+  --tinta: #231a12; --apagado: #5b4632; --linha: #cdb98f; --linha-forte: #3a2c1f;
+  --sangue: #9b2416; --sangue-texto: #9b2416; --sangue-escuro: #6d1a10; --vela: #7a4f0e; --san: #2c4a8f; --pd: #5b2a86; --pv: #9b2416; --pe: #7a4f0e;
+  --ok: #2e6a2a; --perigo: #9b2416; --faixa: #2a1f16; --faixa-texto: #fbf4de;
+  --sombra: 0 2px 0 #3a2c1f22, 0 6px 16px #6b4f2a1f;
   --fonte-titulo: 'Special Elite', 'Courier New', monospace;
-  --fonte-texto: 'Special Elite', 'Courier New', monospace;
+  --fonte-texto: 'Atkinson Hyperlegible', 'Verdana', sans-serif;
+  --fonte-ui: 'Atkinson Hyperlegible', 'Verdana', sans-serif;
   --fonte-mao: 'Cabin Sketch', 'Special Elite', cursive;
-  --fonte-ui: 'Special Elite', 'Courier New', monospace;
+  --fonte-dossie: 'Special Elite', 'Courier New', monospace;
 }
-:root[data-tema="papel"] body { background: radial-gradient(ellipse at 50% 0%, #4a3220, #22160d 70%); font-size: 16px; }
-:root[data-tema="papel"] body::before { background: url(assets/papel-manchas.svg) center / 700px; opacity: .25; }
-:root[data-tema="papel"] body::after { opacity: .2; }
-/* topo como uma tira de papel */
-:root[data-tema="papel"] .topo { background: #1c130c; border-bottom: 3px solid #000; }
-:root[data-tema="papel"] .marca, :root[data-tema="papel"] .topo nav a, :root[data-tema="papel"] .topo nav button { color: #ead7ad; }
-:root[data-tema="papel"] .topo nav a[aria-current="page"] { background: #ead7ad22; }
-:root[data-tema="papel"] .rodape { color: #c9b28a; }
-/* painéis = folhas de papel velho com borda rasgada e queimada */
+:root[data-tema="papel"] body { background: var(--fundo); color: var(--tinta); font-size: 17px; line-height: 1.55; }
+:root[data-tema="papel"] body::before { background: url(assets/papel-manchas.svg) center / 800px; opacity: .10; }
+:root[data-tema="papel"] body::after { opacity: .06; }
+:root[data-tema="papel"] ::placeholder { color: #8a7458; opacity: 1; }
+/* topo: tira escura com letra creme */
+:root[data-tema="papel"] .topo { background: var(--faixa); border-bottom: 3px solid #000; }
+:root[data-tema="papel"] .marca, :root[data-tema="papel"] .topo nav a, :root[data-tema="papel"] .topo nav button { color: var(--faixa-texto); }
+:root[data-tema="papel"] .marca b { color: #f0b49a; }
+:root[data-tema="papel"] .topo nav a[aria-current="page"] { background: #fbf4de26; }
+:root[data-tema="papel"] .rodape { color: var(--apagado); }
+/* folhas: papel claro, borda de tinta, leve envelhecimento só na beirada */
 :root[data-tema="papel"] .painel, :root[data-tema="papel"] .porta, :root[data-tema="papel"] .modo, :root[data-tema="papel"] .ficha-cartao, :root[data-tema="papel"] .ameaca-bloco, :root[data-tema="papel"] .vazio {
-  border: 0; border-radius: 0; color: var(--tinta);
-  background:
-    radial-gradient(circle at 12% 18%, #8e1b1222 0 2px, transparent 3px),
-    radial-gradient(ellipse at center, #f0dfb6 0%, #e2c993 55%, #c9a467 85%, #8a5f2c 100%);
-  box-shadow: inset 0 0 40px #7a4a1a99, inset 0 0 8px #4a2a0c;
-  -webkit-mask: url(assets/papel-borda.svg) center / 100% 100% no-repeat; mask: url(assets/papel-borda.svg) center / 100% 100% no-repeat;
-  filter: drop-shadow(0 8px 14px #000a);
+  background: var(--painel); color: var(--tinta); border: 2px solid var(--linha-forte); border-radius: 2px;
+  box-shadow: inset 0 0 0 4px var(--painel), inset 0 0 0 5px #cdb98f, inset 0 0 28px #c9a46a33, var(--sombra);
 }
-:root[data-tema="papel"] .painel:nth-of-type(2n), :root[data-tema="papel"] .ficha-cartao:nth-child(2n) { -webkit-mask-image: url(assets/papel-borda-2.svg); mask-image: url(assets/papel-borda-2.svg); }
-:root[data-tema="papel"] .painel::after { /* respingos de sangue e manchas */
-  inset: 0; border: 0; background: url(assets/pingos.svg) 85% 70% / 260px no-repeat, url(assets/papel-manchas.svg) center / 520px; opacity: .55; mix-blend-mode: multiply;
-}
-:root[data-tema="papel"] .painel { padding: 22px 20px; }
-:root[data-tema="papel"] .painel > * { position: relative; z-index: 1; }
-/* faixas = barras pretas com letra branca (como "habilidades", "inventário") */
-:root[data-tema="papel"] .faixa { color: #f3e6c8; font: 400 1.15rem var(--fonte-titulo); letter-spacing: .03em; text-transform: lowercase; padding: .3em .8em; margin-left: 0; }
-:root[data-tema="papel"] .faixa::before, :root[data-tema="papel"] .faixa.sangue::before { inset: 0; background: #111; -webkit-mask: none; mask: none; }
-:root[data-tema="papel"] h1.faixa { font-size: 1.6rem; }
-:root[data-tema="papel"] .titulo-vermelho { font: 400 1.5rem var(--fonte-mao); text-transform: lowercase; color: #1c130c; letter-spacing: .02em; }
-:root[data-tema="papel"] .capa h1 { font-family: var(--fonte-mao); color: #ead7ad; text-shadow: 0 3px 0 #000; letter-spacing: .06em; }
-:root[data-tema="papel"] .capa h1 b { color: #c23a2c; }
-:root[data-tema="papel"] .capa p { color: #e9d6ad; }
-:root[data-tema="papel"] .capa .circulo { background: #e9d6ad; opacity: .08; }
+:root[data-tema="papel"] .painel::after { inset: auto 6px 6px auto; width: 120px; height: 120px; border: 0; background: url(assets/pingos.svg) center / contain no-repeat; opacity: .35; }
+:root[data-tema="papel"] .painel::before { display: none; }
+:root[data-tema="papel"] .painel { padding: 20px; }
+/* faixas pretas com letra creme (como "habilidades", "inventário" da ficha de papel) */
+:root[data-tema="papel"] .faixa { color: var(--faixa-texto); font: 400 1.15rem var(--fonte-titulo); letter-spacing: .03em; text-transform: lowercase; padding: .32em .9em; margin-left: 0; }
+:root[data-tema="papel"] .faixa::before, :root[data-tema="papel"] .faixa.sangue::before { inset: 0; background: var(--faixa); -webkit-mask: none; mask: none; }
+:root[data-tema="papel"] .faixa.sangue::before { background: var(--sangue); }
+:root[data-tema="papel"] .faixa::after { display: none; }
+:root[data-tema="papel"] h1.faixa { font-size: 1.55rem; }
+:root[data-tema="papel"] .titulo-vermelho { font: 400 1.45rem var(--fonte-mao); text-transform: lowercase; color: var(--tinta); letter-spacing: .01em; border-bottom: 2px solid var(--linha-forte); display: inline-block; padding-right: 10px; }
+:root[data-tema="papel"] h2, :root[data-tema="papel"] h3 { color: var(--tinta); }
+:root[data-tema="papel"] .capa h1 { font-family: var(--fonte-mao); color: var(--tinta); text-shadow: none; letter-spacing: .05em; }
+:root[data-tema="papel"] .capa h1 b { color: var(--sangue); }
+:root[data-tema="papel"] .capa p { color: var(--apagado); }
+:root[data-tema="papel"] .capa .circulo { background: var(--tinta); opacity: .06; }
 :root[data-tema="papel"] .porta h2, :root[data-tema="papel"] .modo h2 { font-family: var(--fonte-mao); text-transform: lowercase; font-size: 1.7rem; }
-:root[data-tema="papel"] .porta p, :root[data-tema="papel"] .modo ul { color: #4a3420; }
-:root[data-tema="papel"] .modo[aria-pressed="true"] { box-shadow: inset 0 0 0 4px #111, inset 0 0 40px #7a4a1a99; }
-/* campos = caixas desenhadas a tinta; rótulos sublinhados (NOME DO PERSONAGEM) */
+:root[data-tema="papel"] .porta p, :root[data-tema="papel"] .modo ul { color: var(--apagado); }
+:root[data-tema="papel"] .porta .respingo { opacity: .18; }
+:root[data-tema="papel"] .modo[aria-pressed="true"], :root[data-tema="papel"] .porta:hover { border-color: var(--sangue); box-shadow: inset 0 0 0 3px var(--sangue), var(--sombra); }
+:root[data-tema="papel"] .modo.sah[aria-pressed="true"] { border-color: var(--pd); box-shadow: inset 0 0 0 3px var(--pd), var(--sombra); }
+/* campos: caixa clara com contorno de tinta */
 :root[data-tema="papel"] input, :root[data-tema="papel"] select, :root[data-tema="papel"] textarea {
-  background: #f3e3bd99; border: 2px solid #1c130c; border-radius: 0; color: #1c130c; font-family: var(--fonte-texto);
+  background: #fffbef; border: 1.5px solid var(--linha-forte); border-radius: 2px; color: var(--tinta); font-family: var(--fonte-texto); font-size: 16px;
 }
-:root[data-tema="papel"] textarea { background: repeating-linear-gradient(transparent 0 25px, #4a342066 25px 26px), #f3e3bd66; line-height: 26px; }
-:root[data-tema="papel"] .campo > span, :root[data-tema="papel"] .rotulo { color: #1c130c; text-decoration: underline; text-underline-offset: 3px; font-size: .7rem; }
-:root[data-tema="papel"] .btn { background: #f3e3bd; color: #1c130c; border: 2px solid #1c130c; border-radius: 0; box-shadow: 2px 2px 0 #1c130c; }
-:root[data-tema="papel"] .btn:hover { background: #fff2d0; }
-:root[data-tema="papel"] .btn.sangue { background: #1c130c; color: #f3e6c8; border-color: #1c130c; text-shadow: none; }
-:root[data-tema="papel"] .btn.fantasma { background: none; box-shadow: none; border-color: transparent; color: #4a3420; }
-:root[data-tema="papel"] .etiqueta { border: 2px solid #1c130c; color: #1c130c; border-radius: 0; background: #f3e3bd88; }
-:root[data-tema="papel"] .etiqueta.sah { border-color: #5b2a86; color: #5b2a86; }
-:root[data-tema="papel"] .etiqueta.alerta { border-color: #8e1b12; color: #8e1b12; }
-:root[data-tema="papel"] .selo { color: #8e1b12; }
-:root[data-tema="papel"] .abas { border-bottom: 3px solid #000; }
-:root[data-tema="papel"] .abas button { color: #c9b28a; }
-:root[data-tema="papel"] .abas button[aria-selected="true"] { color: #f3e6c8; background: #111; border-color: #111; }
-:root[data-tema="papel"] .ficha-cabeca h1, :root[data-tema="papel"] .ficha-cabeca h1 input { color: #ead7ad; font-family: var(--fonte-mao); text-transform: none; border-bottom-color: #ead7ad66; background: none; border-top: 0; border-left: 0; border-right: 0; }
-:root[data-tema="papel"] .ficha-cabeca .etiqueta { background: #ead7ad; }
-:root[data-tema="papel"] .retrato { border: 3px solid #111; background-color: #e3cd9f; color: #4a3420; }
-:root[data-tema="papel"] .retrato::after { box-shadow: inset 0 0 18px #7a4a1a; }
-/* recursos: rótulo preto + caixa (como PV / XP) */
-:root[data-tema="papel"] .recurso, :root[data-tema="papel"] .chave, :root[data-tema="papel"] .hab, :root[data-tema="papel"] .ritual, :root[data-tema="papel"] .cartao, :root[data-tema="papel"] .ini-linha, :root[data-tema="papel"] .caixa-ritual {
-  background: #f3e3bd55; border: 2px solid #1c130c; border-radius: 0;
+:root[data-tema="papel"] textarea { background: repeating-linear-gradient(transparent 0 25px, #cdb98f88 25px 26px), #fffbef; line-height: 26px; }
+:root[data-tema="papel"] input:focus, :root[data-tema="papel"] select:focus, :root[data-tema="papel"] textarea:focus { outline: 3px solid #e0a43a; outline-offset: 1px; }
+:root[data-tema="papel"] .campo > span, :root[data-tema="papel"] .rotulo { color: var(--tinta); font: 700 .74rem var(--fonte-ui); letter-spacing: .08em; text-transform: uppercase; }
+:root[data-tema="papel"] .btn { background: #fffbef; color: var(--tinta); border: 1.5px solid var(--linha-forte); border-radius: 2px; box-shadow: 2px 2px 0 var(--linha-forte); font: 700 .82rem var(--fonte-ui); letter-spacing: .05em; }
+:root[data-tema="papel"] .btn:hover { background: #fff3d1; }
+:root[data-tema="papel"] .btn.sangue { background: var(--faixa); color: var(--faixa-texto); border-color: var(--faixa); text-shadow: none; }
+:root[data-tema="papel"] .btn.sangue:hover { background: #3d2e21; }
+:root[data-tema="papel"] .btn.fantasma { background: none; box-shadow: none; border-color: transparent; color: var(--apagado); }
+:root[data-tema="papel"] .btn.perigo { color: var(--perigo); border-color: var(--perigo); }
+:root[data-tema="papel"] .etiqueta { border: 1.5px solid var(--linha-forte); color: var(--tinta); border-radius: 2px; background: #fffbef; font-weight: 700; }
+:root[data-tema="papel"] .etiqueta.sah { border-color: var(--pd); color: var(--pd); }
+:root[data-tema="papel"] .etiqueta.lr { border-color: var(--vela); color: var(--vela); }
+:root[data-tema="papel"] .etiqueta.alerta { border-color: var(--perigo); color: var(--perigo); }
+:root[data-tema="papel"] .selo { color: var(--sangue); }
+:root[data-tema="papel"] .abas { border-bottom: 3px solid var(--faixa); }
+:root[data-tema="papel"] .abas button { color: var(--apagado); font-weight: 700; }
+:root[data-tema="papel"] .abas button[aria-selected="true"] { color: var(--faixa-texto); background: var(--faixa); border-color: var(--faixa); }
+:root[data-tema="papel"] .passos button { color: var(--apagado); font-weight: 700; }
+:root[data-tema="papel"] .passos button[aria-current="step"] { color: var(--tinta); border-color: var(--sangue); }
+:root[data-tema="papel"] .ficha-cabeca h1, :root[data-tema="papel"] .ficha-cabeca h1 input { color: var(--tinta); font-family: var(--fonte-ui); font-weight: 700; text-transform: none; background: none; border: 0; border-bottom: 2px dashed var(--linha-forte); }
+:root[data-tema="papel"] .retrato { border: 3px solid var(--linha-forte); background-color: #fffbef; color: var(--apagado); }
+:root[data-tema="papel"] .retrato::after { box-shadow: none; }
+/* blocos internos: papel um pouco mais claro com contorno fino */
+:root[data-tema="papel"] .recurso, :root[data-tema="papel"] .chave, :root[data-tema="papel"] .hab, :root[data-tema="papel"] .ritual, :root[data-tema="papel"] .cartao, :root[data-tema="papel"] .ini-linha, :root[data-tema="papel"] .caixa-ritual, :root[data-tema="papel"] .acao-rapida, :root[data-tema="papel"] .opcional {
+  background: #fffbef; border: 1.5px solid var(--linha-forte); border-radius: 2px; color: var(--tinta);
 }
-:root[data-tema="papel"] .recurso .sigla { background: #111; color: #f3e6c8; padding: 2px 10px; }
-:root[data-tema="papel"] .barra { background: #1c130c22; border: 1px solid #1c130c; border-radius: 0; height: 10px; }
-:root[data-tema="papel"] .barra b { box-shadow: none; }
-:root[data-tema="papel"] .chave b { font-family: var(--fonte-mao); font-size: 1.9rem; }
-:root[data-tema="papel"] .cartao[aria-pressed="true"] { background: #1c130c14; box-shadow: inset 4px 0 0 #1c130c, 3px 3px 0 #1c130c; }
+:root[data-tema="papel"] .hab p, :root[data-tema="papel"] .cartao small, :root[data-tema="papel"] .caixa-ritual small { color: var(--apagado); }
 :root[data-tema="papel"] .hab { border-left-width: 6px; }
-/* tabela de perícias: lista com caixinhas (perícias //☆// níveis) */
-:root[data-tema="papel"] .tabela th { background: #111; color: #f3e6c8; font-family: var(--fonte-titulo); letter-spacing: .04em; text-transform: lowercase; font-size: .85rem; }
-:root[data-tema="papel"] .tabela td { border-bottom: 1px dashed #4a342066; text-transform: uppercase; font-size: .85rem; }
-:root[data-tema="papel"] .tabela tr:nth-child(even) td { background: transparent; }
-:root[data-tema="papel"] .tabela select, :root[data-tema="papel"] .tabela input { min-height: 28px; background: #f3e3bd55; }
-:root[data-tema="papel"] .rolavel .d { border: 2px solid #1c130c; border-radius: 0; background: #f3e3bd88; }
-:root[data-tema="papel"] .rolavel:hover .d { background: #1c130c; color: #f3e6c8; }
-:root[data-tema="papel"] .condicoes button { border: 2px solid #1c130c; border-radius: 0; color: #1c130c; }
-:root[data-tema="papel"] .condicoes button[aria-pressed="true"] { background: #1c130c; color: #f3e6c8; }
-:root[data-tema="papel"] .modal { background: radial-gradient(ellipse at center, #f0dfb6, #d9bb83); border: 3px solid #111; border-radius: 0; color: #1c130c; }
-:root[data-tema="papel"] .historico { background: #e9d6ab; border: 3px solid #111; border-radius: 0; }
-:root[data-tema="papel"] .aviso { background: #111; color: #f3e6c8; border-left-color: #8e1b12; }
-:root[data-tema="papel"] .resultado-grande .total { color: #1c130c; text-shadow: none; font-family: var(--fonte-mao); }
-:root[data-tema="papel"] .passos button { color: #c9b28a; }
-:root[data-tema="papel"] .passos button[aria-current="step"] { color: #f3e6c8; border-color: #f3e6c8; }
-:root[data-tema="papel"] .pagina > .titulo-secao > .apagado, :root[data-tema="papel"] .pagina > .apagado, :root[data-tema="papel"] .pagina > .linha .apagado { color: #c9b28a; }
-:root[data-tema="papel"] .pagina > .titulo-secao h1:not(.faixa) { color: #ead7ad; }
-:root[data-tema="papel"] .contador { color: #7a4e12; }
-/* SÍMBOLO DOS ATRIBUTOS no papel: círculos de tinta ligados e a mancha "ATRIBUTOS" no centro */
+:root[data-tema="papel"] .recurso .sigla { background: var(--faixa); color: var(--faixa-texto); padding: 2px 10px; font-weight: 700; }
+:root[data-tema="papel"] .recurso .numeros { color: var(--tinta); }
+:root[data-tema="papel"] .barra { background: #e9dcb8; border: 1px solid var(--linha-forte); border-radius: 1px; height: 10px; }
+:root[data-tema="papel"] .barra b { box-shadow: none; }
+:root[data-tema="papel"] .chave b { font-family: var(--fonte-mao); font-size: 2rem; color: var(--tinta); }
+:root[data-tema="papel"] .chave span { color: var(--apagado); font-weight: 700; }
+:root[data-tema="papel"] .cartao[aria-pressed="true"] { background: #f6e3b8; box-shadow: inset 5px 0 0 var(--sangue); border-color: var(--sangue); }
+:root[data-tema="papel"] .tabela th { background: var(--faixa); color: var(--faixa-texto); font: 700 .78rem var(--fonte-ui); letter-spacing: .06em; text-transform: uppercase; }
+:root[data-tema="papel"] .tabela td { border-bottom: 1px solid #cdb98f; font-size: .95rem; }
+:root[data-tema="papel"] .tabela tr:nth-child(even) td { background: #f6ecd0; }
+:root[data-tema="papel"] .pericia-bloq { opacity: .6; }
+:root[data-tema="papel"] .rolavel .d { border: 1.5px solid var(--linha-forte); border-radius: 2px; background: #fffbef; font-weight: 700; color: var(--tinta); }
+:root[data-tema="papel"] .rolavel:hover .d { background: var(--faixa); color: var(--faixa-texto); }
+:root[data-tema="papel"] .condicoes button { border: 1.5px solid var(--linha-forte); border-radius: 2px; color: var(--tinta); font-weight: 700; }
+:root[data-tema="papel"] .condicoes button[aria-pressed="true"] { background: var(--sangue); color: #fff; border-color: var(--sangue); }
+:root[data-tema="papel"] .progressao li .n { color: var(--vela); }
+:root[data-tema="papel"] .progressao li.atingido { background: #f3e2b6; }
+:root[data-tema="papel"] .progressao li:not(.atingido) { color: #7a6650; }
+:root[data-tema="papel"] .modal { background: var(--painel); border: 3px solid var(--faixa); border-radius: 2px; color: var(--tinta); }
+:root[data-tema="papel"] .fundo-modal { background: #2a1f16b3; }
+:root[data-tema="papel"] .historico { background: var(--painel); border: 3px solid var(--faixa); border-radius: 2px; }
+:root[data-tema="papel"] .aviso { background: var(--faixa); color: var(--faixa-texto); border-left-color: #e05a3e; }
+:root[data-tema="papel"] .resultado-grande .total { color: var(--tinta); text-shadow: none; font-family: var(--fonte-mao); }
+:root[data-tema="papel"] .resultado-grande .dados-d20 span.escolhido { border-color: var(--sangue); background: #f6d9c9; }
+:root[data-tema="papel"] .avisos-ficha { background: #f8e3d4; border-color: var(--sangue); color: var(--tinta); }
+:root[data-tema="papel"] .contador { color: var(--vela); }
+:root[data-tema="papel"] .contador.erro { color: var(--perigo); }
+:root[data-tema="papel"] .bandeja .btn { background: #fffbef; }
+:root[data-tema="papel"] .efeitos-ativos .efeito { border-bottom-color: #cdb98f; }
+/* símbolo dos atributos: círculos de tinta ligados e a mancha "ATRIBUTOS" */
 :root[data-tema="papel"] .pentagrama .fundo { display: none; }
-:root[data-tema="papel"] .pentagrama .simbolo { display: block; position: absolute; inset: 0; background: #111; -webkit-mask: url(assets/simbolo-atributos.svg) center / 100% 100% no-repeat; mask: url(assets/simbolo-atributos.svg) center / 100% 100% no-repeat; }
-:root[data-tema="papel"] .pentagrama .centro-simbolo { display: block; position: absolute; left: 50%; top: 52.6%; transform: translate(-50%, -50%) rotate(-4deg); color: #f3e6c8; font: 400 1.05rem var(--fonte-mao); text-transform: uppercase; letter-spacing: .04em; pointer-events: none; }
-:root[data-tema="papel"] .atr .valor {
-  width: 72px; height: 72px; background: radial-gradient(circle at 45% 40%, #f6e6c0, #dcc08a 80%); color: #1c130c; border: 5px solid #111;
-  box-shadow: inset 0 0 10px #7a4a1a88; font: 400 2rem var(--fonte-mao);
-}
-:root[data-tema="papel"] .atr .valor:hover { box-shadow: inset 0 0 10px #7a4a1a88, 0 0 0 3px #8e1b12; }
-:root[data-tema="papel"] .atr .nome { background: none; color: #1c130c; font: 400 .95rem var(--fonte-mao); }
-:root[data-tema="papel"] .atr .nome small { color: #4a3420; font-family: var(--fonte-texto); }
-:root[data-tema="papel"] .atr .ajuste button { background: #f3e3bd; border: 2px solid #111; border-radius: 0; color: #111; }
-/* sigilos claros (Medo) continuam visíveis no papel */
-:root[data-tema="papel"] .el-medo { --el: #3d3d48; }
+:root[data-tema="papel"] .pentagrama .simbolo { display: block; position: absolute; inset: 0; background: var(--faixa); -webkit-mask: url(assets/simbolo-atributos.svg) center / 100% 100% no-repeat; mask: url(assets/simbolo-atributos.svg) center / 100% 100% no-repeat; }
+:root[data-tema="papel"] .pentagrama .centro-simbolo { display: block; position: absolute; left: 50%; top: 52.6%; transform: translate(-50%, -50%) rotate(-4deg); color: var(--faixa-texto); font: 400 1.05rem var(--fonte-mao); text-transform: uppercase; pointer-events: none; }
+:root[data-tema="papel"] .atr .valor { width: 72px; height: 72px; background: #fffbef; color: var(--tinta); border: 5px solid var(--faixa); box-shadow: none; font: 400 2.1rem var(--fonte-mao); }
+:root[data-tema="papel"] .atr .valor:hover { box-shadow: 0 0 0 3px var(--sangue); }
+:root[data-tema="papel"] .atr .nome { background: var(--painel); color: var(--tinta); font: 700 .9rem var(--fonte-ui); padding: 0 4px; }
+:root[data-tema="papel"] .atr .nome small { color: var(--apagado); font-weight: 700; }
+:root[data-tema="papel"] .atr .ajuste button { background: #fffbef; border: 1.5px solid var(--faixa); border-radius: 2px; color: var(--tinta); }
+/* elementos legíveis no papel */
+:root[data-tema="papel"] .el-medo { --el: #3d3d48; --el-fundo: #3d3d4814; }
+:root[data-tema="papel"] .el-morte { --el: #2f2f2f; --el-fundo: #2f2f2f12; }
+:root[data-tema="papel"] .el-conhecimento { --el: #8a6200; --el-fundo: #c9971c1f; }
+:root[data-tema="papel"] .el-energia { --el: #6a2bb0; --el-fundo: #7b2cbf14; }
+:root[data-tema="papel"] .el-sangue { --el: #9b2416; --el-fundo: #9b241614; }
+:root[data-tema="papel"] .caixa-ritual.marcada { background: var(--el-fundo); box-shadow: 0 0 0 2px var(--el); }
+:root[data-tema="papel"] .caixa-check { background: #fffbef; }
 @media (max-width: 640px) {
-  :root[data-tema="papel"] .atr .valor { width: 58px; height: 58px; font-size: 1.6rem; border-width: 4px; }
+  :root[data-tema="papel"] .atr .valor { width: 58px; height: 58px; font-size: 1.7rem; border-width: 4px; }
   :root[data-tema="papel"] .pentagrama .centro-simbolo { font-size: .8rem; }
 }
 
@@ -604,3 +621,66 @@ body.levou-dano #app::after { content: ''; position: fixed; inset: 0; pointer-ev
 .hab .meta .usar { margin-left: 4px; }
 .efeitos-ativos .efeito { padding: 6px 0; border-bottom: 1px dashed var(--linha); }
 .efeitos-ativos .efeito:last-of-type { border-bottom: 0; }
+
+/* =====================================================================
+   NOITE — ajustes de legibilidade (mesmo visual, mais contraste)
+   ===================================================================== */
+:root:not([data-tema="papel"]) body { line-height: 1.6; }
+:root:not([data-tema="papel"]) body::after { opacity: .07; }
+:root:not([data-tema="papel"]) ::placeholder { color: #9c8a72; opacity: 1; }
+:root:not([data-tema="papel"]) .titulo-vermelho, :root:not([data-tema="papel"]) .aviso-circulo, :root:not([data-tema="papel"]) .selo,
+:root:not([data-tema="papel"]) .etiqueta.alerta, :root:not([data-tema="papel"]) .veredito.falha, :root:not([data-tema="papel"]) .contador.erro,
+:root:not([data-tema="papel"]) .porta .num, :root:not([data-tema="papel"]) .marca b, :root:not([data-tema="papel"]) .pagina a:not(.btn):not(.porta):not(.ficha-cartao), :root:not([data-tema="papel"]) .ameaca-bloco .linha-stat b,
+:root:not([data-tema="papel"]) .dice3d-brand { color: var(--sangue-texto); }
+:root:not([data-tema="papel"]) .btn.perigo { color: var(--sangue-texto); border-color: #b3121f; }
+:root:not([data-tema="papel"]) .rolavel:hover { color: var(--sangue-texto); }
+:root:not([data-tema="papel"]) .resultado-grande .total { color: #ff4f59; }
+:root:not([data-tema="papel"]) .campo > span, :root:not([data-tema="papel"]) .rotulo { color: #d6c7ad; font-size: .76rem; }
+:root:not([data-tema="papel"]) .atr .nome small { color: #c7b79e; font-size: .56rem; }
+:root:not([data-tema="papel"]) input, :root:not([data-tema="papel"]) select, :root:not([data-tema="papel"]) textarea { background: #0b0606cc; border-color: #6a4d44; }
+:root:not([data-tema="papel"]) .hab p { color: #e6dac4; }
+:root:not([data-tema="papel"]) .tabela td { border-bottom-color: #3f2c27; }
+:root:not([data-tema="papel"]) .pericia-bloq { opacity: .6; }
+:root:not([data-tema="papel"]) .painel::before { opacity: .12; }
+:root:not([data-tema="papel"]) .painel:nth-of-type(2n)::before { opacity: .1; }
+:root:not([data-tema="papel"]) .painel:nth-of-type(3n)::before { opacity: .09; }
+:root:not([data-tema="papel"]) .progressao li:not(.atingido) { color: #ab9b84; }
+:root:not([data-tema="papel"]) .etiqueta { color: #eadfca; }
+
+/* =====================================================================
+   RODA DOS ATRIBUTOS — círculos de borda irregular em volta de uma engrenagem
+   (Noite: escuro e vermelho-sangue · Papel: pergaminho, vinho e tinta preta)
+   ===================================================================== */
+.roda-atr { position: relative; width: min(400px, 100%); aspect-ratio: 1; margin: 6px auto 0; }
+.roda-engrenagem { position: absolute; left: 50%; top: 52%; width: 46%; aspect-ratio: 1; transform: translate(-50%, -50%);
+  background: #6d0a12; -webkit-mask: url(assets/engrenagem.svg) center / contain no-repeat; mask: url(assets/engrenagem.svg) center / contain no-repeat;
+  filter: drop-shadow(0 0 10px #b3121f55); animation: girar-eng 90s linear infinite; }
+@keyframes girar-eng { to { transform: translate(-50%, -50%) rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .roda-engrenagem { animation: none; } }
+.roda-item { position: absolute; width: 31%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 4px; z-index: 1; }
+.roda-circulo { position: relative; width: 100%; aspect-ratio: 1; border-radius: 50%; border: 0; padding: 0; display: grid; place-content: center; text-align: center; gap: 0; color: var(--tinta);
+  background: radial-gradient(circle at 45% 38%, #2c1513, #0d0606 72%); box-shadow: 0 6px 16px #000b, inset 0 0 14px #000; font: inherit; }
+button.roda-circulo { cursor: pointer; }
+.roda-circulo::before { /* borda irregular */
+  content: ''; position: absolute; inset: -6%; background: #c8141f; -webkit-mask: url(assets/anel-grunge.svg) center / contain no-repeat; mask: url(assets/anel-grunge.svg) center / contain no-repeat; filter: drop-shadow(0 0 6px #b3121f99); }
+button.roda-circulo:hover::before { background: #ff3b47; }
+button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offset: 6px; }
+.roda-nome { display: grid; font: 600 .62rem/1.1 var(--fonte-ui); letter-spacing: .08em; text-transform: uppercase; color: #d9cbb0; }
+.roda-nome b { font-size: .95rem; letter-spacing: .12em; color: #f4ecdc; }
+.roda-valor { font: 700 2.1rem/1 var(--fonte-titulo); color: #fff4e6; text-shadow: 0 0 12px #b3121f99; margin-top: 2px; }
+.roda-ajuste { display: flex; gap: 6px; }
+.roda-ajuste button { width: 32px; height: 28px; border: 1px solid var(--linha-forte); background: var(--painel); color: var(--tinta); border-radius: 3px; cursor: pointer; font: 700 1rem var(--fonte-ui); }
+/* Papel: pergaminho, borda vinho, engrenagem de tinta */
+:root[data-tema="papel"] .roda-engrenagem { background: #231a12; filter: none; }
+:root[data-tema="papel"] .roda-circulo { background: radial-gradient(circle at 45% 38%, #fffbef, #f3e6c4 75%); box-shadow: 0 3px 8px #6b4f2a40; color: var(--tinta); }
+:root[data-tema="papel"] .roda-circulo::before { background: #7d1f33; filter: none; }
+:root[data-tema="papel"] button.roda-circulo:hover::before { background: #9b2416; }
+:root[data-tema="papel"] .roda-nome { color: #5b4632; font-weight: 700; }
+:root[data-tema="papel"] .roda-nome b { color: #231a12; }
+:root[data-tema="papel"] .roda-valor { color: #231a12; text-shadow: none; font-family: var(--fonte-mao); font-size: 2.3rem; }
+:root[data-tema="papel"] .roda-ajuste button { background: #fffbef; border: 1.5px solid #2a1f16; border-radius: 2px; }
+@media (max-width: 640px) {
+  .roda-nome { font-size: .5rem; } .roda-nome b { font-size: .78rem; } .roda-valor { font-size: 1.6rem; }
+  :root[data-tema="papel"] .roda-valor { font-size: 1.8rem; }
+  .roda-ajuste button { width: 28px; height: 26px; }
+}

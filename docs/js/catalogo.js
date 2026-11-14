@@ -16,6 +16,7 @@ export const OPCIONAIS = {
   determinacao: { nome: 'Jogando sem Sanidade (Determinação)', pagina: 'SaH p. 104', resumo: 'PE e Sanidade viram uma só reserva: Pontos de Determinação (PD). Dano mental e custos saem dos PD.' },
   nivelExp: { nome: 'NEX & Nível de Experiência', pagina: 'SaH p. 98', resumo: 'A evolução da classe passa a ser por nível (1 a 20). O NEX vira só a exposição ao paranormal e começa em 0%.' },
   patentes: { nome: 'Evolução por Patentes', pagina: 'SaH p. 108', resumo: 'Em vez de 20 níveis, o agente sobe por 5 patentes. Fichas mais leves e agentes menos poderosos. Exige Determinação.' },
+  progressaoNex: { nome: 'Progressão de NEX', pagina: 'SaH p. 99', resumo: 'A exposição muda o agente: em NEX 25/35/50% e nas faixas 60/75/90% do elemento escolhido ele ganha poderes e penalidades. Desligada, o NEX só é anotado.' },
   ferimentos: { nome: 'Ferimentos Debilitantes', pagina: 'SaH p. 105', resumo: 'Falhar contra dano massivo causa um ferimento num atributo (–1 dado nos testes dele) em vez de cair a 0 PV.' },
 };
 
@@ -316,7 +317,7 @@ export const TRILHAS = [
     [8, 'Ser Maldito', 'A transformação avança: novos benefícios ligados ao elemento.'],
     [13, 'Ser Assustador', 'A transformação avança ainda mais.'],
     [20, 'Ser Aterrorizante', 'Transformação completa. Agentes que chegam aqui costumam perder o controle.'],
-  ], 'SaH', { aviso: 'Usa a Progressão de NEX (Sobrevivendo ao Horror, p. 98–102), mesmo sem a regra opcional. Detalhes de cada elemento: livro Sobrevivendo ao Horror, p. 17–21.' }),
+  ], 'SaH', { aviso: 'O livro indica usar a Progressão de NEX nesta trilha (Sobrevivendo ao Horror, p. 98–102): ligue a regra opcional na aba Notas. Detalhes de cada elemento: livro Sobrevivendo ao Horror, p. 17–21.' }),
   // Especialista (LR)
   T('atirador', 'Atirador de Elite', 'especialista', [
     [2, 'Mira de Elite', 'Proficiência com armas de fogo de balas longas e soma o Intelecto no dano delas.'],

@@ -4,7 +4,7 @@ import {
   ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS,
   PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES,
   ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA,
-} from './catalogo.js?v=0.3';
+} from './catalogo.js?v=0.5';
 
 export const VERSAO_FICHA = 1;
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
@@ -35,8 +35,8 @@ export function normalizar(f) {
   const modo = f.modo === 'sah' ? 'sah' : 'padrao';
   const o = f.opcionais || {};
   const opcionais = modo === 'sah' ? {
-    determinacao: !!o.determinacao || !!o.patentes, nivelExp: !!o.nivelExp && !o.patentes, patentes: !!o.patentes, ferimentos: !!o.ferimentos,
-  } : { determinacao: false, nivelExp: false, patentes: false, ferimentos: false };
+    determinacao: !!o.determinacao || !!o.patentes, nivelExp: !!o.nivelExp && !o.patentes, patentes: !!o.patentes, ferimentos: !!o.ferimentos, progressaoNex: !!o.progressaoNex,
+  } : { determinacao: false, nivelExp: false, patentes: false, ferimentos: false, progressaoNex: false };
   let classe = CLASSES[f.classe] ? f.classe : 'combatente';
   if (CLASSES[classe].soSah && modo !== 'sah') classe = 'combatente';
   const atributos = {};
@@ -58,6 +58,9 @@ export function normalizar(f) {
     nex: NEX.includes(Number(f.nex)) ? Number(f.nex) : 5,
     nivel: int(f.nivel, 1, 20, 1), nexExposicao: int(f.nexExposicao, 0, 99, 0),
     estagio: int(f.estagio, 1, 5, 1), pp: int(f.pp, 0, 9999, 0),
+    patenteManual: int(f.patenteManual, 0, 5, 0),
+    limitesItens: Array.isArray(f.limitesItens) && f.limitesItens.length === 4 ? f.limitesItens.map(v => int(v, 0, 20, 0)) : null,
+    creditoManual: ['Baixo', 'Médio', 'Alto', 'Ilimitado'].includes(f.creditoManual) ? f.creditoManual : '',
     pericias, bonusPericia,
     profissao: txt(f.profissao, 40),
     poderes: lista(f.poderes, 60).map(p => ({ id: PODER[p?.id] ? p.id : 'proprio', nome: txt(p?.nome, 80), resumo: txt(p?.resumo, 1000), escolha: txt(p?.escolha, 60), via: txt(p?.via, 60), uid: txt(p?.uid, 60) || uid() }))
@@ -102,28 +105,31 @@ export const ehSobrevivente = f => f.classe === 'sobrevivente';
 // NEX separado da experiência (só vale como EXPOSIÇÃO): regras NEX & Experiência, Patentes e o Sobrevivente
 export const nexSeparado = f => f.modo === 'sah' && (!!f.opcionais?.nivelExp || !!f.opcionais?.patentes || f.classe === 'sobrevivente');
 // valor de NEX (exposição) da ficha
+// Patente: o jogador pode escolher à mão (patenteManual 1–5) ou deixar pelos pontos de prestígio
+export const patenteDaFicha = f => (f.patenteManual ? PATENTES[f.patenteManual - 1] : patenteDosPP(f.pp));
 export const nexDaFicha = f => (nexSeparado(f) ? f.nexExposicao : f.nex);
 // Progressão de NEX do SaH vale com NEX separado e na trilha Monstruoso
-export const usaProgressaoNex = f => f.modo === 'sah' && (nexSeparado(f) || f.trilha === 'monstruoso');
+// Agora é OPCIONAL: só vale com a caixinha "Progressão de NEX" ligada
+export const usaProgressaoNex = f => f.modo === 'sah' && !!f.opcionais?.progressaoNex;
 export const poderesDisponiveis = f => PODERES.filter(p => p.fonte !== 'SaH' || f.modo === 'sah');
 
 // nível de progressão: 1..20 (ou 1..5 para estágio/patente)
 export function nivelProgressao(f) {
   if (ehSobrevivente(f)) return f.estagio;
-  if (temOpcional(f, 'patentes')) return patenteDosPP(f.pp).n;
+  if (temOpcional(f, 'patentes')) return patenteDaFicha(f).n;
   if (temOpcional(f, 'nivelExp')) return f.nivel;
   return nivelDoNex(f.nex);
 }
 // "nível equivalente" (1..20) para pré-requisitos e bônus "por 5% de NEX"
 export function nivelEquivalente(f) {
   if (ehSobrevivente(f)) return 0;
-  if (temOpcional(f, 'patentes')) return patenteDosPP(f.pp).limitePd;
+  if (temOpcional(f, 'patentes')) return patenteDaFicha(f).limitePd;
   if (temOpcional(f, 'nivelExp')) return f.nivel;
   return nivelDoNex(f.nex);
 }
 export function textoNivel(f) {
   if (ehSobrevivente(f)) return `Estágio ${f.estagio}${f.modo === 'sah' ? ` · NEX ${f.nexExposicao}%` : ''}`;
-  if (temOpcional(f, 'patentes')) return `${patenteDosPP(f.pp).nome} · NEX ${f.nexExposicao}%`;
+  if (temOpcional(f, 'patentes')) return `${patenteDaFicha(f).nome} · NEX ${f.nexExposicao}%`;
   if (temOpcional(f, 'nivelExp')) return `Nível ${f.nivel} · NEX ${f.nexExposicao}%`;
   return `NEX ${f.nex}%`;
 }
@@ -144,7 +150,7 @@ function efeitosAtivos(f, nivel) {
 // a habilidade de trilha "nivel" (2, 8, 13, 20 — ou 2/4 do Sobrevivente) já foi alcançada?
 export function trilhaLiberada(f, nivelHab) {
   if (ehSobrevivente(f)) return f.estagio >= nivelHab;
-  if (temOpcional(f, 'patentes')) { const p = patenteDosPP(f.pp).n; return (nivelHab === 2 && p >= 3) || (nivelHab === 8 && p >= 4) || (nivelHab >= 13 && p >= 5); }
+  if (temOpcional(f, 'patentes')) { const p = patenteDaFicha(f).n; return (nivelHab === 2 && p >= 3) || (nivelHab === 8 && p >= 4) || (nivelHab >= 13 && p >= 5); }
   return nivelProgressao(f) >= nivelHab;
 }
 
@@ -222,7 +228,7 @@ export function derivar(f) {
   }
 
   // --- limite de PE por turno ---
-  let limitePE = ehSobrevivente(f) ? 1 : patentes ? patenteDosPP(f.pp).limitePd : n;
+  let limitePE = ehSobrevivente(f) ? 1 : patentes ? patenteDaFicha(f).limitePd : n;
   const limiteRitual = limitePE + (f.trilha === 'intuitivo' && trilhaLiberada(f, 8) ? at.pre : 0);
 
   // --- condições: dados a menos ---
@@ -396,7 +402,8 @@ export function derivar(f) {
   });
 
   // --- patente e itens por categoria ---
-  const patente = patenteDosPP(f.pp);
+  const patBase = patenteDaFicha(f);
+  const patente = { ...patBase, itens: f.limitesItens || patBase.itens, credito: f.creditoManual || patBase.credito, itensEditados: !!f.limitesItens, creditoEditado: !!f.creditoManual };
   const usoCategoria = [0, 0, 0, 0, 0];
   for (const a of ataques) if (!a.automatica) usoCategoria[a.categoriaEfetiva]++;
   for (const p of f.protecoes) usoCategoria[p.categoria]++;

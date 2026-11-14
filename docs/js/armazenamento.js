@@ -1,6 +1,6 @@
 // armazenamento.js — salva tudo no navegador (localStorage). Sem servidor, sem login.
 // Chaves: fichaoculta-fichas (agentes), fichaoculta-mestre (Área do Mestre), fichaoculta-tema, fichaoculta-rolagens.
-import { normalizar } from './regras.js?v=0.3';
+import { normalizar } from './regras.js?v=0.5';
 
 const CHAVE_FICHAS = 'fichaoculta-fichas';
 const ler = (k, padrao) => { try { const v = localStorage.getItem(k); return v == null ? padrao : JSON.parse(v); } catch { return padrao; } };

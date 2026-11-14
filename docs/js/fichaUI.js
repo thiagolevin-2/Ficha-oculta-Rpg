@@ -2,12 +2,12 @@
 import {
   MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS,
   ARMAS, PROTECOES, ITENS_GERAIS, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL,
-} from './catalogo.js?v=0.3';
-import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.3';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.3';
-import { pentagramaAtributos } from './criador.js?v=0.3';
-import { textoTeste, d, rolar } from './dados.js?v=0.3';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.3';
+} from './catalogo.js?v=0.5';
+import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.5';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.5';
+import { pentagramaAtributos } from './criador.js?v=0.5';
+import { textoTeste, d, rolar } from './dados.js?v=0.5';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.5';
 
 export const ABAS = [['agente', 'Agente'], ['combate', 'Combate'], ['habilidades', 'Habilidades'], ['rituais', 'Rituais'], ['inventario', 'Inventário'], ['notas', 'Notas']];
 const ELEM = Object.fromEntries(ELEMENTOS.map(e => [e.id, e]));
@@ -74,7 +74,7 @@ function abaAgente(f, d) {
     : temOpcional(f, 'patentes') ? `<label class="campo"><span>Prestígio (PP)</span><input type="number" min="0" data-campo="pp" data-tipo="int" id="f-pp" value="${f.pp}"></label>${campoNexExposicao}`
       : temOpcional(f, 'nivelExp') ? `<label class="campo"><span>Nível</span><select data-campo="nivel" data-tipo="int">${Array.from({ length: 20 }, (_, i) => `<option value="${i + 1}" ${f.nivel === i + 1 ? 'selected' : ''}>${i + 1}</option>`).join('')}</select></label>${campoNexExposicao}`
         : `<label class="campo"><span>NEX</span><select data-campo="nex" data-tipo="int">${NEX.map(n => `<option value="${n}" ${f.nex === n ? 'selected' : ''}>${n}%</option>`).join('')}</select></label>`;
-  const botoesExposicao = nexSeparado(f) ? `<div class="linha" style="margin-top:8px"><span class="rotulo">Exposição ao paranormal:</span>${EXPOSICOES.map(e => `<button class="btn pequeno" data-acao="exposicao" data-nex="${e.nex}" title="${esc(e.resumo)}">${esc(e.nome)} +${e.nex}%</button>`).join('')}</div><p class="apagado" style="font-size:.85rem;margin-top:4px">O NEX aqui mede só a exposição (máximo 99%). Aprender um ritual soma o círculo dele no NEX. A Progressão de NEX está na aba Habilidades.</p>` : '';
+  const botoesExposicao = nexSeparado(f) ? `<div class="linha" style="margin-top:8px"><span class="rotulo">Exposição ao paranormal:</span>${EXPOSICOES.map(e => `<button class="btn pequeno" data-acao="exposicao" data-nex="${e.nex}" title="${esc(e.resumo)}">${esc(e.nome)} +${e.nex}%</button>`).join('')}</div><p class="apagado" style="font-size:.85rem;margin-top:4px">O NEX aqui mede só a exposição (máximo 99%). Aprender um ritual soma o círculo dele no NEX. ${f.opcionais.progressaoNex ? 'A Progressão de NEX está na aba Habilidades.' : 'A Progressão de NEX (regra opcional) está desligada: ligue na aba Notas se quiser.'}</p>` : '';
   return `${efeitos ? `<div style="margin-bottom:14px">${efeitos}</div>` : ''}<div class="grade c2">
   <section class="painel"><div class="titulo-secao"><h2 class="faixa sangue">Atributos</h2><button class="btn pequeno fantasma" data-acao="editar-atributos">Editar</button></div>
     ${pentagramaAtributos(f.atributos, false, true)}
@@ -368,7 +368,15 @@ function abaInventario(f, d) {
     <p class="apagado" style="font-size:.88rem">5 espaços por ponto de Força (Força 0: 2 espaços). Máximo absoluto: o dobro.</p>
   </section>
   <section class="painel"><h2 class="faixa">${ehSobrevivente(f) ? 'Sobrevivente' : `Patente · ${esc(d.patente.nome)}`}</h2>
-    ${lim ? `<table class="tabela"><thead><tr><th>Categoria</th><th>I</th><th>II</th><th>III</th><th>IV</th></tr></thead><tbody><tr><td>Em uso / limite</td>${[1, 2, 3, 4].map(c => `<td class="num" style="${d.usoCategoria[c] > lim[c - 1] ? 'color:var(--perigo)' : ''}">${d.usoCategoria[c]} / ${lim[c - 1]}</td>`).join('')}</tr></tbody></table><p style="margin-top:8px">Crédito: <b>${esc(d.patente.credito)}</b> · ${f.pp} PP${PATENTES[d.patente.n] ? ` (próxima: ${PATENTES[d.patente.n].nome} com ${PATENTES[d.patente.n].pp} PP)` : ''}</p>`
+    ${lim ? `<div class="grade c2" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+        <label class="campo"><span>Patente</span><select data-campo="patenteManual" data-tipo="int"><option value="0" ${!f.patenteManual ? 'selected' : ''}>Automática pelos PP (${esc(PATENTES.find(p => p.n === (PATENTES.filter(x => f.pp >= x.pp).at(-1) || PATENTES[0]).n).nome)})</option>${PATENTES.map(p => `<option value="${p.n}" ${f.patenteManual === p.n ? 'selected' : ''}>${esc(p.nome)}</option>`).join('')}</select></label>
+        <label class="campo"><span>Pontos de prestígio</span><input type="number" min="0" data-campo="pp" data-tipo="int" id="inv-pp" value="${f.pp}"></label>
+        <label class="campo"><span>Limite de crédito</span><select data-campo="creditoManual"><option value="" ${!f.creditoManual ? 'selected' : ''}>Da patente (${esc(PATENTES[d.patente.n - 1].credito)})</option>${['Baixo', 'Médio', 'Alto', 'Ilimitado'].map(c => `<option ${f.creditoManual === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label></div>
+      <table class="tabela" style="margin-top:10px"><thead><tr><th>Categoria</th><th>I</th><th>II</th><th>III</th><th>IV</th></tr></thead><tbody>
+        <tr><td>Em uso</td>${[1, 2, 3, 4].map(c => `<td class="num" style="${d.usoCategoria[c] > lim[c - 1] ? 'color:var(--perigo);font-weight:700' : ''}">${d.usoCategoria[c]}</td>`).join('')}</tr>
+        <tr><td>Pode levar</td>${[1, 2, 3, 4].map(c => `<td><input type="number" min="0" max="20" style="width:64px;min-height:30px;padding:2px 6px" data-limite-item="${c - 1}" id="lim-${c}" value="${lim[c - 1]}" aria-label="Limite de itens de categoria ${romano(c)}"></td>`).join('')}</tr></tbody></table>
+      <div class="linha" style="margin-top:8px"><small class="apagado">${d.patente.itensEditados ? 'Limites editados à mão.' : 'Limites da patente.'} Itens de categoria 0 não têm limite.</small>${d.patente.itensEditados ? '<button class="btn pequeno" data-acao="limites-padrao">Voltar ao padrão da patente</button>' : ''}</div>
+      ${!f.patenteManual && PATENTES[d.patente.n] ? `<p class="apagado" style="margin-top:6px">Próxima: ${esc(PATENTES[d.patente.n].nome)} com ${PATENTES[d.patente.n].pp} PP.</p>` : ''}`
       : '<p>Um item de categoria I e itens de categoria 0 compatíveis com a origem. Não usa patente.</p>'}
   </section></div>
   <section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa sangue">Itens</h2><div class="linha"><button class="btn pequeno" data-acao="add-item-lista">+ Da lista</button><button class="btn pequeno" data-acao="add-item">+ Item livre</button></div></div>
@@ -688,11 +696,12 @@ export function acoesFicha(ctx) {
     'condicao': el => { const ficha = f(); const id = el.dataset.id; ficha.condicoes = ficha.condicoes.includes(id) ? ficha.condicoes.filter(c => c !== id) : [...ficha.condicoes, id]; salvar(); },
     'rolar-ferimento': () => { const ficha = f(); const n = d(6); const atr = FERIMENTOS[n - 1]; if (atr) { ficha.ferimentos.push(atr); salvar(); } ctx.avisar(`1d6 = ${n}: ${atr ? 'ferimento em ' + ATRIBUTOS.find(a => a.id === atr).nome : 'ferimento superficial (nenhum atributo)'}.`); },
     'remover': el => { const ficha = f(); const lista = ficha[el.dataset.lista]; const i = Number(el.dataset.i); const nome = lista[i]?.nome || ''; if (['poderes', 'protecoes', 'habilidadesProprias', 'itens'].includes(el.dataset.lista) && nome && !confirm(`Remover "${nome}"?`)) return; lista.splice(i, 1); salvar(); },
+    'limites-padrao': () => { const ficha = f(); ficha.limitesItens = null; salvar(); },
     'exposicao': el => { const ficha = f(); const antes = ficha.nexExposicao; ficha.nexExposicao = Math.min(99, antes + Number(el.dataset.nex)); salvar(); ctx.avisar(`NEX ${antes}% → ${ficha.nexExposicao}%.`); },
     'subir-nivel': () => {
       const ficha = f();
       if (ehSobrevivente(ficha)) { if (ficha.estagio >= 5) return ctx.avisar('Estágio máximo. Se a Ordem o recrutar, crie a versão com a nova classe (Treinamento Especial).'); ficha.estagio++; }
-      else if (temOpcional(ficha, 'patentes')) { const p = PATENTES.find(x => x.pp > ficha.pp); if (!p) return ctx.avisar('Já é agente de elite.'); ficha.pp = p.pp; }
+      else if (temOpcional(ficha, 'patentes')) { if (ficha.patenteManual) { if (ficha.patenteManual >= 5) return ctx.avisar('Já é agente de elite.'); ficha.patenteManual++; } else { const p = PATENTES.find(x => x.pp > ficha.pp); if (!p) return ctx.avisar('Já é agente de elite.'); ficha.pp = p.pp; } }
       else if (temOpcional(ficha, 'nivelExp')) { if (ficha.nivel >= 20) return; ficha.nivel++; }
       else { const i = NEX.indexOf(ficha.nex); if (i >= NEX.length - 1) return ctx.avisar('NEX 99% é o máximo.'); ficha.nex = NEX[i + 1]; }
       ficha.recursos.pv = ficha.recursos.pe = ficha.recursos.san = ficha.recursos.pd = null;
