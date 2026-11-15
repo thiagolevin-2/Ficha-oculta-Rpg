@@ -761,3 +761,23 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 /* Fonte direta das descrições pendentes, sem simular confirmação de OCR */
 .fonte-sah-link{display:inline-flex;align-items:center;margin:9px 0;padding:8px 13px;border:1px solid var(--linha);border-radius:8px;color:var(--sangue-texto);font-size:.88rem;font-weight:700;text-decoration:underline;text-underline-offset:3px}
 .fonte-sah-link:hover{border-color:var(--sangue);background:var(--painel-2)}
+
+/* v0.10 · textos do OCR do Sobrevivendo ao Horror (não revisados) */
+.texto-completo.texto-ocr{border-left-style:dashed}
+.aviso-ocr{margin:6px 0 0;font-size:.82rem;color:var(--apagado);font-style:italic}
+
+/* v0.10 · pré-visualização do ritual antes de aprender */
+.previa-ritual{display:grid;gap:10px}
+.previa-ritual .cab-previa{display:flex;gap:12px;align-items:flex-start}
+.previa-ritual .cab-previa svg{flex:none;width:44px;height:44px}
+.previa-ritual .cab-previa p{margin:4px 0 0}
+.previa-ritual .cab-previa .etiqueta{margin-left:8px}
+.previa-ritual .ficha-ritual{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:0;padding:10px 12px;border:1px solid var(--linha);border-left:3px solid var(--el);border-radius:6px}
+.previa-ritual .ficha-ritual dt{font-weight:700;color:var(--apagado)}
+.previa-ritual .ficha-ritual dd{margin:0;overflow-wrap:anywhere}
+.previa-ritual .formas-previa{margin:0;padding-left:18px;display:grid;gap:4px}
+.previa-ritual .aviso-previa{margin:0;padding:8px 10px;border-radius:6px;border:1px solid var(--perigo);color:var(--perigo);font-size:.9rem}
+.previa-ritual h3{margin:6px 0 0}
+.previa-ritual .texto-completo{margin-top:0}
+/* botões "Aprender ritual" / "Cancelar" sempre visíveis, mesmo com descrição longa */
+.modal:has(.previa-ritual) footer{position:sticky;bottom:-18px;margin:16px -18px -18px;padding:12px 18px;background:var(--painel);border-top:1px solid var(--linha);z-index:1}

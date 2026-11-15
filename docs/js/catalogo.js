@@ -314,7 +314,7 @@ export const TRILHAS = [
   ], 'SaH'),
   T('monstruoso', 'Monstruoso', 'combatente', [
     [2, 'Ser Amaldiçoado', 'Treina Ocultismo (ou +2) e escolhe um elemento; um ritual diário desse elemento dá benefícios (e mudanças) no corpo.'],
-    [8, 'Ser Maldito', 'A transformação avança: novos benefícios ligados ao elemento.'],
+    [8, 'Ser Macabro', 'A transformação avança: RD da etapa ritualística sobe para 10 e a penalidade para –2 dados; novos efeitos ligados ao elemento.'],
     [13, 'Ser Assustador', 'A transformação avança ainda mais.'],
     [20, 'Ser Aterrorizante', 'Transformação completa. Agentes que chegam aqui costumam perder o controle.'],
   ], 'SaH', { aviso: 'O livro indica usar a Progressão de NEX nesta trilha (Sobrevivendo ao Horror, p. 98–102): ligue a regra opcional na aba Notas. Detalhes de cada elemento: livro Sobrevivendo ao Horror, p. 17–21.' }),

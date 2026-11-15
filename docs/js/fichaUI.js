@@ -2,19 +2,28 @@
 import {
   MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS,
   ARMAS, PROTECOES, ITENS_GERAIS, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA,
-} from './catalogo.js?v=0.10';
-import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.10';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.10';
-import { pentagramaAtributos } from './criador.js?v=0.10';
-import { textoTeste, d, rolar } from './dados.js?v=0.10';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.10';
+} from './catalogo.js?v=0.11';
+import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.11';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.11';
+import { pentagramaAtributos } from './criador.js?v=0.11';
+import { textoTeste, d, rolar } from './dados.js?v=0.11';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.11';
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.10', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.10-sah', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.11', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.11-sah', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos_sah_ocr.json?v=0.11-ocr', {cache:'no-cache'}); if (r.ok) OCR_SAH = await r.json(); } catch {}
+}
+// Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
+let OCR_SAH = { rituais: {}, habilidades: {} };
+const textoOcr = (tipo, nome) => { const o = OCR_SAH?.[tipo]?.[nome]; return o && typeof o.texto === 'string' && o.texto ? o : null; };
+function blocoOcr(o) {
+  return `<div class="texto-completo texto-ocr">${esc(o.texto)}</div>
+    <p class="aviso-ocr">Texto do OCR do <i>Sobrevivendo ao Horror</i> (PDF p. ${o.pagina}): pode ter erros de leitura e “[…]” marca trecho ilegível. Confira no livro.</p>
+    <a class="fonte-sah-link" href="#/acervo/sah/${o.pagina}">Abrir a página ${o.pagina} do livro digitalizado</a>`;
 }
 function abrirPaginaSah(tipo,nome) {
   const pagina = FONTES_SAH?.[tipo]?.[nome]?.pagina;
@@ -223,8 +232,9 @@ function hab(nome, resumo, meta = '', chave = '', f = null, trancada = false) {
   const base = String(nome).replace(/ \(.*\)$/, '');
   const usar = !trancada && dAtual ? botaoUsar(base, dAtual) : '';
   const completo = textoCompleto('habilidades', base);
+  const ocr = !completo ? textoOcr('habilidades', base) : null;
   const pendente = !completo && Object.hasOwn(TEXTOS?.habilidades || {},base);
-  return `<div class="hab ${trancada ? 'trancada' : ''}"><span class="meta">${meta}${usar}</span><b>${esc(nome)}</b>${completo ? `<div class="texto-completo">${esc(completo)}</div>` : pendente ? `<p class="apagado">Descrição ainda não conferida palavra por palavra. O livro digitalizado pode conter erros de OCR.</p>${abrirPaginaSah('habilidades',base)}` : (resumo ? `<p>${esc(resumo)}</p>` : '')}
+  return `<div class="hab ${trancada ? 'trancada' : ''}"><span class="meta">${meta}${usar}</span><b>${esc(nome)}</b>${completo ? `<div class="texto-completo">${esc(completo)}</div>` : ocr ? blocoOcr(ocr) : pendente ? `<p class="apagado">Descrição ainda não conferida palavra por palavra. O livro digitalizado pode conter erros de OCR.</p>${abrirPaginaSah('habilidades',base)}` : (resumo ? `<p>${esc(resumo)}</p>` : '')}
     ${chave && !trancada ? `<details${nota ? ' open' : ''}><summary class="apagado" style="cursor:pointer;font-size:.85rem">Anotação</summary><textarea data-campo="notasHabilidade.${esc(chave)}" id="nota-${esc(chave)}" placeholder="Texto do livro, custo, detalhes…">${esc(nota)}</textarea></details>` : ''}</div>`;
 }
 function abaHabilidades(f, d) {
@@ -344,7 +354,7 @@ function abaRituais(f, d, ui) {
     <p class="apagado" style="font-size:.88rem;margin-top:8px">Toque num ritual para ver tudo. Conjurar faz sozinho o teste de Ocultismo (DT 20 + custo; menos para Medo). ${f.classe === 'ocultista' && !temOpcional(f, 'patentes') ? 'Ocultista: 3 rituais de 1º círculo no início e +1 a cada NEX.' : ''}</p>
     <label class="campo" style="max-width:200px"><span>Rituais extras (mestre)</span><input type="number" min="0" data-campo="bonus.rituais" data-tipo="int" id="bonus-rituais" value="${f.bonus.rituais || 0}"></label>
   </section>
-  <section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa">Grimório</h2><span class="apagado">${lista.length} rituais</span></div>
+  <section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa">Grimório</h2><span class="apagado">${lista.length} rituais · toque num ritual para ver tudo antes de aprender</span></div>
     <div class="linha" style="margin-bottom:12px">
       <input type="search" class="filtro" placeholder="Procurar ritual…" data-rit-filtro="busca" id="rit-busca" value="${esc(filtro.busca)}" aria-label="Procurar ritual">
       <select data-rit-filtro="elemento" style="width:auto" aria-label="Elemento"><option value="">Todos os elementos</option>${ELEMENTOS.map(e => `<option value="${e.id}" ${filtro.elemento === e.id ? 'selected' : ''}>${e.nome}</option>`).join('')}</select>
@@ -357,10 +367,52 @@ function abaRituais(f, d, ui) {
         <input type="checkbox" data-acao-check="ritual-catalogo" data-id="${r.id}" data-elemento="${r.elemento}" ${marcado ? 'checked' : ''} aria-label="${esc(r.nome)} (${ELEM[r.elemento].nome}, ${r.circulo}º círculo)">
         <span class="caixa-check" aria-hidden="true"></span>
         ${sigilo(r.elemento, 'var(--el)')}
-        <span class="txt"><b>${esc(r.nome)}</b> <small class="dossie-txt">${ELEM[r.elemento].nome} ${r.circulo}${fonteTag(r.fonte)}</small><small>${textoCompleto('rituais', r.nome) ? 'Texto integral disponível' : 'Descrição integral pendente — consulte o livro'}</small>${acima ? '<small class="aviso-circulo">Círculo acima do seu acesso</small>' : ''}</span>
+        <span class="txt"><b>${esc(r.nome)}</b> <small class="dossie-txt">${ELEM[r.elemento].nome} ${r.circulo}${fonteTag(r.fonte)}</small><small>${textoCompleto('rituais', r.nome) ? 'Texto integral disponível' : textoOcr('rituais', r.nome) ? 'Texto do OCR disponível (conferir)' : 'Descrição integral pendente — consulte o livro'}</small>${acima ? '<small class="aviso-circulo">Círculo acima do seu acesso</small>' : ''}</span>
       </label>`;
     }).join('')}</div>
   </section>`;
+}
+// Janela de PRÉ-VISUALIZAÇÃO (grimório): tocar num ritual mostra tudo antes de ele entrar nos rituais conhecidos.
+const chaveRitual = r => semAcento(r.nome) + '|' + r.elemento;
+function janelaPreviaRitual(f, d, r) {
+  const k = d.pd ? 'PD' : 'PE';
+  const conhecido = f.rituais.some(x => chaveRitual(x) === chaveRitual(r));
+  const custo = CIRCULOS[r.circulo - 1]?.custo ?? 0;
+  const texto = textoCompleto('rituais', r.nome), ocr = !texto ? textoOcr('rituais', r.nome) : null;
+  const afinidade = f.elementoAfinidade && f.elementoAfinidade === r.elemento;
+  const lim = d.limiteRituais, qtd = f.rituais.length;
+  const ficha = [['Execução', r.execucao], ['Alcance', r.alcance], ['Alvo', r.alvo], ['Área', r.area], ['Efeito', r.efeitoArea], ['Duração', r.duracao], ['Resistência', r.resistencia]].filter(([, v]) => v);
+  const formas = [['discente', 'Discente'], ['verdadeiro', 'Verdadeiro']].filter(([id]) => r[id]).map(([id, nome]) => {
+    const fo = r[id], okCirc = !fo.circulo || d.circuloMax >= fo.circulo, okAf = !fo.afinidade || afinidade;
+    const req = [fo.circulo ? `requer ${fo.circulo}º círculo` : '', fo.afinidade ? 'requer afinidade' : ''].filter(Boolean).join(' e ');
+    return `<li><b>${nome}</b> +${fo.custo} ${k} <span class="apagado">(total ${custo + fo.custo} ${k})</span>${req ? ` · <small>${req}</small>` : ''}${okCirc && okAf ? '' : ' <small class="aviso-circulo">você ainda não pode usar</small>'}</li>`;
+  });
+  const avisos = [
+    r.circulo > d.circuloMax ? `Este ritual é de ${r.circulo}º círculo e seu acesso hoje vai até o ${d.circuloMax}º.` : '',
+    !conhecido && lim && qtd >= lim ? `Você já conhece ${qtd} de ${lim} rituais possíveis.` : '',
+    r.elemento === 'variavel' ? 'Elemento variável: escolha o elemento no cartão do ritual depois de aprender.' : '',
+  ].filter(Boolean);
+  const corpo = `<div class="previa-ritual el-${r.elemento}">
+    <div class="cab-previa">${sigilo(r.elemento, 'var(--el)')}<div><b>${esc(ELEM[r.elemento]?.nome || r.elemento)} · ${r.circulo}º círculo</b>${fonteTag(r.fonte)}
+      <p class="apagado">${esc(r.resumo || '')}</p></div></div>
+    <div class="linha"><span class="etiqueta">Custo ${custo} ${k}</span><span class="etiqueta">DT ${d.dtRitual}</span>${conhecido ? '<span class="etiqueta">Já conhecido</span>' : ''}</div>
+    ${ficha.length ? `<dl class="ficha-ritual">${ficha.map(([rot, v]) => `<dt>${rot}</dt><dd>${esc(v)}</dd>`).join('')}</dl>` : ''}
+    ${r.dados ? `<div class="linha dano-previa"><span class="etiqueta">${r.tipoDados === 'cura' ? 'Cura' : 'Dano'} ${esc(r.dados)}</span><button class="btn pequeno" data-acao="rolar-ritual-previa" data-id="${r.id}">Rolar ${esc(r.dados)}</button></div>` : ''}
+    ${formas.length ? `<h3 class="titulo-vermelho">Formas avançadas</h3><ul class="formas-previa">${formas.join('')}</ul>` : ''}
+    ${avisos.map(a => `<p class="aviso-previa">${esc(a)}</p>`).join('')}
+    <h3 class="titulo-vermelho">Descrição</h3>
+    ${texto ? `<div class="texto-completo">${esc(texto)}</div>` : ocr ? blocoOcr(ocr) : `<p class="apagado">Descrição integral ainda não disponível nos livros anexados.</p>${abrirPaginaSah('rituais', r.nome)}`}
+  </div>`;
+  const rodape = conhecido
+    ? `<button class="btn fantasma" data-acao="fechar-modal">Fechar</button><button class="btn perigo" data-acao="ritual-catalogo-esquecer" data-id="${r.id}">Esquecer ritual</button>`
+    : `<button class="btn fantasma" data-acao="fechar-modal">Cancelar</button><button class="btn sangue" data-acao="ritual-aprender" data-id="${r.id}">Aprender ritual</button>`;
+  abrirModal(`Ritual · ${r.nome}`, corpo, rodape, true);
+}
+function adicionarRitualCatalogo(ficha, r) {
+  if (ficha.rituais.some(x => chaveRitual(x) === chaveRitual(r))) return false;
+  ficha.rituais.push({ uid: uid(), nome: r.nome, elemento: r.elemento === 'variavel' ? 'variavel' : r.elemento, circulo: r.circulo, efeito: r.resumo,
+    execucao: r.execucao || '', alcance: r.alcance || '', alvo: r.alvo || r.area || r.efeitoArea || '', duracao: r.duracao || '', resistencia: r.resistencia || '', formula: r.dados || '' });
+  return true;
 }
 function cartaoRitual(f, d, r, i) {
   const calc = d.rituais[i] || {}, custo = calc.custo ?? CIRCULOS[r.circulo - 1].custo, k = d.pd ? 'PD' : 'PE';
@@ -369,13 +421,14 @@ function cartaoRitual(f, d, r, i) {
   const forma = (fo, nome) => fo ? `<span class="etiqueta">${nome} +${fo.custo} ${k}${fo.circulo ? ` · ${fo.circulo}º` : ''}${fo.afinidade ? ' · afinidade' : ''}</span>` : '';
   const formula = calc.formulaFinal || r.formula;
   const texto = textoCompleto('rituais', r.nome);
+  const ocr = !texto ? textoOcr('rituais', r.nome) : null;
   return `<details class="ritual ritual-compacto el-${r.elemento}">
     <summary><span class="cab">${sigilo(r.elemento, 'var(--el)')}<b>${esc(r.nome)}</b></span>
       <span class="linha resumo-rit"><span class="etiqueta">${custo} ${k}</span>${formula ? `<span class="etiqueta">${cat.tipoDados === 'cura' ? 'cura' : 'dano'} ${esc(formula)}</span>` : ''}<span class="etiqueta">DT ${calc.dt ?? d.dtRitual}</span></span>
-      <small class="apagado">${texto ? 'Descrição disponível abaixo' : 'Transcrição ainda não revisada'}</small>
+      <small class="apagado">${texto ? 'Descrição disponível abaixo' : ocr ? 'Texto do OCR abaixo (conferir no livro)' : 'Transcrição ainda não revisada'}</small>
       <span class="linha" style="margin-top:6px"><button class="btn pequeno sangue" data-acao="conjurar" data-i="${i}">Conjurar</button>${formula ? `<button class="btn pequeno" data-acao="rolar-ritual" data-i="${i}">Rolar ${esc(formula)}</button>` : ''}</span></summary>
     <div class="detalhes-rit">
-      ${!texto ? `<p class="apagado">Descrição integral pendente de conferência: compare os dados com o PDF original.</p>${abrirPaginaSah('rituais',r.nome)}` : ''}
+      ${!texto && !ocr ? `<p class="apagado">Descrição integral pendente de conferência: compare os dados com o PDF original.</p>${abrirPaginaSah('rituais',r.nome)}` : ''}
       <div class="grade-mini">
         <label class="campo"><span>Elemento</span><select data-campo="rituais.${i}.elemento">${ELEMENTOS.map(x => `<option value="${x.id}" ${r.elemento === x.id ? 'selected' : ''}>${x.nome}</option>`).join('')}</select></label>
         <label class="campo"><span>Círculo</span><select data-campo="rituais.${i}.circulo" data-tipo="int">${CIRCULOS.map(c => `<option value="${c.n}" ${r.circulo === c.n ? 'selected' : ''}>${c.n}º</option>`).join('')}</select></label>
@@ -384,7 +437,7 @@ function cartaoRitual(f, d, r, i) {
       </div>
       <p class="linha" style="margin-top:8px">${forma(cat.discente, 'Discente')}${forma(cat.verdadeiro, 'Verdadeiro')}</p>
       ${calc.notas?.length ? `<p class="apagado" style="font-size:.85rem">${calc.notas.map(esc).join(' · ')}</p>` : ''}
-      ${texto ? `<div class="texto-completo">${esc(texto)}</div>` : '<p class="apagado">O texto completo deste ritual ainda não está disponível nos livros anexados.</p>'}
+      ${texto ? `<div class="texto-completo">${esc(texto)}</div>` : ocr ? blocoOcr(ocr) : '<p class="apagado">O texto completo deste ritual ainda não está disponível nos livros anexados.</p>'}
       <label class="campo" style="margin-top:8px"><span>Efeito / anotações (cole aqui o texto do seu livro, se quiser)</span><textarea data-campo="rituais.${i}.efeito" id="rit-${i}-efeito">${esc(r.efeito)}</textarea></label>
       <div class="linha fim" style="margin-top:6px"><button class="btn pequeno perigo" data-acao="esquecer-ritual" data-i="${i}">Esquecer ritual</button></div>
     </div></details>`;
@@ -731,6 +784,21 @@ export function acoesFicha(ctx) {
     'rolar-iniciativa': () => { const d = derivar(f()); rolarTesteUI({ titulo: 'Iniciativa', quem: quem(), dados: d.iniciativa.dados, bonus: d.iniciativa.bonus }); },
     'rolar-ataque': el => { const d0 = derivar(f()); const ops = opcoesGasto(f(), d0, { tipo: 'ataque', i: Number(el.dataset.i) }); if (ops.length) return janelaGasto(f(), d0, { tipo: 'ataque', i: Number(el.dataset.i) }, ops); const a = d0.ataques[Number(el.dataset.i)]; rolarTesteUI({ titulo: `Ataque · ${a.nome}`, quem: quem(), dados: a.dados, bonus: a.bonus, margem: a.margem, mult: a.mult, tipo: 'ataque', formulaDano: a.formula }); },
     'rolar-dano': el => { const a = derivar(f()).ataques[Number(el.dataset.i)]; rolarDanoUI({ titulo: `Dano · ${a.nome}`, quem: quem(), formula: a.formula }); },
+    'ritual-aprender': el => {
+      const ficha = f(); const r = RITUAIS.find(x => x.id === el.dataset.id); if (!r) return;
+      const novo = adicionarRitualCatalogo(ficha, r);
+      const n = normalizar(ficha); Object.assign(ficha, n); ctx.salvarFicha(ficha); fecharModal();
+      if (novo) ctx.avisar(`Ritual "${r.nome}" adicionado aos conhecidos.`);
+      ctx.render();
+    },
+    'ritual-catalogo-esquecer': el => {
+      const ficha = f(); const r = RITUAIS.find(x => x.id === el.dataset.id); if (!r) return;
+      ficha.rituais = ficha.rituais.filter(x => chaveRitual(x) !== chaveRitual(r));
+      const n = normalizar(ficha); Object.assign(ficha, n); ctx.salvarFicha(ficha); fecharModal();
+      ctx.avisar(`Ritual "${r.nome}" removido dos conhecidos.`);
+      ctx.render();
+    },
+    'rolar-ritual-previa': el => { const r = RITUAIS.find(x => x.id === el.dataset.id); if (r?.dados) rolarDanoUI({ titulo: `${r.nome} (prévia)`, quem: quem(), formula: r.dados }); },
     'rolar-ritual': el => { const i = Number(el.dataset.i), r = derivar(f()).rituais[i]; rolarDanoUI({ titulo: r.nome, quem: quem(), formula: r.formulaFinal || r.formula }); },
     'conjurar': el => janelaConjurar(f(), derivar(f()), Number(el.dataset.i)),
     'conjurar-confirmar': async el => {
@@ -945,15 +1013,11 @@ export function acoesFicha(ctx) {
 export function checksFicha(ctx) {
   const f = () => ctx.fichaAtual();
   return {
+    // A caixinha do grimório não muda sozinha: abre a pré-visualização, e "Aprender"/"Esquecer" decidem.
     'ritual-catalogo': el => {
-      const ficha = f(); const r = RITUAIS.find(x => x.id === el.dataset.id);
-      const chave = semAcento(r.nome) + '|' + r.elemento;
-      if (el.checked) {
-        ficha.rituais.push({ uid: uid(), nome: r.nome, elemento: r.elemento === 'variavel' ? 'variavel' : r.elemento, circulo: r.circulo, efeito: r.resumo,
-          execucao: r.execucao || '', alcance: r.alcance || '', alvo: r.alvo || r.area || r.efeitoArea || '', duracao: r.duracao || '', resistencia: r.resistencia || '', formula: r.dados || '' });
-      }
-      else ficha.rituais = ficha.rituais.filter(x => semAcento(x.nome) + '|' + x.elemento !== chave);
-      ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render();
+      const ficha = f(); const r = RITUAIS.find(x => x.id === el.dataset.id); if (!r) return;
+      el.checked = !el.checked;
+      janelaPreviaRitual(ficha, derivar(ficha), r);
     },
     'ritual-esquecer': el => { const ficha = f(); const r = ficha.rituais[Number(el.dataset.i)]; if (!confirm(`Esquecer o ritual "${r.nome}"?`)) { el.checked = true; return; } ficha.rituais.splice(Number(el.dataset.i), 1); ctx.salvarFicha(ficha); ctx.render(); },
     'opcional': el => {
