@@ -1,15 +1,23 @@
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
-import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.9';
-import { normalizar, derivar } from './regras.js?v=0.9';
-import { carregarFichas, salvarFichas, carregarTema, salvarTema, espacoUsado } from './armazenamento.js?v=0.9';
-import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.9';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.9';
-import { telaFicha, acoesFicha, checksFicha } from './fichaUI.js?v=0.9';
-import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.9';
-import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.9';
+import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.9.2';
+import { normalizar, derivar } from './regras.js?v=0.9.2';
+import { carregarFichas, salvarFichas, carregarTema, salvarTema, espacoUsado } from './armazenamento.js?v=0.9.2';
+import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.9.2';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.9.2';
+import { telaFicha, acoesFicha, checksFicha } from './fichaUI.js?v=0.9.2';
+import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.9.2';
+import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.9.2';
 
-export const VERSAO = '0.9';
+export const VERSAO = '0.9.2';
+const PALETAS_NOITE = ['sangue', 'energia', 'conhecimento', 'morte'];
+const carregarPaletaNoite = () => {
+  try {
+    const p = localStorage.getItem('fichaoculta-efeito') || 'sangue';
+    return PALETAS_NOITE.includes(p) ? p : 'sangue';
+  } catch { return 'sangue'; }
+};
+const salvarPaletaNoite = p => { try { localStorage.setItem('fichaoculta-efeito', p); } catch {} };
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -17,6 +25,8 @@ const estado = {
   criador: null,
   historicoAberto: false,
   tema: carregarTema(),
+  efeito: carregarPaletaNoite(),
+  uiFxAberto: false,
 };
 // Uma preferência visual apenas: não interfere nas regras ou nos dados das fichas.
 let ambienteAtivo = true;
@@ -25,6 +35,7 @@ document.documentElement.dataset.ambiente = ambienteAtivo ? 'ativo' : 'silencios
 const app = $('#app');
 definirRaizModal($('#modal-raiz'));
 document.documentElement.dataset.tema = estado.tema;
+document.documentElement.dataset.efeito = estado.efeito;
 
 const ctx = {
   estado, avisar,
@@ -57,9 +68,13 @@ addEventListener('hashchange', () => {
 function topo() {
   const r = estado.rota.tela;
   const link = (href, nome, ativo) => `<a href="${href}" ${ativo ? 'aria-current="page"' : ''}>${nome}</a>`;
+  const nomesPaleta = { sangue: 'Sangue', energia: 'Energia', conhecimento: 'Conhecimento', morte: 'Morte' };
+  const opPaleta = (id, desc) => `<button class="fx-op fx-${id}" data-acao="trocar-efeito" data-efeito="${id}" aria-pressed="${estado.efeito === id}"><span class="fx-bolha" aria-hidden="true"></span><span><b>${nomesPaleta[id]}</b><small>${desc}</small></span></button>`;
   return `<header class="topo topo-oculto"><a class="marca" href="#/"><img src="assets/selo-oculto.svg" alt=""><span>FICHA <b>OCULTA</b><small>ARQUIVO DE AGENTES</small></span></a>
     <nav>${link('#/agentes', 'Agentes', ['agentes', 'ficha', 'novo'].includes(r))}${link('#/mestre', 'Mestre', r === 'mestre')}${link('#/sobre', 'Sobre', r === 'sobre')}
-    <button class="btn-ambiente" data-acao="ambiente" title="Ativar ou pausar efeitos visuais" aria-label="Ativar ou pausar efeitos visuais" aria-pressed="${ambienteAtivo}">${ambienteAtivo ? '◉ Efeitos' : '◎ Efeitos'}</button>
+    <div class="caixa-efeitos"><button class="btn-ambiente" data-acao="efeitos" title="Escolher a paleta do Outro Lado" aria-label="Abrir opções de efeitos" aria-haspopup="dialog" aria-expanded="${estado.uiFxAberto}">${ambienteAtivo ? '◉ Efeitos' : '◎ Efeitos'}</button>
+      ${estado.uiFxAberto ? `<div class="menu-efeitos" role="dialog" aria-label="Opções de efeitos e paleta"><div class="menu-efeitos-titulo">Paleta do Outro Lado</div><div class="menu-efeitos-opcoes">${opPaleta('sangue', 'carne, calor e violência')}${opPaleta('energia', 'caos, descarga e instabilidade')}${opPaleta('conhecimento', 'sinais, grimório e revelação')}${opPaleta('morte', 'tempo, ruína e decadência')}</div><button class="fx-ambiente-toggle" data-acao="ambiente" aria-pressed="${ambienteAtivo}">${ambienteAtivo ? 'Desligar ambiente animado' : 'Ligar ambiente animado'}</button><small class="fx-aviso">As paletas mudam o modo Noite. No modo Papel, elas ficam salvas para quando você voltar.</small></div>` : ''}
+    </div>
     <button data-acao="tema" title="Trocar tema" aria-label="Trocar tema claro/escuro" aria-pressed="${estado.tema === 'papel'}">${estado.tema === 'papel' ? '☾ Noite' : '☼ Papel'}</button></nav></header>`;
 }
 function inicio() {
@@ -148,7 +163,8 @@ const acoes = {
   'fechar-modal': () => fecharModal(),
   'fechar-modal-fundo': (el, ev) => { if (ev.target === el) fecharModal(); },
   'ambiente': () => { ambienteAtivo = !ambienteAtivo; document.documentElement.dataset.ambiente = ambienteAtivo ? 'ativo' : 'silencioso'; try { localStorage.setItem('fichaoculta-ambiente', ambienteAtivo ? '1' : '0'); } catch {} render(); },
-  'tema': () => { estado.tema = estado.tema === 'papel' ? 'noite' : 'papel'; document.documentElement.dataset.tema = estado.tema; salvarTema(estado.tema); render(); },
+  'tema': () => { estado.tema = estado.tema === 'papel' ? 'noite' : 'papel'; document.documentElement.dataset.tema = estado.tema;
+document.documentElement.dataset.efeito = estado.efeito; salvarTema(estado.tema); render(); },
   'novo-agente': (el, ev) => { ev.preventDefault(); estado.criador = novoRascunho(); if (location.hash === '#/novo') render(); else location.hash = '#/novo'; },
   'historico': () => { estado.historicoAberto = !estado.historicoAberto; render(); },
   'limpar-historico': () => limparHistorico(),
@@ -167,6 +183,13 @@ const acoes = {
   'exportar-todos': () => baixarArquivo(`agentes-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ tipo: 'fichaoculta-fichas', versao: 1, fichas: estado.fichas }, null, 2)),
 };
 const checks = { ...checksFicha(ctx), 'animacoes': el => { ligarAnimacoes(el.checked); avisar(el.checked ? 'Animação ligada.' : 'Animação desligada.'); } };
+
+document.addEventListener('click', ev => {
+  if (!estado.uiFxAberto) return;
+  if (ev.target.closest('.caixa-efeitos')) return;
+  estado.uiFxAberto = false;
+  render();
+});
 
 document.addEventListener('click', ev => {
   const alvo = ev.target.closest('[data-acao]');

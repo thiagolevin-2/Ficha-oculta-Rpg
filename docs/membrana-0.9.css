@@ -721,3 +721,185 @@ input,select,textarea {
   .abas button,
   .passos button { border-radius: 15px 14px 16px 12px / 16px 16px 12px 18px; }
 }
+
+
+/* 0.9.2 — PALETAS DO OUTRO LADO + PAPEL DE FOLHA + BLOCOS ORGÂNICOS */
+:root[data-tema="noite"] {
+  --fx-fundo: #150b0f;
+  --fx-fundo-2: #241419;
+}
+:root[data-tema="noite"][data-efeito="sangue"] {
+  --fundo:#110b0d; --fundo-2:#1d1215; --painel:#261b1d; --painel-2:#302122;
+  --linha:#634d48; --linha-forte:#987568; --sangue:#af2730; --sangue-escuro:#5d0e1d;
+  --sangue-texto:#ff8a8d; --vela:#deb47b; --roxo:#9c6fc8;
+}
+:root[data-tema="noite"][data-efeito="energia"] {
+  --fundo:#0d0a14; --fundo-2:#171226; --painel:#211733; --painel-2:#2c1f45;
+  --linha:#5c4c88; --linha-forte:#8c78c3; --sangue:#8f46e8; --sangue-escuro:#4a2382;
+  --sangue-texto:#e4beff; --vela:#6bc9ff; --roxo:#d27dff; --pv:#9f64ff; --pe:#77c8ff; --san:#a2a5ff; --pd:#c97cff;
+}
+:root[data-tema="noite"][data-efeito="conhecimento"] {
+  --fundo:#13100a; --fundo-2:#221c11; --painel:#2e2616; --painel-2:#3a301b;
+  --linha:#7b6541; --linha-forte:#b08a52; --sangue:#b4852c; --sangue-escuro:#6a4b17;
+  --sangue-texto:#f1d08e; --vela:#f6e2b6; --roxo:#cc9d47; --pv:#be9442; --pe:#e5cb7d; --san:#b3a98f; --pd:#d2a257;
+}
+:root[data-tema="noite"][data-efeito="morte"] {
+  --fundo:#0c100d; --fundo-2:#151c17; --painel:#1c251e; --painel-2:#243128;
+  --linha:#516554; --linha-forte:#83a088; --sangue:#617a63; --sangue-escuro:#324534;
+  --sangue-texto:#cfdfcc; --vela:#aab89a; --roxo:#8ca18d; --pv:#768e72; --pe:#aab89a; --san:#9cb0a0; --pd:#8ba08c;
+}
+
+/* Recoloração de áreas que antes tinham vermelhos fixos */
+:root[data-tema="noite"] body {
+  background:radial-gradient(ellipse at 68% 0, color-mix(in srgb, var(--sangue) 32%, transparent) 0, transparent 45%), var(--fundo);
+}
+:root[data-tema="noite"] .topo.topo-oculto::before,
+:root[data-tema="noite"] .sobrescrito-oculto .risco-vivo,
+:root[data-tema="noite"] .faixa::before,
+:root[data-tema="noite"] .modal::after,
+:root[data-tema="noite"] .historico::before,
+:root[data-tema="noite"] .ficha-cabeca::before,
+:root[data-tema="noite"] .painel::before { background: var(--sangue); }
+:root[data-tema="noite"] .titulo-vermelho::before,
+:root[data-tema="noite"] .invocar.principal,
+:root[data-tema="noite"] .bandeja .btn,
+:root[data-tema="noite"] .tabela th { background: color-mix(in srgb, var(--sangue) 74%, black 26%); }
+:root[data-tema="noite"] .sinopse-limiar,
+:root[data-tema="noite"] .portal-margem,
+:root[data-tema="noite"] .topo.topo-oculto nav a:hover,
+:root[data-tema="noite"] .topo.topo-oculto nav button:hover,
+:root[data-tema="noite"] .topo.topo-oculto nav a[aria-current="page"] { border-color: var(--sangue); }
+:root[data-tema="noite"] .hero-selo img,
+:root[data-tema="noite"] .roda-centro img { filter: drop-shadow(0 0 18px color-mix(in srgb, var(--sangue) 42%, transparent)); }
+:root[data-tema="noite"][data-efeito="energia"] .hero-gravura,
+:root[data-tema="noite"][data-efeito="energia"] .portal-imagem,
+:root[data-tema="noite"][data-efeito="energia"] .hero-ruido { filter:hue-rotate(64deg) saturate(1.05) brightness(.92); }
+:root[data-tema="noite"][data-efeito="conhecimento"] .hero-gravura,
+:root[data-tema="noite"][data-efeito="conhecimento"] .portal-imagem,
+:root[data-tema="noite"][data-efeito="conhecimento"] .hero-ruido { filter:hue-rotate(132deg) sepia(.28) saturate(.88) brightness(.94); }
+:root[data-tema="noite"][data-efeito="morte"] .hero-gravura,
+:root[data-tema="noite"][data-efeito="morte"] .portal-imagem,
+:root[data-tema="noite"][data-efeito="morte"] .hero-ruido { filter:hue-rotate(188deg) saturate(.55) brightness(.88); }
+
+/* Janelinha de efeitos no topo */
+.caixa-efeitos { position:relative; display:flex; align-items:center; }
+.menu-efeitos {
+  position:absolute; top:calc(100% + 10px); right:0; width:min(340px, 86vw); z-index:60;
+  padding:16px 14px 14px; color:var(--tinta);
+  background:linear-gradient(180deg, rgba(255,255,255,.06), transparent 28%), var(--painel);
+  border:1px solid var(--linha-forte);
+  border-radius: 28px 18px 26px 22px / 18px 30px 20px 34px;
+  box-shadow:0 24px 70px rgba(0,0,0,.42);
+}
+.menu-efeitos::before {
+  content:''; position:absolute; right:24px; top:-8px; width:18px; height:18px; transform:rotate(45deg);
+  background:var(--painel); border-left:1px solid var(--linha-forte); border-top:1px solid var(--linha-forte);
+}
+.menu-efeitos-titulo {
+  font:700 11px/1.4 var(--fonte-dossie); letter-spacing:.14em; text-transform:uppercase; color:var(--apagado); margin-bottom:10px;
+}
+.menu-efeitos-opcoes { display:grid; gap:9px; }
+.fx-op {
+  display:grid; grid-template-columns:18px 1fr; align-items:center; gap:12px; width:100%; text-align:left;
+  padding:11px 13px; color:var(--tinta); background:color-mix(in srgb, var(--fundo-2) 74%, transparent);
+  border:1px solid var(--linha); border-radius: 18px 14px 22px 16px / 16px 22px 16px 24px;
+}
+.fx-op b { display:block; font:700 1.02rem/1.1 var(--fonte-titulo); }
+.fx-op small { display:block; margin-top:2px; color:var(--apagado); font:11px/1.35 var(--fonte-texto); }
+.fx-op[aria-pressed="true"] { border-color:var(--sangue); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sangue) 40%, transparent), 0 8px 18px rgba(0,0,0,.15); }
+.fx-bolha {
+  width:16px; height:16px; border-radius:43% 57% 50% 50% / 44% 40% 60% 56%;
+  background:currentColor; box-shadow:0 0 12px currentColor;
+}
+.fx-sangue { color:#d9545a; }
+.fx-energia { color:#b96cff; }
+.fx-conhecimento { color:#d1ab4d; }
+.fx-morte { color:#91aa93; }
+.fx-ambiente-toggle {
+  width:100%; margin-top:12px; padding:10px 14px; color:var(--tinta);
+  border:1px solid var(--linha); background:color-mix(in srgb, var(--fundo-2) 72%, transparent);
+  border-radius: 16px 12px 18px 14px / 14px 18px 14px 20px;
+}
+.fx-aviso { display:block; margin-top:9px; color:var(--apagado); font:10px/1.45 var(--fonte-texto); }
+
+/* Formatos ainda mais orgânicos, inspirados na referência enviada */
+.painel:nth-of-type(3n+1), .modal:nth-of-type(3n+1) { border-radius: 34px 22px 38px 24px / 24px 36px 22px 40px; }
+.painel:nth-of-type(3n+2), .modal:nth-of-type(3n+2) { border-radius: 24px 36px 22px 34px / 34px 22px 38px 24px; }
+.painel:nth-of-type(3n+3), .modal:nth-of-type(3n+3) { border-radius: 30px 18px 32px 26px / 20px 34px 24px 36px; }
+:is(.cartao,.modo,.ficha-cartao,.ameaca-bloco,.recurso,.caixa-ritual,.ritual,.hab,.acao-rapida,.historico,.vazio):nth-child(4n+1) { border-radius: 28px 18px 30px 20px / 18px 28px 22px 30px; }
+:is(.cartao,.modo,.ficha-cartao,.ameaca-bloco,.recurso,.caixa-ritual,.ritual,.hab,.acao-rapida,.historico,.vazio):nth-child(4n+2) { border-radius: 20px 30px 18px 28px / 28px 18px 30px 22px; }
+:is(.cartao,.modo,.ficha-cartao,.ameaca-bloco,.recurso,.caixa-ritual,.ritual,.hab,.acao-rapida,.historico,.vazio):nth-child(4n+3) { border-radius: 32px 22px 26px 18px / 24px 30px 18px 28px; }
+:is(.cartao,.modo,.ficha-cartao,.ameaca-bloco,.recurso,.caixa-ritual,.ritual,.hab,.acao-rapida,.historico,.vazio):nth-child(4n+4) { border-radius: 22px 28px 22px 34px / 30px 20px 34px 22px; }
+.portal-acesso, .menu-efeitos, .ficha-cabeca, .retrato { box-shadow:0 16px 36px rgba(0,0,0,.25); }
+
+/* Modo papel: mais cara de folha real, com linhas regulares e sublinhados limpos */
+:root[data-tema="papel"] body {
+  background:
+    linear-gradient(90deg, transparent 0 52px, rgba(156,61,61,.16) 52px 54px, transparent 54px),
+    repeating-linear-gradient(180deg, transparent 0 31px, rgba(78,117,177,.16) 31px 32px),
+    radial-gradient(ellipse at 50% 0,#f3e6cf 0,transparent 70%),
+    var(--fundo);
+}
+:root[data-tema="papel"] body::before { opacity:.08; }
+:root[data-tema="papel"] .painel,
+:root[data-tema="papel"] .hab,
+:root[data-tema="papel"] .chave,
+:root[data-tema="papel"] .recurso,
+:root[data-tema="papel"] .modo,
+:root[data-tema="papel"] .cartao,
+:root[data-tema="papel"] .ficha-cartao,
+:root[data-tema="papel"] .ameaca-bloco,
+:root[data-tema="papel"] .ritual,
+:root[data-tema="papel"] .vazio,
+:root[data-tema="papel"] .acao-rapida,
+:root[data-tema="papel"] .ini-linha,
+:root[data-tema="papel"] .caixa-ritual,
+:root[data-tema="papel"] .modal,
+:root[data-tema="papel"] .historico {
+  background:
+    linear-gradient(90deg, transparent 0 46px, rgba(156,61,61,.12) 46px 48px, transparent 48px),
+    repeating-linear-gradient(180deg, transparent 0 31px, rgba(78,117,177,.14) 31px 32px),
+    linear-gradient(160deg,#fff3da,transparent 40%), var(--painel);
+}
+:root[data-tema="papel"] .faixa::before {
+  -webkit-mask:none; mask:none; height:2px; bottom:3px; border-radius:999px;
+  background:linear-gradient(90deg, rgba(136,32,46,.05), rgba(136,32,46,.8) 8%, rgba(136,32,46,.8) 92%, rgba(136,32,46,.05));
+}
+:root[data-tema="papel"] .titulo-vermelho {
+  color:var(--sangue); padding:0 0 6px; background:none;
+}
+:root[data-tema="papel"] .titulo-vermelho::before {
+  inset:auto 0 0 0; height:2px; background:var(--sangue); -webkit-mask:none; mask:none; border-radius:999px;
+}
+:root[data-tema="papel"] .campo>span,
+:root[data-tema="papel"] .rotulo,
+:root[data-tema="papel"] .etiqueta,
+:root[data-tema="papel"] .capitulo-cabecalho p {
+  text-decoration-skip-ink:none;
+}
+:root[data-tema="papel"] .campo>span,
+:root[data-tema="papel"] .rotulo {
+  display:inline-block; padding-bottom:2px; border-bottom:1px solid rgba(99,85,120,.28);
+}
+:root[data-tema="papel"] .topo.topo-oculto nav a,
+:root[data-tema="papel"] .topo.topo-oculto nav button {
+  border-bottom-width:1px;
+}
+:root[data-tema="papel"] input,
+:root[data-tema="papel"] select,
+:root[data-tema="papel"] textarea {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.68), transparent 42%),
+    repeating-linear-gradient(180deg, transparent 0 29px, rgba(78,117,177,.1) 29px 30px),
+    #fff9ed;
+}
+:root[data-tema="papel"] .sinopse-limiar,
+:root[data-tema="papel"] .portal-link,
+:root[data-tema="papel"] .passos,
+:root[data-tema="papel"] .cabecalho-ritual,
+:root[data-tema="papel"] .ficha-cabeca,
+:root[data-tema="papel"] .titulo-secao { border-color: rgba(104,78,64,.4); }
+
+@media(max-width:760px){
+  .menu-efeitos { right:-10px; width:min(320px, 92vw); }
+}
