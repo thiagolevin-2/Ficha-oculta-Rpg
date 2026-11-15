@@ -1,11 +1,11 @@
 // mestre.js — Área do Mestre (primeira versão): Ameaças, Combate (iniciativa), Anotações e Backup.
 // Ideia do dm-manager do Arcana, com o "bloco de ameaça" do Ordem Paranormal.
-import { ELEMENTOS, ATRIBUTOS } from './catalogo.js?v=0.9';
-import { derivar } from './regras.js?v=0.9';
-import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.9';
-import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal } from './util.js?v=0.9';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.9';
-import { rolarTeste } from './dados.js?v=0.9';
+import { ELEMENTOS, ATRIBUTOS } from './catalogo.js?v=0.10';
+import { derivar } from './regras.js?v=0.10';
+import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.10';
+import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal } from './util.js?v=0.10';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.10';
+import { rolarTeste } from './dados.js?v=0.10';
 
 const txt = (v, m = 200) => (typeof v === 'string' ? v : v == null ? '' : String(v)).slice(0, m);
 const FORMULA = /^[0-9d+\-\s]{0,40}$/i;
@@ -50,7 +50,7 @@ export const pegarMestre = () => mestre;
 export function telaMestre(fichas) {
   const abas = [['combate', 'Combate'], ['ameacas', `Ameaças (${mestre.ameacas.length})`], ['anotacoes', 'Anotações']];
   const corpo = mestre.aba === 'ameacas' ? abaAmeacas() : mestre.aba === 'anotacoes' ? abaAnotacoes() : abaCombate(fichas);
-  return `<div class="pagina mestre-oculto"><div class="cabecalho-ritual"><span>O OUTRO LADO OBSERVA · DOCUMENTO CONFIDENCIAL</span><small>ÁREA DO MESTRE / NÍVEL DE ACESSO MÁXIMO</small></div><div class="titulo-secao"><h1 class="faixa sangue">Área do Mestre</h1><div class="linha"><button class="btn pequeno" data-acao="m-backup">Backup</button><button class="btn pequeno fantasma" data-acao="m-restaurar">Restaurar</button></div></div>
+  return `<div class="pagina"><div class="titulo-secao"><h1 class="faixa sangue">Área do Mestre</h1><div class="linha"><button class="btn pequeno" data-acao="m-backup">Backup</button><button class="btn pequeno fantasma" data-acao="m-restaurar">Restaurar</button></div></div>
   <nav class="abas" role="tablist">${abas.map(([id, n]) => `<button role="tab" data-acao="m-aba" data-aba="${id}" aria-selected="${mestre.aba === id}">${n}</button>`).join('')}</nav>${corpo}</div>`;
 }
 

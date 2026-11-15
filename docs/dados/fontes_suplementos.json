@@ -1,0 +1,83 @@
+[
+  {
+    "nome": "Passagem de Conhecimento",
+    "fonte": "AS01",
+    "paginas": [
+      48
+    ],
+    "elemento": "sangue+conhecimento",
+    "circulo": 2,
+    "caracteres": 2388
+  },
+  {
+    "nome": "Passagem de Conhecimento Expandido",
+    "fonte": "AS01",
+    "paginas": [
+      50
+    ],
+    "elemento": "sangue+conhecimento",
+    "circulo": 4,
+    "caracteres": 2152
+  },
+  {
+    "nome": "Mapa Sanguíneo",
+    "fonte": "AS02",
+    "paginas": [
+      65
+    ],
+    "elemento": "sangue",
+    "circulo": 2,
+    "caracteres": 611
+  },
+  {
+    "nome": "Labirinto Mental",
+    "fonte": "AS02",
+    "paginas": [
+      66
+    ],
+    "elemento": "conhecimento",
+    "circulo": 2,
+    "caracteres": 593
+  },
+  {
+    "nome": "Capturar Momento",
+    "fonte": "AS02",
+    "paginas": [
+      66
+    ],
+    "elemento": "morte",
+    "circulo": 2,
+    "caracteres": 797
+  },
+  {
+    "nome": "Backup",
+    "fonte": "AS04",
+    "paginas": [
+      68
+    ],
+    "elemento": "energia",
+    "circulo": 2,
+    "caracteres": 1465
+  },
+  {
+    "nome": "Hesitação Forçada",
+    "fonte": "AS06",
+    "paginas": [
+      72
+    ],
+    "elemento": "conhecimento",
+    "circulo": 1,
+    "caracteres": 1871
+  },
+  {
+    "nome": "Vampirismo",
+    "fonte": "AS07",
+    "paginas": [
+      76,
+      77
+    ],
+    "elemento": "sangue",
+    "circulo": 2,
+    "caracteres": 3593
+  }
+]

@@ -71,6 +71,6 @@ export function reduzirImagem(arquivo, lado = 360, qualidade = 0.82) {
     img.src = url;
   });
 }
-export const sigilo = (elemento, cor) => `<span class="sigilo" style="--img:url(assets/glifo-${esc(elemento)}.svg);${cor ? `--cor:${cor}` : ''}" aria-hidden="true"></span>`;
+export const sigilo = (elemento, cor) => `<span class="sigilo" style="--img:url(assets/sigilo-${esc(elemento)}.svg);${cor ? `--cor:${cor}` : ''}" aria-hidden="true"></span>`;
 // Imagem opcional (coloque o arquivo em docs/assets/imagens/): se não existir, some sem quebrar a tela
 export const imagemOpcional = (src, classe = '', alt = '') => `<img src="${esc(src)}" class="${esc(classe)}" alt="${esc(alt)}" loading="lazy" onerror="this.remove()">`;

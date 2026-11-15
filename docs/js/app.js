@@ -1,23 +1,15 @@
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
-import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.9.3';
-import { normalizar, derivar } from './regras.js?v=0.9.3';
-import { carregarFichas, salvarFichas, carregarTema, salvarTema, espacoUsado } from './armazenamento.js?v=0.9.3';
-import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.9.3';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.9.3';
-import { telaFicha, acoesFicha, checksFicha } from './fichaUI.js?v=0.9.3';
-import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.9.3';
-import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.9.3';
+import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.10';
+import { normalizar, derivar } from './regras.js?v=0.10';
+import { carregarFichas, salvarFichas, carregarTema, salvarTema, espacoUsado } from './armazenamento.js?v=0.10';
+import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.10';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.10';
+import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.10-sah';
+import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.10';
+import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.10';
 
-export const VERSAO = '0.9.3';
-const PALETAS_NOITE = ['sangue', 'energia', 'conhecimento', 'morte'];
-const carregarPaletaNoite = () => {
-  try {
-    const p = localStorage.getItem('fichaoculta-efeito') || 'sangue';
-    return PALETAS_NOITE.includes(p) ? p : 'sangue';
-  } catch { return 'sangue'; }
-};
-const salvarPaletaNoite = p => { try { localStorage.setItem('fichaoculta-efeito', p); } catch {} };
+export const VERSAO = '0.10';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -25,17 +17,38 @@ const estado = {
   criador: null,
   historicoAberto: false,
   tema: carregarTema(),
-  efeito: carregarPaletaNoite(),
-  uiFxAberto: false,
 };
-// Uma preferência visual apenas: não interfere nas regras ou nos dados das fichas.
-let ambienteAtivo = true;
-try { ambienteAtivo = localStorage.getItem('fichaoculta-ambiente') !== '0'; } catch {}
-document.documentElement.dataset.ambiente = ambienteAtivo ? 'ativo' : 'silencioso';
 const app = $('#app');
+let SUPLEMENTOS = null;
+let SAH_REF = null;
+const LIVROS_DIGITALIZADOS = [{"id": "base", "titulo": "Livro de Regras v1.3", "paginas": 332}, {"id": "as01", "titulo": "Arquivos Secretos #01", "paginas": 74}, {"id": "as02", "titulo": "Arquivos Secretos #02", "paginas": 108}, {"id": "as03", "titulo": "Arquivos Secretos #03", "paginas": 142}, {"id": "as04", "titulo": "Arquivos Secretos #04", "paginas": 79}, {"id": "as05", "titulo": "Arquivos Secretos #05", "paginas": 72}, {"id": "as06", "titulo": "Arquivos Secretos #06", "paginas": 84}, {"id": "as07", "titulo": "Arquivos Secretos #07", "paginas": 93}, {"id": "as09", "titulo": "Arquivos Secretos #09", "paginas": 66}, {"id": "sah", "titulo": "Sobrevivendo ao Horror · OCR", "paginas": 226}];
+let livroDigital = null;
+let paginaDigital = 1;
+let buscaLivroDigital = '';
+async function abrirLivroDigital(id, pagina=1) {
+  if (!LIVROS_DIGITALIZADOS.some(v=>v.id===id)) return;
+  try {
+    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.10-sah', {cache:'no-cache'});
+    if (!resp.ok) throw new Error('Não foi possível carregar esta transcrição.');
+    livroDigital = await resp.json(); paginaDigital = Math.min(Math.max(1, Number(pagina)||1),livroDigital.paginas.length); buscaLivroDigital = '';
+    render();
+    if (id === 'sah' && location.hash.startsWith('#/acervo/sah/')) {
+      requestAnimationFrame(() => document.getElementById('leitor-privado')?.scrollIntoView({block:'start'}));
+    }
+  } catch (e) { avisar('Falha ao abrir livro digitalizado: '+e.message,true); }
+}
+
+async function carregarSuplementos(){
+  try { const r=await fetch('dados/suplementos.json?v=0.10'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
+}
+async function carregarReferenciasSAH(){
+  try {
+    const r = await fetch('dados/sah_referencias.json?v=0.10', {cache:'no-cache'});
+    if(r.ok) SAH_REF = await r.json();
+  } catch(e){ console.warn('Índice do Sobrevivendo ao Horror não disponível', e); }
+}
 definirRaizModal($('#modal-raiz'));
 document.documentElement.dataset.tema = estado.tema;
-document.documentElement.dataset.efeito = estado.efeito;
 
 const ctx = {
   estado, avisar,
@@ -50,9 +63,10 @@ const ctx = {
 // ---------- Rotas ----------
 function lerRota() {
   const h = location.hash.replace(/^#\/?/, '');
-  const [tela, id] = h.split('/');
+  const [tela, id, pagina] = h.split('/');
+  if (tela === 'acervo' && id === 'sah') return {tela:'acervo', livro:'sah', pagina:Math.max(1,Number(pagina)||1)};
   if (tela === 'agente' && id) return { tela: 'ficha', id };
-  if (['agentes', 'novo', 'mestre', 'sobre'].includes(tela)) return { tela };
+  if (['agentes', 'novo', 'mestre', 'sobre', 'acervo'].includes(tela)) return { tela };
   return { tela: 'inicio' };
 }
 addEventListener('hashchange', () => {
@@ -61,6 +75,9 @@ addEventListener('hashchange', () => {
   if (estado.rota.tela === 'novo' && !estado.criador) estado.criador = novoRascunho();
   if (estado.rota.tela === 'ficha' && antes.id !== estado.rota.id) estado.ui.aba = 'agente';
   fecharModal();
+  if(estado.rota.tela==='acervo' && estado.rota.livro==='sah') {
+    abrirLivroDigital('sah',estado.rota.pagina);
+  }
   render(); scrollTo(0, 0);
 });
 
@@ -68,72 +85,90 @@ addEventListener('hashchange', () => {
 function topo() {
   const r = estado.rota.tela;
   const link = (href, nome, ativo) => `<a href="${href}" ${ativo ? 'aria-current="page"' : ''}>${nome}</a>`;
-  const nomesPaleta = { sangue: 'Sangue', energia: 'Energia', conhecimento: 'Conhecimento', morte: 'Morte' };
-  const opPaleta = (id, desc) => `<button class="fx-op fx-${id}" data-acao="trocar-efeito" data-efeito="${id}" aria-pressed="${estado.efeito === id}"><span class="fx-bolha" aria-hidden="true"></span><span><b>${nomesPaleta[id]}</b><small>${desc}</small></span></button>`;
-  return `<header class="topo topo-oculto"><a class="marca" href="#/"><img src="assets/selo-oculto.svg" alt=""><span>FICHA <b>OCULTA</b><small>ARQUIVO DE AGENTES</small></span></a>
-    <nav>${link('#/agentes', 'Agentes', ['agentes', 'ficha', 'novo'].includes(r))}${link('#/mestre', 'Mestre', r === 'mestre')}${link('#/sobre', 'Sobre', r === 'sobre')}
-    <div class="caixa-efeitos"><button class="btn-ambiente" data-acao="efeitos" title="Escolher a paleta do Outro Lado" aria-label="Abrir opções de efeitos" aria-haspopup="dialog" aria-expanded="${estado.uiFxAberto}">${ambienteAtivo ? '◉ Efeitos' : '◎ Efeitos'}</button>
-      ${estado.uiFxAberto ? `<div class="menu-efeitos" role="dialog" aria-label="Opções de efeitos e paleta"><div class="menu-efeitos-titulo">Paleta do Outro Lado</div><div class="menu-efeitos-opcoes">${opPaleta('sangue', 'carne, calor e violência')}${opPaleta('energia', 'caos, descarga e instabilidade')}${opPaleta('conhecimento', 'sinais, grimório e revelação')}${opPaleta('morte', 'tempo, ruína e decadência')}</div><button class="fx-ambiente-toggle" data-acao="ambiente" aria-pressed="${ambienteAtivo}">${ambienteAtivo ? 'Desligar ambiente animado' : 'Ligar ambiente animado'}</button><small class="fx-aviso">As paletas mudam o modo Noite. No modo Papel, elas ficam salvas para quando você voltar.</small></div>` : ''}
-    </div>
-    <button data-acao="tema" title="Trocar tema" aria-label="Trocar tema claro/escuro" aria-pressed="${estado.tema === 'papel'}">${estado.tema === 'papel' ? '☾ Noite' : '☼ Papel'}</button></nav></header>`;
+  return `<header class="topo"><span class="gotas" aria-hidden="true"><i></i><i></i><i></i></span><a class="marca" href="#/"><img src="assets/favicon.svg" alt=""><span>Ficha <b>Oculta</b> RPG</span></a>
+    <nav>${link('#/agentes', 'Agentes', ['agentes', 'ficha', 'novo'].includes(r))}${link('#/mestre', 'Mestre', r === 'mestre')}${link('#/acervo', 'Suplementos', r === 'acervo')}${link('#/sobre', 'Sobre', r === 'sobre')}
+    <button data-acao="tema" title="Trocar tema" aria-label="Trocar tema claro/escuro">${estado.tema === 'papel' ? '☾ Noite' : '☼ Papel'}</button></nav></header>`;
 }
 function inicio() {
-  const elementos = [['sangue','Sangue','A intensidade do sentir.'],['morte','Morte','O tempo devora tudo.'],['conhecimento','Conhecimento','O preço de saber.'],['energia','Energia','Nada permanece igual.'],['medo','Medo','O impossível tem nome.']];
-  return `<div class="inicio-oculto">
-    <section class="limiar-hero" aria-label="Bem-vindo à Ficha Oculta">
-      <div class="hero-ruido" aria-hidden="true"></div>
-      <div class="hero-gravura" aria-hidden="true"></div>
-      <div class="hero-veu" aria-hidden="true"></div>
-      <div class="hero-container pagina">
-        <div class="hero-texto">
-          <span class="sobrescrito-oculto"><span class="marca-cruz" aria-hidden="true">✦</span> REGISTRO NÃO AUTORIZADO <span class="risco-vivo" aria-hidden="true"></span></span>
-          <h1 class="titulo-limiar">A MEMBRANA<br><span>ESTÁ</span><br><em>SE ROMPENDO.</em></h1>
-          <p class="sinopse-limiar">Há coisas que não deveriam atravessar. Registre seus agentes, reúna evidências e encare o inexplicável em uma ficha feita para histórias de <i>Ordem Paranormal</i>.</p>
-          <div class="hero-acoes"><a href="#/novo" data-acao="novo-agente" class="invocar principal"><span>✠</span> CRIAR UM AGENTE</a><a href="#/agentes" class="invocar secundario">CONSULTAR ARQUIVOS <span>↗</span></a></div>
-          <div class="hero-nota"><span>REGISTROS DO OUTRO LADO</span><span>FERRAMENTA GRATUITA DE FÃS</span></div>
-          <div class="licenca-comunidade"><a href="https://ordemparanormal.com.br/licenca" target="_blank" rel="noopener noreferrer" aria-label="Ler a licença oficial da comunidade"><img src="assets/selo-comunidade-referencia.svg" alt="Aviso de projeto não oficial e não canônico; consulte o selo oficial na página da licença" loading="lazy"></a><div><strong>PROJETO NÃO OFICIAL</strong><small>Este é um conteúdo não oficial, publicado sob a Licença da Comunidade de Ordem Paranormal.</small><small>Contém material gerado por inteligência artificial.</small></div></div>
-        </div>
-        <div class="hero-selo" aria-hidden="true"><img src="assets/selo-oculto.svg" alt=""><span class="hero-selo-texto">QUANDO A REALIDADE<br>FALHA, INVESTIGUE.</span></div>
-      </div>
-      <div class="hero-rodape" aria-hidden="true"><span>DOCUMENTO 001 / ACESSO AO OUTRO LADO</span><span>SCROLL PARA INVESTIGAR ↓</span></div>
-    </section>
-    <section class="pagina capitulo" aria-labelledby="capitulo-titulo">
-      <header class="capitulo-cabecalho"><span class="capitulo-numero">I</span><div><span class="sobrescrito-oculto">DOSSIÊ DE OPERAÇÕES</span><h2 id="capitulo-titulo">Toda investigação <em>começa aqui.</em></h2></div></header>
-      <div class="portais-acesso">
-        <a href="#/agentes" class="portal-acesso portal-jogador"><span class="portal-imagem" aria-hidden="true"></span><span class="portal-margem">ARQUIVO 01 / PESSOAL</span><span class="portal-descricao"><span class="portal-icon" aria-hidden="true">✠</span><strong>Meus agentes</strong><small>Fichas, atributos, poderes, rituais e as marcas deixadas pelo Outro Lado.</small><span class="portal-link">ABRIR REGISTROS <b>↗</b></span></span></a>
-        <a href="#/mestre" class="portal-acesso portal-mestre"><span class="portal-imagem" aria-hidden="true"></span><span class="portal-margem">ARQUIVO 02 / AMEAÇAS</span><span class="portal-descricao"><span class="portal-icon" aria-hidden="true">◈</span><strong>Área do mestre</strong><small>Controle o desconhecido, organize ameaças e registre a sua missão.</small><span class="portal-link">INVESTIGAR <b>↗</b></span></span></a>
-        <div class="portal-acesso portal-futuro" aria-label="Tabuleiro em desenvolvimento"><span class="portal-imagem" aria-hidden="true"></span><span class="portal-margem">ARQUIVO 03 / LACRADO</span><span class="portal-descricao"><span class="portal-icon" aria-hidden="true">◇</span><strong>Mesa e tabuleiro</strong><small>O próximo mistério ainda não está pronto para ser revelado.</small><span class="portal-link">DOCUMENTO LACRADO <b>✕</b></span></span></div>
-      </div>
-    </section>
-    <section class="elementos-ocultos" aria-labelledby="elementos-titulo"><div class="pagina">
-      <header class="capitulo-cabecalho"><span class="capitulo-numero">II</span><div><span class="sobrescrito-oculto">ALÉM DA REALIDADE</span><h2 id="elementos-titulo">Os cinco <em>elementos.</em></h2><p>Há forças que não deveriam ser compreendidas.</p></div></header>
-      <div class="circulo-elementos">${elementos.map(([id,nome,descricao]) => `<div class="elemento-placa elemento-${id}"><span class="elemento-sombra" aria-hidden="true"></span><img src="assets/glifo-${id}.svg" alt="" aria-hidden="true"><b>${nome}</b><small>${descricao}</small></div>`).join('')}</div>
-      <div class="nota-fim"><span>UMA FERRAMENTA DE FÃS · NÃO OFICIAL</span><span>OS DADOS SÃO SALVOS NESTE NAVEGADOR. EXPORTE UMA CÓPIA.</span></div>
-    </div></section>
-  </div>`;
+  return `<div class="pagina"><section class="capa"><div class="circulo" aria-hidden="true"></div>
+    <h1>Ficha Oculta<b>RPG</b></h1>
+    <p>Fichas, rolagens e Área do Mestre para <i>Ordem Paranormal RPG</i>. Tudo fica salvo no seu navegador, sem conta e sem servidor.</p>
+    ${imagemOpcional('assets/imagens/capa.jpg', 'imagem-capa', '')}
+  </section>
+  <div class="portas">
+    <a class="porta" href="#/agentes"><span class="num">ARQUIVO 01</span><h2>Área do Jogador</h2><p>Crie agentes nas Regras Padrão ou no Sobrevivendo ao Horror. Ficha completa com rolagens.</p><span class="respingo"></span></a>
+    <a class="porta" href="#/mestre"><span class="num">ARQUIVO 02</span><h2>Área do Mestre</h2><p>Ameaças, combate com iniciativa, anotações e backup.</p><span class="respingo" style="transform:rotate(90deg)"></span></a>
+    <div class="porta em-breve"><span class="num">ARQUIVO 03 · EM BREVE</span><h2>Tabuleiro e Mesa</h2><p>Mapa ao vivo e mesa online (vamos trazer do Arcana nas próximas versões).</p></div>
+  </div></div>`;
 }
-
 function listaAgentes() {
   const fs = estado.fichas;
-  return `<div class="pagina arquivo-agentes"><div class="titulo-secao"><h1 class="faixa">Agentes</h1>
+  return `<div class="pagina"><div class="titulo-secao"><h1 class="faixa">Agentes</h1>
     <div class="linha"><a class="btn sangue" href="#/novo" data-acao="novo-agente">+ Novo agente</a><button class="btn" data-acao="importar">Importar</button>${fs.length ? '<button class="btn fantasma" data-acao="exportar-todos">Exportar todos</button>' : ''}</div></div>
     ${fs.length ? `<div class="lista-fichas">${fs.map(f => {
       const d = derivar(f);
       return `<a class="ficha-cartao" href="#/agente/${esc(f.id)}"><span class="mini" style="${f.retrato ? `background-image:url(${esc(f.retrato)})` : ''}">${f.retrato ? '' : esc((f.nome || '?')[0].toUpperCase())}</span>
         <span><b>${esc(f.nome || 'Sem nome')}</b><br><small>${esc(CLASSES[f.classe].nome)} · ${esc(ORIGEM[f.origem]?.nome || f.origemPropria?.nome || '—')}</small><br>
         <small class="dossie-txt">${esc(d.textoNivel)} · PV ${d.atual.pv}/${d.pv}${d.pd ? ` · PD ${d.atual.pd}/${d.pdMax}` : ` · PE ${d.atual.pe}/${d.pe} · SAN ${d.atual.san}/${d.san}`}</small><br>
-        <span class="etiqueta ${f.modo === 'sah' ? 'sah' : 'lr'}" style="margin-top:4px">${esc(MODOS[f.modo].nome)}</span></span></a>`;
+        <span class="etiqueta ${f.modo === 'sah' ? 'sah' : 'lr'}" style="margin-top:4px">${esc(MODOS[f.modo].nome)}</span>
+        ${d.pendencias.length ? `<span class="pend-mini"><b>A fazer:</b> ${d.pendencias.map(p => esc(p.texto)).join(' · ')}</span>` : '<span class="pend-mini ok">Ficha em dia.</span>'}</span></a>`;
     }).join('')}</div>` : `<div class="vazio"><p>Nenhum agente ainda. O Outro Lado está esperando.</p><a class="btn sangue" href="#/novo" data-acao="novo-agente">Criar o primeiro agente</a></div>`}
     <p class="apagado" style="margin-top:20px;font-size:.88rem">As fichas ficam só neste navegador (${Math.round(espacoUsado() / 1024)} KB usados). Se limpar os dados do navegador, elas somem: use Exportar para guardar uma cópia.</p></div>`;
+}
+
+function acervo() {
+  const volumes = SUPLEMENTOS?.volumes || [];
+  const pg = livroDigital?.paginas?.find(p=>p.pagina===paginaDigital);
+  const consulta = buscaLivroDigital.trim().toLocaleLowerCase('pt-BR');
+  const resultados = consulta && livroDigital ? livroDigital.paginas.filter(p=>p.texto.toLocaleLowerCase('pt-BR').includes(consulta)).slice(0,45) : [];
+  return `<div class="pagina acervo-pagina"><div class="titulo-secao"><h1 class="faixa">Acervo de suplementos</h1><span class="etiqueta">Textos dos PDFs enviados</span></div>
+    <section class="painel"><p>Consulta de regras, poderes, rituais, trilhas, origens e itens adicionais dos <i>Arquivos Secretos</i>. Conteúdo extraído dos materiais enviados para uso pessoal; as imagens e tabelas devem ser conferidas no livro original. Estas regras não são ativadas automaticamente nas fichas.</p>
+      <p class="apagado">O livro <i>Sobrevivendo ao Horror</i> agora está disponível nesta Biblioteca em texto OCR por página. As referências ajudam a localizar 155 descrições pendentes, mas erros de leitura são possíveis, especialmente em tabelas e números. A transcrição não foi conferida palavra por palavra.</p>
+      <label class="campo"><span>Buscar nos suplementos</span><input type="search" data-acervo-busca placeholder="Nome de poder, ritual, trilha, regra ou item..." autocomplete="off"></label>
+    </section>
+
+    <section class="painel biblioteca-livros" id="biblioteca-digital">
+      <h2 class="faixa">Biblioteca digitalizada</h2>
+      <p>Os textos abaixo foram fornecidos em TXT e Word pelo usuário, incluindo Sobrevivendo ao Horror. A leitura conserva as transcrições por página e não transforma automaticamente menções em descrições de habilidades. Conteúdo destinado a uso pessoal — não publique em GitHub Pages público sem autorização.</p>
+      <div class="livros-lista">${LIVROS_DIGITALIZADOS.map(v=>`<button class="btn pequeno" data-acao="abrir-livro-digital" data-livro="${v.id}" aria-pressed="${livroDigital?.id===v.id}">${esc(v.titulo)} · ${v.paginas} páginas</button>`).join('')}</div>
+      ${livroDigital ? `<div class="livro-leitor" id="leitor-privado"><h3 class="titulo-vermelho">${esc(livroDigital.titulo)}</h3>
+        <div class="linha livro-acoes">
+          <button class="btn pequeno" data-acao="pagina-livro" data-pagina="${Math.max(1,paginaDigital-1)}" ${paginaDigital<=1?'disabled':''}>Anterior</button>
+          <span class="etiqueta">Página ${paginaDigital} / ${livroDigital.paginas.length}</span>
+          <button class="btn pequeno" data-acao="pagina-livro" data-pagina="${Math.min(livroDigital.paginas.length,paginaDigital+1)}" ${paginaDigital>=livroDigital.paginas.length?'disabled':''}>Próxima</button>
+          <label class="campo pagina-escolher"><span>Ir à página</span><input type="number" id="biblioteca-ir-pagina" min="1" max="${livroDigital.paginas.length}" value="${paginaDigital}"></label>
+          <button class="btn pequeno" data-acao="ir-pagina-livro">Abrir</button>
+        </div>
+        <div class="linha livro-acoes"><label class="campo" style="flex:1"><span>Buscar neste volume</span><input id="biblioteca-buscar" type="search" value="${esc(buscaLivroDigital)}" placeholder="Palavra ou nome de poder"></label><button class="btn pequeno" data-acao="buscar-livro-digital">Buscar</button></div>
+        ${consulta ? `<div class="livro-resultados"><small>${resultados.length} resultado(s) listado(s), até 45 páginas</small><div class="linha">${resultados.map(p=>`<button class="btn pequeno fantasma" data-acao="pagina-livro" data-pagina="${p.pagina}">Página ${p.pagina}</button>`).join('')}</div></div>`:''}
+        <div class="livro-pagina-digital"><strong>Página ${paginaDigital} · transcrição enviada</strong><pre>${esc(pg?.texto||'Página não localizada')}</pre></div>
+      </div>` : ''}
+    </section>
+    ${!volumes.length ? '<p class="painel">Carregando os textos...</p>' : volumes.map(vol=>`<section class="painel acervo-volume" data-acervo-volume><h2 class="faixa">${esc(vol.titulo)}</h2><p class="apagado">${esc(vol.id)} · ${vol.secoes.reduce((n,sec)=>n+sec.paginas.length,0)} páginas selecionadas</p>${vol.secoes.map(sec=>`<div class="acervo-secao"><h3 class="titulo-vermelho">${esc(sec.titulo)}</h3>${sec.paginas.map(p=>`<details class="acervo-pagina-fonte" data-acervo-pagina><summary>Página ${p.pagina} · ver transcrição</summary><div class="acervo-conteudo">${esc(p.texto)}</div></details>`).join('')}</div>`).join('')}</section>`).join('')}
+    <section class="painel referencias-sah">
+      <h2 class="faixa">Sobrevivendo ao Horror — referências</h2>
+      <p>Consulta por <strong>página do PDF</strong> (não pela numeração impressa). O conteúdo foi localizado por reconhecimento óptico automático e ainda precisa de conferência manual nos originais.</p>
+      ${SAH_REF ? `
+        <details open><summary>16 rituais pendentes · ver localização</summary>
+          <div class="refs-sah-grid">${Object.entries(SAH_REF.rituais).map(([nome,info])=>`<div class="ref-sah"><strong>${esc(nome)}</strong><small>${esc(info.documento)} · PDF páginas ${info.pdf_paginas.join(', ')}</small></div>`).join('')}</div>
+        </details>
+        <details><summary>${Object.keys(SAH_REF.habilidades).length} possíveis localizações de poderes e habilidades</summary>
+          <p class="apagado">As ocorrências devem ser conferidas: o nome pode aparecer em uma lista, tabela ou exemplo sem conter a descrição completa.</p>
+          <div class="refs-sah-grid">${Object.entries(SAH_REF.habilidades).map(([nome,info])=>`<div class="ref-sah"><strong>${esc(nome)}</strong><small>PDF páginas ${info.pdf_paginas.join(', ')}</small></div>`).join('')}</div>
+        </details>
+      ` : '<p class="apagado">Índice de referências não carregado.</p>'}
+    </section>
+    <p class="apagado">É necessário ter direito de redistribuição antes de publicar o texto integral dos suplementos em uma página pública.</p>
+  </div>`;
 }
 function sobre() {
   return `<div class="pagina"><section class="painel"><h1 class="faixa">Sobre</h1>
     <p><b>${NOME_DO_SITE}</b> v${VERSAO} é uma ferramenta de fãs para jogar <i>Ordem Paranormal RPG</i>. Não é um produto oficial.</p>
-    <p>As regras estão resumidas com outras palavras, só para consulta rápida durante o jogo. Os textos completos, as artes e as ameaças estão nos livros (Livro de Regras e Sobrevivendo ao Horror): compre e consulte os livros oficiais.</p>
+    <p>As descrições de rituais e habilidades localizadas nos arquivos enviados foram transcritas para consulta pessoal. Os itens não localizados estão indicados como pendentes. Verifique o livro oficial para confirmar diagramação, tabelas e regras adicionais. A publicação pública de textos integrais pode exigir autorização dos titulares.</p>
     <h3 class="titulo-vermelho">Imagens</h3><p>Você pode colocar imagens suas na pasta <span class="dossie-txt">assets/imagens/</span> do site (veja o LEIA-ME de lá): <span class="dossie-txt">capa.jpg</span>, <span class="dossie-txt">classe-combatente.jpg</span>, <span class="dossie-txt">origem-academico.jpg</span> etc. Se o arquivo existir, ele aparece; se não, o espaço some.</p>
     <h3 class="titulo-vermelho">Dados 3D</h3><label class="check"><input type="checkbox" data-acao-check="animacoes" ${animacoesLigadas() ? 'checked' : ''}> <span>Mostrar a animação dos dados 3D</span></label>
     <h3 class="titulo-vermelho">Elementos</h3><p>${[['sangue', '#c8141f', 'Sangue'], ['morte', '#8d8d8d', 'Morte'], ['conhecimento', '#d9a521', 'Conhecimento'], ['energia', '#a64dff', 'Energia'], ['medo', '#f2efe8', 'Medo']].map(([id, cor, n]) => `<span class="etiqueta" style="border-color:${cor}">${sigilo(id, cor)} ${n}</span>`).join(' ')}</p>
-    <p class="apagado" style="font-size:.88rem">A identidade gráfica usa artes originais criadas para esta versão, incluindo uma imagem gerada por inteligência artificial, e símbolos reinterpretados em vetores. Os livros oficiais foram usados como referência de atmosfera, sem reprodução de imagens ou logos dos livros. Este é um conteúdo não oficial, publicado sob a Licença da Comunidade de Ordem Paranormal. Contém material gerado por inteligência artificial.</p></section></div>`;
+    <p class="apagado" style="font-size:.88rem">Os sigilos, o círculo ritual e as pinceladas deste site são desenhos originais, não os símbolos oficiais.</p></section></div>`;
 }
 function bandeja() {
   return `<div class="bandeja"><button class="btn" data-acao="historico" aria-expanded="${estado.historicoAberto}">🎲 Rolagens</button></div>
@@ -150,10 +185,10 @@ function render() {
   else if (r.tela === 'novo') corpo = telaCriador(estado.criador || (estado.criador = novoRascunho()));
   else if (r.tela === 'ficha') { const f = ctx.fichaAtual(); corpo = f ? telaFicha(f, estado.ui) : `<div class="pagina"><p class="vazio">Agente não encontrado neste navegador. <a href="#/agentes">Voltar</a></p></div>`; }
   else if (r.tela === 'mestre') corpo = telaMestre(estado.fichas);
+  else if (r.tela === 'acervo') corpo = acervo();
   else if (r.tela === 'sobre') corpo = sobre();
   else corpo = inicio();
-  document.documentElement.dataset.tela = r.tela;
-  htmlMantendoFoco(app, `${topo()}<main id="conteudo">${corpo}</main><footer class="rodape">${NOME_DO_SITE} v${VERSAO} · conteúdo não oficial · sob a Licença da Comunidade de Ordem Paranormal · contém material gerado por inteligência artificial · salvo só neste navegador</footer>${bandeja()}`);
+  htmlMantendoFoco(app, `${topo()}<main id="conteudo">${corpo}</main><footer class="rodape">${NOME_DO_SITE} v${VERSAO} · ferramenta de fãs para Ordem Paranormal RPG · salvo só neste navegador</footer>${bandeja()}`);
 }
 quandoMudar(() => { if (estado.historicoAberto) render(); });
 
@@ -162,30 +197,12 @@ const acoes = {
   ...acoesCriador(ctx), ...acoesFicha(ctx), ...acoesMestre(ctx),
   'fechar-modal': () => fecharModal(),
   'fechar-modal-fundo': (el, ev) => { if (ev.target === el) fecharModal(); },
-  'efeitos': () => { estado.uiFxAberto = !estado.uiFxAberto; render(); },
-  'trocar-efeito': (el) => {
-    const novo = el.dataset.efeito;
-    if (!PALETAS_NOITE.includes(novo)) return;
-    estado.efeito = novo;
-    estado.uiFxAberto = false;
-    document.documentElement.dataset.efeito = novo;
-    salvarPaletaNoite(novo);
-    render();
-  },
-  'ambiente': () => {
-    ambienteAtivo = !ambienteAtivo;
-    document.documentElement.dataset.ambiente = ambienteAtivo ? 'ativo' : 'silencioso';
-    try { localStorage.setItem('fichaoculta-ambiente', ambienteAtivo ? '1' : '0'); } catch {}
-    render();
-  },
-  'tema': () => {
-    estado.tema = estado.tema === 'papel' ? 'noite' : 'papel';
-    estado.uiFxAberto = false;
-    document.documentElement.dataset.tema = estado.tema;
-    salvarTema(estado.tema);
-    render();
-  },
+  'tema': () => { estado.tema = estado.tema === 'papel' ? 'noite' : 'papel'; document.documentElement.dataset.tema = estado.tema; salvarTema(estado.tema); render(); },
   'novo-agente': (el, ev) => { ev.preventDefault(); estado.criador = novoRascunho(); if (location.hash === '#/novo') render(); else location.hash = '#/novo'; },
+  'abrir-livro-digital': el => abrirLivroDigital(el.dataset.livro),
+  'pagina-livro': el => { paginaDigital = Number(el.dataset.pagina)||1; render(); document.getElementById('leitor-privado')?.scrollIntoView({block:'start'}); },
+  'ir-pagina-livro': () => { const n=Number(document.getElementById('biblioteca-ir-pagina')?.value); if(!livroDigital || !Number.isInteger(n) || n<1 || n>livroDigital.paginas.length) return; paginaDigital=n;render();document.getElementById('leitor-privado')?.scrollIntoView({block:'start'}); },
+  'buscar-livro-digital': () => { buscaLivroDigital=document.getElementById('biblioteca-buscar')?.value||''; render(); document.getElementById('leitor-privado')?.scrollIntoView({block:'start'}); },
   'historico': () => { estado.historicoAberto = !estado.historicoAberto; render(); },
   'limpar-historico': () => limparHistorico(),
   'rolar-dano-ultimo': el => { const u = ultimaRolagem(); if (!u) return; fecharModal(); rolarDanoUI({ titulo: u.titulo.replace(/^Ataque/, 'Dano'), quem: u.quem, formula: u.formulaDano, multiplicador: el.dataset.crit === '1' ? u.mult : 1 }); },
@@ -203,13 +220,6 @@ const acoes = {
   'exportar-todos': () => baixarArquivo(`agentes-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ tipo: 'fichaoculta-fichas', versao: 1, fichas: estado.fichas }, null, 2)),
 };
 const checks = { ...checksFicha(ctx), 'animacoes': el => { ligarAnimacoes(el.checked); avisar(el.checked ? 'Animação ligada.' : 'Animação desligada.'); } };
-
-document.addEventListener('click', ev => {
-  if (!estado.uiFxAberto) return;
-  if (ev.target.closest('.caixa-efeitos')) return;
-  estado.uiFxAberto = false;
-  render();
-});
 
 document.addEventListener('click', ev => {
   const alvo = ev.target.closest('[data-acao]');
@@ -259,16 +269,18 @@ function aoEditar(ev, final) {
   ctx.salvarFicha(f);
   if (precisa && (el.tagName === 'SELECT' || tipo || el.type === 'checkbox')) render();
 }
-document.addEventListener('input', ev => aoEditar(ev, false));
+document.addEventListener('input', ev => { if(ev.target.matches('[data-acervo-busca]')){
+  const q=ev.target.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  document.querySelectorAll('[data-acervo-pagina]').forEach(el=>{const txt=el.textContent.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');el.hidden=!!q&&!txt.includes(q)});
+  document.querySelectorAll('[data-acervo-volume]').forEach(el=>{el.hidden=!!q && !el.querySelector('[data-acervo-pagina]:not([hidden])')}); return;
+ } aoEditar(ev, false); });
 document.addEventListener('change', ev => aoEditar(ev, true));
-document.addEventListener('keydown', ev => {
-  if (ev.key !== 'Escape') return;
-  if (estado.uiFxAberto) { estado.uiFxAberto = false; render(); return; }
-  if ($('#modal-raiz').firstChild) fecharModal();
-});
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && $('#modal-raiz').firstChild) fecharModal(); });
 
 // ---------- Início ----------
 estado.rota = lerRota();
 if (estado.rota.tela === 'novo') estado.criador = novoRascunho();
+if (estado.rota.tela === 'acervo' && estado.rota.livro === 'sah') abrirLivroDigital('sah',estado.rota.pagina);
 render();
+Promise.all([carregarTextos(),carregarSuplementos(),carregarReferenciasSAH()]).then(render);
 try { navigator.storage?.persist?.(); } catch {}

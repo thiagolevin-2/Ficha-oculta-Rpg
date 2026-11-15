@@ -647,3 +647,117 @@ body.levou-dano #app::after { content: ''; position: fixed; inset: 0; pointer-ev
 :root:not([data-tema="papel"]) .progressao li:not(.atingido) { color: #ab9b84; }
 :root:not([data-tema="papel"]) .etiqueta { color: #eadfca; }
 
+/* =====================================================================
+   RODA DOS ATRIBUTOS — círculos de borda irregular em volta de uma engrenagem
+   (Noite: escuro e vermelho-sangue · Papel: pergaminho, vinho e tinta preta)
+   ===================================================================== */
+.roda-atr { position: relative; width: min(400px, 100%); aspect-ratio: 1; margin: 6px auto 0; }
+.roda-engrenagem { position: absolute; left: 50%; top: 52%; width: 46%; aspect-ratio: 1; transform: translate(-50%, -50%);
+  background: #6d0a12; -webkit-mask: url(assets/engrenagem.svg) center / contain no-repeat; mask: url(assets/engrenagem.svg) center / contain no-repeat;
+  filter: drop-shadow(0 0 10px #b3121f55); animation: girar-eng 90s linear infinite; }
+@keyframes girar-eng { to { transform: translate(-50%, -50%) rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .roda-engrenagem { animation: none; } }
+.roda-item { position: absolute; width: 31%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 4px; z-index: 1; }
+.roda-circulo { position: relative; width: 100%; aspect-ratio: 1; border-radius: 50%; border: 0; padding: 0; display: grid; place-content: center; text-align: center; gap: 0; color: var(--tinta);
+  background: radial-gradient(circle at 45% 38%, #2c1513, #0d0606 72%); box-shadow: 0 6px 16px #000b, inset 0 0 14px #000; font: inherit; }
+button.roda-circulo { cursor: pointer; }
+.roda-circulo::before { /* borda irregular */
+  content: ''; position: absolute; inset: -6%; background: #c8141f; -webkit-mask: url(assets/anel-grunge.svg) center / contain no-repeat; mask: url(assets/anel-grunge.svg) center / contain no-repeat; filter: drop-shadow(0 0 6px #b3121f99); }
+button.roda-circulo:hover::before { background: #ff3b47; }
+button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offset: 6px; }
+.roda-nome { display: grid; font: 600 .62rem/1.1 var(--fonte-ui); letter-spacing: .08em; text-transform: uppercase; color: #d9cbb0; }
+.roda-nome b { font-size: .95rem; letter-spacing: .12em; color: #f4ecdc; }
+.roda-valor { font: 700 2.1rem/1 var(--fonte-titulo); color: #fff4e6; text-shadow: 0 0 12px #b3121f99; margin-top: 2px; }
+.roda-ajuste { display: flex; gap: 6px; }
+.roda-ajuste button { width: 32px; height: 28px; border: 1px solid var(--linha-forte); background: var(--painel); color: var(--tinta); border-radius: 3px; cursor: pointer; font: 700 1rem var(--fonte-ui); }
+/* Papel: pergaminho, borda vinho, engrenagem de tinta */
+:root[data-tema="papel"] .roda-engrenagem { background: #231a12; filter: none; }
+:root[data-tema="papel"] .roda-circulo { background: radial-gradient(circle at 45% 38%, #fffbef, #f3e6c4 75%); box-shadow: 0 3px 8px #6b4f2a40; color: var(--tinta); }
+:root[data-tema="papel"] .roda-circulo::before { background: #7d1f33; filter: none; }
+:root[data-tema="papel"] button.roda-circulo:hover::before { background: #9b2416; }
+:root[data-tema="papel"] .roda-nome { color: #5b4632; font-weight: 700; }
+:root[data-tema="papel"] .roda-nome b { color: #231a12; }
+:root[data-tema="papel"] .roda-valor { color: #231a12; text-shadow: none; font-family: var(--fonte-mao); font-size: 2.3rem; }
+:root[data-tema="papel"] .roda-ajuste button { background: #fffbef; border: 1.5px solid #2a1f16; border-radius: 2px; }
+@media (max-width: 640px) {
+  .roda-nome { font-size: .5rem; } .roda-nome b { font-size: .78rem; } .roda-valor { font-size: 1.6rem; }
+  :root[data-tema="papel"] .roda-valor { font-size: 1.8rem; }
+  .roda-ajuste button { width: 28px; height: 26px; }
+}
+
+/* =====================================================================
+   v0.6 — rituais compactos, d20, pendências e janelas que não cobrem o texto
+   ===================================================================== */
+/* avisos: pequenos, no canto de cima, sem cobrir o conteúdo do meio */
+#avisos { left: auto; right: 12px; top: 64px; bottom: auto; transform: none; width: min(300px, calc(100vw - 24px)); gap: 4px; }
+.aviso { padding: 6px 10px; font-size: .8rem; line-height: 1.3; box-shadow: 0 4px 12px #0008; opacity: .97; }
+/* botão de rolagens menor e página com espaço embaixo para ele */
+.bandeja .btn { min-height: 34px; padding: 4px 10px; font-size: .74rem; }
+.pagina { padding-bottom: 96px; }
+.historico { max-height: 50vh; bottom: 58px; width: min(340px, calc(100vw - 28px)); }
+/* janelas (modais): não passam da tela e rolam por dentro */
+.modal { max-height: calc(100dvh - 32px); }
+.modal.largo { width: min(820px, calc(100vw - 24px)); }
+.fundo-modal { padding: 12px; align-items: start; overflow-y: auto; }
+@media (min-height: 700px) { .fundo-modal { align-items: center; } }
+/* d20 nas perícias */
+.rolar-d20 { gap: 6px; }
+.icone-d20 { width: 26px; height: 26px; flex: none; color: var(--sangue-texto, var(--sangue)); transition: transform .2s; }
+.rolar-d20:hover .icone-d20 { transform: rotate(60deg) scale(1.1); }
+:root[data-tema="papel"] .icone-d20 { color: #7d1f33; }
+/* rituais conhecidos: cartões compactos que abrem */
+.rituais-compactos { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.ritual-compacto { padding: 0; }
+.ritual-compacto > summary { list-style: none; cursor: pointer; padding: 10px 12px; display: grid; gap: 4px; }
+.ritual-compacto > summary::-webkit-details-marker { display: none; }
+.ritual-compacto > summary .cab { display: flex; gap: 8px; align-items: center; }
+.ritual-compacto > summary .cab b { font-family: var(--fonte-titulo); }
+.ritual-compacto > summary small { line-height: 1.3; }
+.ritual-compacto[open] { grid-column: 1 / -1; }
+.detalhes-rit { padding: 0 12px 12px; border-top: 1px dashed var(--linha); }
+.resumo-rit .etiqueta { font-size: .68rem; }
+.marcador-rituais { font-size: 1rem; padding: 2px 10px; border: 2px solid currentColor; border-radius: 4px; }
+.texto-completo { white-space: pre-wrap; font-size: .92rem; padding: 8px 10px; border-left: 3px solid var(--linha-forte); margin-top: 6px; }
+.texto-completo-box summary { cursor: pointer; font-size: .85rem; color: var(--apagado); margin-top: 4px; }
+/* pendências */
+.lista-pend { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.lista-pend li { display: flex; gap: 8px; align-items: center; }
+.pend-mini { display: block; margin-top: 6px; font-size: .8rem; color: var(--sangue-texto, var(--sangue)); line-height: 1.35; }
+.pend-mini.ok { color: var(--ok); }
+
+/* v0.10 — descrições integrais e acervo de suplementos */
+.texto-completo,.acervo-conteudo{white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;line-height:1.68;font-family:var(--fonte-texto);font-size:1rem;color:var(--tinta)}
+.texto-completo{margin-top:12px;padding:16px;background:color-mix(in srgb,var(--painel) 72%,transparent);border-left:3px solid var(--sangue);border-radius:4px}
+.acervo-pagina-fonte{margin:8px 0;padding:11px 15px;background:var(--fundo-2);border:1px solid var(--linha);border-radius:5px}
+.acervo-pagina-fonte summary{cursor:pointer;font-family:var(--fonte-ui);letter-spacing:.04em;line-height:1.45}
+.acervo-conteudo{padding:18px 8px 9px;border-top:1px solid var(--linha);margin-top:13px}
+.acervo-secao{margin:15px 0 24px}.acervo-volume{margin-top:18px}.acervo-pagina-fonte[hidden],.acervo-volume[hidden]{display:none!important}
+@media(max-width:680px){.acervo-pagina-fonte{padding:12px 10px}.acervo-conteudo{padding:12px 3px}}
+
+/* v0.10 — referências de conteúdo digitalizado, sem transcrição não conferida */
+.referencias-sah{margin-top:20px}
+.referencias-sah details{border-top:1px solid var(--linha);padding:10px 2px}
+.referencias-sah details>summary{cursor:pointer;font-family:var(--fonte-ui);padding:10px 3px;line-height:1.4}
+.refs-sah-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px;margin:16px 0}
+.ref-sah{padding:12px 14px;border:1px solid var(--linha);border-radius:7px;background:var(--fundo-2);overflow-wrap:anywhere}
+.ref-sah strong{display:block;font-size:14px;line-height:1.4}
+.ref-sah small{display:block;line-height:1.45;color:var(--apagado)}
+
+/* v0.10 — Biblioteca digital para consulta pessoal dos livros enviados */
+.biblioteca-livros{margin-top:20px}
+.livros-lista{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0}
+.livros-lista .btn[aria-pressed="true"]{border-color:var(--sangue);box-shadow:inset 0 0 0 1px var(--sangue)}
+.livro-leitor{margin-top:20px;padding:16px;border:1px solid var(--linha);background:var(--fundo-2);border-radius:10px}
+.livro-acoes{gap:10px;align-items:end;flex-wrap:wrap;margin:10px 0 18px}
+.livro-acoes .campo{margin:0}
+.livro-acoes .pagina-escolher{max-width:110px}
+.livro-pagina-digital{padding:22px 20px;background:var(--painel);border:1px solid var(--linha);border-radius:6px}
+.livro-pagina-digital>strong{display:block;border-bottom:1px solid var(--linha);padding-bottom:10px;margin-bottom:15px}
+.livro-pagina-digital pre{white-space:pre-wrap;overflow-wrap:anywhere;word-wrap:break-word;max-width:100%;font:14px/1.7 var(--fonte-texto);margin:0;color:var(--tinta)}
+.livro-resultados{padding:12px;margin:8px 0 16px;background:var(--painel-2);border:1px solid var(--linha)}
+.livro-resultados .linha{gap:8px;flex-wrap:wrap;margin-top:10px}
+@media(max-width:550px){.livro-leitor{padding:12px}.livro-pagina-digital{padding:16px 12px}.livro-pagina-digital pre{font-size:13px}.livros-lista .btn{width:100%}}
+
+/* Fonte direta das descrições pendentes, sem simular confirmação de OCR */
+.fonte-sah-link{display:inline-flex;align-items:center;margin:9px 0;padding:8px 13px;border:1px solid var(--linha);border-radius:8px;color:var(--sangue-texto);font-size:.88rem;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.fonte-sah-link:hover{border-color:var(--sangue);background:var(--painel-2)}

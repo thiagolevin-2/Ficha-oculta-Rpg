@@ -1,17 +1,31 @@
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 import {
   MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS,
-  ARMAS, PROTECOES, ITENS_GERAIS, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL,
-} from './catalogo.js?v=0.9';
-import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.9';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.9';
-import { pentagramaAtributos } from './criador.js?v=0.9';
-import { textoTeste, d, rolar } from './dados.js?v=0.9';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.9';
+  ARMAS, PROTECOES, ITENS_GERAIS, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA,
+} from './catalogo.js?v=0.10';
+import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.10';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.10';
+import { pentagramaAtributos } from './criador.js?v=0.10';
+import { textoTeste, d, rolar } from './dados.js?v=0.10';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.10';
 
+// Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
+let TEXTOS = {};
+let FONTES_SAH = {rituais:{},habilidades:{}};
+export async function carregarTextos() {
+  try { const r = await fetch('dados/textos.json?v=0.10', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.10-sah', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+}
+function abrirPaginaSah(tipo,nome) {
+  const pagina = FONTES_SAH?.[tipo]?.[nome]?.pagina;
+  return pagina ? `<a class="fonte-sah-link" href="#/acervo/sah/${pagina}" title="Abrir transcrição digitalizada de Sobrevivendo ao Horror · página ${pagina}">Consultar fonte · Sobrevivendo ao Horror, PDF p. ${pagina}</a>` : '';
+}
+export const textoCompleto = (tipo, nome) => { const t = TEXTOS?.[tipo]?.[nome]; return typeof t === 'string' ? t.slice(0, 20000) : ''; };
+// Ícone de d20 (desenho simples, original)
+export const ICONE_D20 = '<svg class="icone-d20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8 21.6 7.2v9.6L12 22.2 2.4 16.8V7.2Z" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 6.3 17.6 15.8H6.4Z M12 1.8V6.3 M2.4 7.2l4 8.6 M21.6 7.2l-4 8.6 M6.4 15.8 12 22.2l5.6-6.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>';
 export const ABAS = [['agente', 'Agente'], ['combate', 'Combate'], ['habilidades', 'Habilidades'], ['rituais', 'Rituais'], ['inventario', 'Inventário'], ['notas', 'Notas']];
 const ELEM = Object.fromEntries(ELEMENTOS.map(e => [e.id, e]));
-const fonteTag = f => f === 'SaH' ? '<span class="etiqueta sah">SaH</span>' : '';
+const fonteTag = f => f === 'SaH' ? '<span class="etiqueta sah">SaH</span>' : String(f).startsWith('AS') ? `<span class="etiqueta">${esc(f)}</span>` : '';
 const cat = n => (n ? romano(n) : '0');
 
 // ---------- Tela ----------
@@ -20,8 +34,7 @@ export function telaFicha(f, ui) {
   dAtual = d;
   const aba = ui.aba || 'agente';
   const corpo = { agente: abaAgente, combate: abaCombate, habilidades: abaHabilidades, rituais: abaRituais, inventario: abaInventario, notas: abaNotas }[aba](f, d, ui);
-  return `<div class="pagina ficha-oculta-pagina">
-  <div class="cabecalho-ritual"><span>REGISTRO DE AGENTE · ACESSO RESTRITO</span><small>AS MARCAS DO OUTRO LADO PERMANECEM</small></div>
+  return `<div class="pagina">
   ${cabecalho(f, d)}
   ${d.avisos.length ? `<details class="avisos-ficha" style="margin-top:12px"><summary class="ui" style="cursor:pointer">⚠ ${d.avisos.length} aviso(s) de regra</summary><ul>${d.avisos.map(a => `<li>${esc(a)}</li>`).join('')}</ul></details>` : ''}
   <nav class="abas" role="tablist" data-guardar-rolagem="abas">${ABAS.map(([id, nome]) => `<button role="tab" data-acao="aba" data-aba="${id}" aria-selected="${aba === id}">${nome}</button>`).join('')}</nav>
@@ -76,7 +89,7 @@ function abaAgente(f, d) {
       : temOpcional(f, 'nivelExp') ? `<label class="campo"><span>Nível</span><select data-campo="nivel" data-tipo="int">${Array.from({ length: 20 }, (_, i) => `<option value="${i + 1}" ${f.nivel === i + 1 ? 'selected' : ''}>${i + 1}</option>`).join('')}</select></label>${campoNexExposicao}`
         : `<label class="campo"><span>NEX</span><select data-campo="nex" data-tipo="int">${NEX.map(n => `<option value="${n}" ${f.nex === n ? 'selected' : ''}>${n}%</option>`).join('')}</select></label>`;
   const botoesExposicao = nexSeparado(f) ? `<div class="linha" style="margin-top:8px"><span class="rotulo">Exposição ao paranormal:</span>${EXPOSICOES.map(e => `<button class="btn pequeno" data-acao="exposicao" data-nex="${e.nex}" title="${esc(e.resumo)}">${esc(e.nome)} +${e.nex}%</button>`).join('')}</div><p class="apagado" style="font-size:.85rem;margin-top:4px">O NEX aqui mede só a exposição (máximo 99%). Aprender um ritual soma o círculo dele no NEX. ${f.opcionais.progressaoNex ? 'A Progressão de NEX está na aba Habilidades.' : 'A Progressão de NEX (regra opcional) está desligada: ligue na aba Notas se quiser.'}</p>` : '';
-  return `${efeitos ? `<div style="margin-bottom:14px">${efeitos}</div>` : ''}<div class="grade c2">
+  return `${painelPendencias(d) ? `<div style="margin-bottom:14px">${painelPendencias(d)}</div>` : ''}${efeitos ? `<div style="margin-bottom:14px">${efeitos}</div>` : ''}<div class="grade c2">
   <section class="painel"><div class="titulo-secao"><h2 class="faixa sangue">Atributos</h2><button class="btn pequeno fantasma" data-acao="editar-atributos">Editar</button></div>
     ${pentagramaAtributos(f.atributos, false, true)}
     <p class="apagado" style="text-align:center;font-size:.9rem">Toque num atributo para rolar. ${d.slotsAtributo ? `Aumentos de atributo liberados: ${d.slotsAtributo}.` : ''}</p>
@@ -105,7 +118,7 @@ function abaAgente(f, d) {
       <td class="num">${p.atrUsado.toUpperCase()}</td>
       <td><select data-campo="pericias.${p.id}" data-tipo="int" aria-label="Grau em ${esc(p.nome)}">${GRAUS.map(g => `<option value="${g.id}" ${(f.pericias[p.id] || 0) === g.id ? 'selected' : ''}>${g.nome}</option>`).join('')}</select></td>
       <td class="esconde-celular"><input type="number" style="width:64px;min-height:30px;padding:2px 6px" data-campo="bonusPericia.${p.id}" data-tipo="int" id="bp-${p.id}" value="${f.bonusPericia[p.id] || ''}" placeholder="0" aria-label="Bônus extra em ${esc(p.nome)}"></td>
-      <td><button class="rolavel" data-acao="rolar-pericia" data-id="${p.id}" ${p.bloqueada ? 'title="Só pode ser usada se treinado"' : ''}><span class="d">${textoTeste(p.dados, p.bonus)}</span></button></td></tr>`).join('')}
+      <td><button class="rolavel rolar-d20" data-acao="rolar-pericia" data-id="${p.id}" title="${p.bloqueada ? 'Só pode ser usada se treinado. ' : ''}Rolar ${esc(p.nome)}" aria-label="Rolar ${esc(p.nome)}: ${textoTeste(p.dados, p.bonus)}">${ICONE_D20}<span class="d">${textoTeste(p.dados, p.bonus)}</span></button></td></tr>`).join('')}
     </tbody></table></div>
     <label class="campo" style="max-width:320px;margin-top:10px"><span>Especialização de Profissão</span><input data-campo="profissao" id="f-prof" value="${esc(f.profissao)}" placeholder="Ex.: cozinheiro, engenheiro"></label>
     <p class="apagado" style="font-size:.88rem;margin-top:8px">* só treinada · + sofre penalidade de carga${d.penalCarga ? ` (agora: −${d.penalCarga})` : ''}. Veterano a partir de NEX 35%, expert a partir de 70%.</p>
@@ -193,6 +206,12 @@ function botaoUsar(nome, d) {
   if (BOTOES_JANELA[nome]) return `<button class="btn pequeno usar" data-acao="${BOTOES_JANELA[nome][0]}">${BOTOES_JANELA[nome][1]}</button>`;
   const u = USAVEIS[nome]; if (!u) return '';
   const k = d.pd ? 'PD' : 'PE';
+  if (u.dura !== 'instante') {
+    const ativoAgora = (d.nomesAtivos || []).some(n => n === nome || n.startsWith(nome + ':'));
+    const c = typeof u.custo === 'number' ? (u.custo ? `−${u.custo} ${k}` : 'grátis') : `${k} variável`;
+    return ativoAgora ? `<button class="btn pequeno sangue usar" data-acao="desativar-nome" data-nome="${esc(nome)}">Desativar</button>`
+      : `<button class="btn pequeno usar" data-acao="usar" data-nome="${esc(nome)}" title="${esc(u.nota || '')}">Ativar (${c})</button>`;
+  }
   const custo = typeof u.custo === 'number' ? (u.custo ? `−${u.custo} ${k}` : 'grátis') : u.custo === 'aliados' ? `${k} por alvo` : `${k} variável`;
   return `<button class="btn pequeno usar" data-acao="usar" data-nome="${esc(nome)}" title="${esc(u.nota || '')}">Usar (${custo})</button>`;
 }
@@ -203,7 +222,9 @@ function hab(nome, resumo, meta = '', chave = '', f = null, trancada = false) {
   const nota = chave && f ? f.notasHabilidade[chave] || '' : '';
   const base = String(nome).replace(/ \(.*\)$/, '');
   const usar = !trancada && dAtual ? botaoUsar(base, dAtual) : '';
-  return `<div class="hab ${trancada ? 'trancada' : ''}"><span class="meta">${meta}${usar}</span><b>${esc(nome)}</b>${resumo ? `<p>${esc(resumo)}</p>` : ''}
+  const completo = textoCompleto('habilidades', base);
+  const pendente = !completo && Object.hasOwn(TEXTOS?.habilidades || {},base);
+  return `<div class="hab ${trancada ? 'trancada' : ''}"><span class="meta">${meta}${usar}</span><b>${esc(nome)}</b>${completo ? `<div class="texto-completo">${esc(completo)}</div>` : pendente ? '<p class="apagado">Descrição ainda não conferida palavra por palavra. O livro digitalizado pode conter erros de OCR.</p>${abrirPaginaSah('habilidades',base)}' : (resumo ? `<p>${esc(resumo)}</p>` : '')}
     ${chave && !trancada ? `<details${nota ? ' open' : ''}><summary class="apagado" style="cursor:pointer;font-size:.85rem">Anotação</summary><textarea data-campo="notasHabilidade.${esc(chave)}" id="nota-${esc(chave)}" placeholder="Texto do livro, custo, detalhes…">${esc(nota)}</textarea></details>` : ''}</div>`;
 }
 function abaHabilidades(f, d) {
@@ -278,7 +299,7 @@ function secaoParanormais(f, d) {
   }).join('');
   const T = d.transcenderes, LT = d.limiteTranscender;
   return `<section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa sangue">Poderes paranormais</h2>
-      <div class="linha"><span class="contador ${T > LT ? 'erro' : ''}" title="Quantas vezes transcendeu">Transcender: ${T} / ${LT}</span><span class="contador ${d.paranormaisUsados > d.limiteParanormais ? 'erro' : ''}" title="Poderes paranormais escolhidos">Paranormais: ${d.paranormaisUsados} / ${d.limiteParanormais}</span></div></div>
+      <div class="linha"><span class="contador ${T > LT ? 'erro' : ''}" title="Quantas vezes transcendeu">Transcender: ${T} usado(s) · ${d.transcenderLivres} disponível(is)</span><span class="contador ${d.paranormaisUsados > d.limiteParanormais ? 'erro' : ''}" title="Poderes paranormais escolhidos">Paranormais: ${d.paranormaisUsados} / ${d.limiteParanormais}</span></div></div>
     <p class="apagado" style="font-size:.88rem">${d.transcenderSeparado ? 'Com NEX separado (Sobrevivendo ao Horror), você pode transcender uma vez em cada faixa de NEX 25/35/50/60/75/90%, sem gastar poder de classe.' : 'Cada Transcender ocupa um poder de classe e não dá Sanidade naquele NEX.'} Cada Transcender dá 1 poder paranormal${d.paranormalDaOrigem ? '; a origem Cultista Arrependido dá mais 1' : ''}.${f.elementoAfinidade ? ` Afinidade: <b>${esc(f.elementoAfinidade)}</b> (pode escolher poderes desse elemento uma 2ª vez).` : ''}</p>
     <div class="lista-hab">${lista || '<p class="apagado">Nenhum poder paranormal.</p>'}</div>
     <div class="linha" style="margin-top:10px"><button class="btn sangue" data-acao="transcender">Transcender</button><button class="btn" data-acao="janela-paranormal" data-fonte="${d.paranormalDaOrigem && !f.paranormais.some(p => p.fonte === 'origem') ? 'origem' : 'outro'}">+ Poder paranormal${d.paranormalDaOrigem && !f.paranormais.some(p => p.fonte === 'origem') ? ' (Traços do Outro Lado)' : ''}</button>
@@ -314,11 +335,14 @@ function abaRituais(f, d, ui) {
     && (!filtro.elemento || r.elemento === filtro.elemento) && (!filtro.circulo || r.circulo === Number(filtro.circulo))
     && (!filtro.busca || semAcento(r.nome + ' ' + r.resumo).includes(semAcento(filtro.busca)))).sort((a, b) => a.nome.localeCompare(b.nome, 'pt'));
   const podeConjurar = f.classe === 'ocultista' || f.rituais.length > 0 || (f.trilha === 'esoterico');
+  const porCirculo = [1, 2, 3, 4].map(c => ({ c, itens: f.rituais.map((r, i) => [r, i]).filter(([r]) => r.circulo === c) }));
+  const lim = d.limiteRituais, qtd = f.rituais.length;
   return `<section class="painel"><div class="titulo-secao"><h2 class="faixa sangue">Rituais conhecidos</h2>
-    <div class="linha"><span class="etiqueta">DT ${d.dtRitual}</span><span class="etiqueta">Círculo máx. ${d.circuloMax}º</span><button class="btn pequeno" data-acao="ritual-proprio">+ Ritual próprio</button></div></div>
+    <div class="linha"><span class="contador marcador-rituais ${lim && qtd > lim ? 'erro' : ''}" title="Rituais conhecidos / que pode conhecer">${qtd} / ${lim || '—'} rituais</span><span class="etiqueta">DT ${d.dtRitual}</span><span class="etiqueta">Círculo máx. ${d.circuloMax}º</span><button class="btn pequeno" data-acao="ritual-proprio">+ Ritual próprio</button></div></div>
     ${!podeConjurar ? '<p class="apagado">Só ocultistas conjuram rituais desde o início (outros podem aprender por poderes, trilhas ou origem).</p>' : ''}
-    <div class="grade c2">${f.rituais.map((r, i) => cartaoRitual(f, d, r, i)).join('') || '<p class="vazio" style="grid-column:1/-1">Nenhum ritual. Marque as caixinhas na lista abaixo.</p>'}</div>
-    <p class="apagado" style="font-size:.88rem;margin-top:8px">Custo: 1º círculo 1 PE · 2º 3 PE · 3º 6 PE · 4º 10 PE. DT = 10 + limite de ${d.pd ? 'PD' : 'PE'} + Presença.${f.classe === 'ocultista' && !temOpcional(f, 'patentes') ? ' Ocultista: 3 rituais de 1º círculo no início e +1 a cada NEX.' : ''}</p>
+    ${qtd ? porCirculo.filter(g => g.itens.length).map(g => `<h3 class="titulo-vermelho">${g.c}º círculo <small class="apagado">· ${CIRCULOS[g.c - 1].custo} ${d.pd ? 'PD' : 'PE'}</small></h3><div class="rituais-compactos">${g.itens.map(([r, i]) => cartaoRitual(f, d, r, i)).join('')}</div>`).join('') : '<p class="vazio">Nenhum ritual. Marque as caixinhas na lista abaixo.</p>'}
+    <p class="apagado" style="font-size:.88rem;margin-top:8px">Toque num ritual para ver tudo. Conjurar faz sozinho o teste de Ocultismo (DT 20 + custo; menos para Medo). ${f.classe === 'ocultista' && !temOpcional(f, 'patentes') ? 'Ocultista: 3 rituais de 1º círculo no início e +1 a cada NEX.' : ''}</p>
+    <label class="campo" style="max-width:200px"><span>Rituais extras (mestre)</span><input type="number" min="0" data-campo="bonus.rituais" data-tipo="int" id="bonus-rituais" value="${f.bonus.rituais || 0}"></label>
   </section>
   <section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa">Grimório</h2><span class="apagado">${lista.length} rituais</span></div>
     <div class="linha" style="margin-bottom:12px">
@@ -333,29 +357,37 @@ function abaRituais(f, d, ui) {
         <input type="checkbox" data-acao-check="ritual-catalogo" data-id="${r.id}" data-elemento="${r.elemento}" ${marcado ? 'checked' : ''} aria-label="${esc(r.nome)} (${ELEM[r.elemento].nome}, ${r.circulo}º círculo)">
         <span class="caixa-check" aria-hidden="true"></span>
         ${sigilo(r.elemento, 'var(--el)')}
-        <span class="txt"><b>${esc(r.nome)}</b> <small class="dossie-txt">${ELEM[r.elemento].nome} ${r.circulo}${fonteTag(r.fonte)}</small><small>${esc(r.resumo)}</small>${acima ? '<small class="aviso-circulo">Círculo acima do seu acesso</small>' : ''}</span>
+        <span class="txt"><b>${esc(r.nome)}</b> <small class="dossie-txt">${ELEM[r.elemento].nome} ${r.circulo}${fonteTag(r.fonte)}</small><small>${textoCompleto('rituais', r.nome) ? 'Texto integral disponível' : 'Descrição integral pendente — consulte o livro'}</small>${acima ? '<small class="aviso-circulo">Círculo acima do seu acesso</small>' : ''}</span>
       </label>`;
     }).join('')}</div>
   </section>`;
 }
 function cartaoRitual(f, d, r, i) {
-  const e = ELEM[r.elemento] || ELEM.variavel;
-  const calc = d.rituais[i] || {}, custo = calc.custo ?? CIRCULOS[r.circulo - 1].custo;
-  const campo = (k, rot) => `<label class="campo"><span>${rot}</span><input data-campo="rituais.${i}.${k}" id="rit-${i}-${k}" value="${esc(r[k])}"></label>`;
-  return `<article class="ritual el-${r.elemento}">
-    <div class="cab"><label class="caixa-mini"><input type="checkbox" data-acao-check="ritual-esquecer" data-i="${i}" checked aria-label="Conhecido: desmarque para esquecer ${esc(r.nome)}"><span class="caixa-check" aria-hidden="true"></span></label>
-      ${sigilo(r.elemento, 'var(--el)')}<div style="flex:1"><input data-campo="rituais.${i}.nome" id="rit-${i}-nome" value="${esc(r.nome)}" aria-label="Nome do ritual" style="font-family:var(--fonte-titulo);font-weight:700"></div>
-      <span class="etiqueta" style="border-color:var(--el)">${r.circulo}º · ${custo} ${d.pd ? 'PD' : 'PE'}</span></div>
-    <div class="grade-mini">
-      <label class="campo"><span>Elemento</span><select data-campo="rituais.${i}.elemento">${ELEMENTOS.map(x => `<option value="${x.id}" ${r.elemento === x.id ? 'selected' : ''}>${x.nome}</option>`).join('')}</select></label>
-      <label class="campo"><span>Círculo</span><select data-campo="rituais.${i}.circulo" data-tipo="int">${CIRCULOS.map(c => `<option value="${c.n}" ${r.circulo === c.n ? 'selected' : ''}>${c.n}º</option>`).join('')}</select></label>
-      ${campo('execucao', 'Execução')}${campo('alcance', 'Alcance')}${campo('alvo', 'Alvo/Área')}${campo('duracao', 'Duração')}${campo('resistencia', 'Resistência')}
-      <label class="campo"><span>Dano/cura</span><input data-campo="rituais.${i}.formula" id="rit-${i}-formula" value="${esc(r.formula)}" placeholder="ex.: 3d6+3"></label>
-    </div>
-    <label class="campo" style="margin-top:8px"><span>Efeito</span><textarea data-campo="rituais.${i}.efeito" id="rit-${i}-efeito" placeholder="Resumo do efeito, formas discente e verdadeira…">${esc(r.efeito)}</textarea></label>
-    <div class="linha" style="margin-top:8px"><button class="btn pequeno sangue" data-acao="conjurar" data-i="${i}">Conjurar (−${custo} ${d.pd ? 'PD' : 'PE'})</button>${r.formula ? `<button class="btn pequeno" data-acao="rolar-ritual" data-i="${i}">Rolar ${esc(calc.formulaFinal || r.formula)}</button>` : ''}<span class="espaco"></span><span class="apagado dossie-txt">DT ${calc.dt ?? d.dtRitual}</span></div>
-    ${calc.notas?.length ? `<p class="apagado" style="font-size:.82rem;margin:4px 0 0">${calc.notas.map(esc).join(' · ')}</p>` : ''}
-  </article>`;
+  const calc = d.rituais[i] || {}, custo = calc.custo ?? CIRCULOS[r.circulo - 1].custo, k = d.pd ? 'PD' : 'PE';
+  const cat = RITUAIS.find(x => semAcento(x.nome) === semAcento(r.nome)) || {};
+  const campo = (c, rot) => `<label class="campo"><span>${rot}</span><input data-campo="rituais.${i}.${c}" id="rit-${i}-${c}" value="${esc(r[c])}"></label>`;
+  const forma = (fo, nome) => fo ? `<span class="etiqueta">${nome} +${fo.custo} ${k}${fo.circulo ? ` · ${fo.circulo}º` : ''}${fo.afinidade ? ' · afinidade' : ''}</span>` : '';
+  const formula = calc.formulaFinal || r.formula;
+  const texto = textoCompleto('rituais', r.nome);
+  return `<details class="ritual ritual-compacto el-${r.elemento}">
+    <summary><span class="cab">${sigilo(r.elemento, 'var(--el)')}<b>${esc(r.nome)}</b></span>
+      <span class="linha resumo-rit"><span class="etiqueta">${custo} ${k}</span>${formula ? `<span class="etiqueta">${cat.tipoDados === 'cura' ? 'cura' : 'dano'} ${esc(formula)}</span>` : ''}<span class="etiqueta">DT ${calc.dt ?? d.dtRitual}</span></span>
+      <small class="apagado">${texto ? 'Descrição disponível abaixo' : 'Transcrição ainda não revisada'}</small>
+      <span class="linha" style="margin-top:6px"><button class="btn pequeno sangue" data-acao="conjurar" data-i="${i}">Conjurar</button>${formula ? `<button class="btn pequeno" data-acao="rolar-ritual" data-i="${i}">Rolar ${esc(formula)}</button>` : ''}</span></summary>
+    <div class="detalhes-rit">
+      ${!texto ? `<p class="apagado">Descrição integral pendente de conferência: compare os dados com o PDF original.</p>${abrirPaginaSah('rituais',r.nome)}` : ''}
+      <div class="grade-mini">
+        <label class="campo"><span>Elemento</span><select data-campo="rituais.${i}.elemento">${ELEMENTOS.map(x => `<option value="${x.id}" ${r.elemento === x.id ? 'selected' : ''}>${x.nome}</option>`).join('')}</select></label>
+        <label class="campo"><span>Círculo</span><select data-campo="rituais.${i}.circulo" data-tipo="int">${CIRCULOS.map(c => `<option value="${c.n}" ${r.circulo === c.n ? 'selected' : ''}>${c.n}º</option>`).join('')}</select></label>
+        ${campo('execucao', 'Execução')}${campo('alcance', 'Alcance')}${campo('alvo', 'Alvo/Área')}${campo('duracao', 'Duração')}${campo('resistencia', 'Resistência')}
+        <label class="campo"><span>Dano/cura</span><input data-campo="rituais.${i}.formula" id="rit-${i}-formula" value="${esc(r.formula)}" placeholder="ex.: 3d6+3"></label>
+      </div>
+      <p class="linha" style="margin-top:8px">${forma(cat.discente, 'Discente')}${forma(cat.verdadeiro, 'Verdadeiro')}</p>
+      ${calc.notas?.length ? `<p class="apagado" style="font-size:.85rem">${calc.notas.map(esc).join(' · ')}</p>` : ''}
+      ${texto ? `<div class="texto-completo">${esc(texto)}</div>` : '<p class="apagado">O texto completo deste ritual ainda não está disponível nos livros anexados.</p>'}
+      <label class="campo" style="margin-top:8px"><span>Efeito / anotações (cole aqui o texto do seu livro, se quiser)</span><textarea data-campo="rituais.${i}.efeito" id="rit-${i}-efeito">${esc(r.efeito)}</textarea></label>
+      <div class="linha fim" style="margin-top:6px"><button class="btn pequeno perigo" data-acao="esquecer-ritual" data-i="${i}">Esquecer ritual</button></div>
+    </div></details>`;
 }
 
 // ---------- Aba INVENTÁRIO ----------
@@ -380,14 +412,16 @@ function abaInventario(f, d) {
       ${!f.patenteManual && PATENTES[d.patente.n] ? `<p class="apagado" style="margin-top:6px">Próxima: ${esc(PATENTES[d.patente.n].nome)} com ${PATENTES[d.patente.n].pp} PP.</p>` : ''}`
       : '<p>Um item de categoria I e itens de categoria 0 compatíveis com a origem. Não usa patente.</p>'}
   </section></div>
-  <section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa sangue">Itens</h2><div class="linha"><button class="btn pequeno" data-acao="add-item-lista">+ Da lista</button><button class="btn pequeno" data-acao="add-item">+ Item livre</button></div></div>
+  <section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa sangue">Itens</h2><div class="linha"><button class="btn pequeno" data-acao="add-arma">+ Arma</button><button class="btn pequeno" data-acao="add-protecao">+ Proteção</button><button class="btn pequeno" data-acao="add-item-lista">+ Item da lista</button><button class="btn pequeno" data-acao="add-item">+ Item personalizado</button></div></div>
     ${f.itens.length ? `<div class="tabela-rolagem"><table class="tabela"><thead><tr><th>Item</th><th>Qtd</th><th>Cat.</th><th>Esp.</th><th></th></tr></thead><tbody>${f.itens.map((it, i) => `<tr>
       <td><input data-campo="itens.${i}.nome" id="it-n-${i}" value="${esc(it.nome)}" aria-label="Nome do item"><input data-campo="itens.${i}.nota" id="it-o-${i}" value="${esc(it.nota)}" placeholder="anotação" style="margin-top:3px;font-size:.88rem;min-height:30px" aria-label="Anotação"></td>
       <td><input type="number" min="0" style="width:64px" data-campo="itens.${i}.qtd" data-tipo="int" id="it-q-${i}" value="${it.qtd}" aria-label="Quantidade"></td>
       <td><select data-campo="itens.${i}.categoria" data-tipo="int" aria-label="Categoria">${[0, 1, 2, 3, 4].map(c => `<option value="${c}" ${it.categoria === c ? 'selected' : ''}>${cat(c)}</option>`).join('')}</select></td>
       <td><input type="number" min="0" step="0.25" style="width:70px" data-campo="itens.${i}.espacos" data-tipo="num" id="it-e-${i}" value="${it.espacos}" aria-label="Espaços"></td>
       <td><button class="icone-btn" data-acao="remover" data-lista="itens" data-i="${i}" aria-label="Remover ${esc(it.nome)}">✕</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="vazio">Mochila vazia.</p>'}
-    <p class="apagado" style="font-size:.88rem;margin-top:8px">Armas e proteções ficam na aba Combate e também contam na carga.</p>
+    ${f.armas.length || f.protecoes.length ? `<h3 class="titulo-vermelho">Armas e proteções</h3><div class="lista-hab">${f.armas.map((a, i) => `<div class="hab"><span class="meta"><button class="btn pequeno" data-acao="editar-arma" data-i="${i}">Editar / modificar</button></span><b>${esc(a.nome)}</b><p>${esc(a.dano)} · cat. ${cat(Math.min(4, a.categoria + a.mods.length))}${a.mods.length ? ' · ' + a.mods.map(m => MODIFICACAO[m].nome).join(', ') : ''}${a.maldicao?.tipo ? ' · amaldiçoada' : ''}</p></div>`).join('')}
+      ${f.protecoes.map((p, i) => `<div class="hab"><span class="meta"><button class="btn pequeno" data-acao="editar-protecao" data-i="${i}">Editar / modificar</button></span><b>${esc(p.nome)}</b><p>Defesa +${p.defesa} · cat. ${cat(Math.min(4, p.categoria + p.mods.length))}${p.mods.length ? ' · ' + p.mods.map(m => MODIFICACAO[m].nome).join(', ') : ''}</p></div>`).join('')}</div>` : ''}
+    <p class="apagado" style="font-size:.88rem;margin-top:8px">Armas e proteções também aparecem na aba Combate e contam na carga. Cada modificação aumenta a categoria em +1.</p>
   </section>`;
 }
 
@@ -429,18 +463,30 @@ function janelaParamedico(f, d) {
 // Janela de CONJURAR: custo do ritual + extras (Ampliar, Acelerar, Camuflar, formas avançadas) + pagar com PV (Flagelador)
 function janelaConjurar(f, d, i) {
   const r = d.rituais[i], k = d.pd ? 'PD' : 'PE';
+  const cat = RITUAIS.find(x => semAcento(x.nome) === semAcento(r.nome)) || {};
   const tem = id => f.poderes.some(p => p.id === id);
+  const afinidade = f.elementoAfinidade && f.elementoAfinidade === r.elemento;
+  const formas = [['basica', 'Forma básica', 0, true, '']];
+  for (const [id, nome] of [['discente', 'Forma discente'], ['verdadeiro', 'Forma verdadeira']]) {
+    const fo = cat[id]; if (!fo) continue;
+    const okCirc = !fo.circulo || d.circuloMax >= fo.circulo, okAf = !fo.afinidade || afinidade;
+    formas.push([id, nome, fo.custo, okCirc && okAf, `${fo.circulo ? `requer ${fo.circulo}º círculo` : ''}${fo.afinidade ? ' e afinidade' : ''}${!okCirc || !okAf ? ' (você ainda não pode)' : ''}`]);
+  }
   const op = [];
-  if (f.trilha === 'conduite' && d.trilhaHabs.find(h => h.nome === 'Ampliar Ritual')?.liberada) op.push(['ampliar', 'Ampliar Ritual (+2): mais alcance ou área em dobro', 2]);
-  if (f.trilha === 'conduite' && d.trilhaHabs.find(h => h.nome === 'Acelerar Ritual')?.liberada) op.push(['acelerar', 'Acelerar Ritual (+4): conjurar como ação livre', 4]);
-  if (tem('camuflar-ocultismo')) op.push(['camuflar', 'Camuflar Ocultismo (+2): sem gestos nem palavras', 2]);
-  if (f.trilha === 'lamina' && semAcento(r.nome) === 'amaldicoar arma') op.push(['lamina', 'Lâmina Maldita (+1): conjurar com ação de movimento', 1]);
+  if (f.trilha === 'conduite' && d.trilhaHabs.find(h => h.nome === 'Ampliar Ritual')?.liberada) op.push(['ampliar', 'Ampliar Ritual: mais alcance ou área em dobro', 2]);
+  if (f.trilha === 'conduite' && d.trilhaHabs.find(h => h.nome === 'Acelerar Ritual')?.liberada) op.push(['acelerar', 'Acelerar Ritual: conjurar como ação livre', 4]);
+  if (tem('camuflar-ocultismo')) op.push(['camuflar', 'Camuflar Ocultismo: sem gestos nem palavras', 2]);
+  if (f.trilha === 'lamina' && semAcento(r.nome) === 'amaldicoar arma') op.push(['lamina', 'Lâmina Maldita: conjurar com ação de movimento', 1]);
   const flagelo = f.trilha === 'flagelador' && d.trilhaHabs.find(h => h.nome === 'Poder do Flagelo')?.liberada;
-  abrirModal(`Conjurar · ${r.nome}`, `<p>Custo base: <b>${r.custo} ${k}</b> · DT ${r.dt} · limite ${d.limiteRitual} ${k}/turno.</p>
-    <div class="lista-hab">${op.map(([id, n]) => `<label class="check hab"><input type="checkbox" id="conj-${id}" data-custo="${op.find(o => o[0] === id)[2]}"><span>${esc(n)}</span></label>`).join('')}
-    <label class="campo hab"><span>Forma discente/verdadeira ou outro custo extra (${k})</span><input type="number" min="0" id="conj-extra" value="0"></label>
-    ${flagelo ? `<label class="check hab"><input type="checkbox" id="conj-flagelo"><span><b>Poder do Flagelo:</b> pagar com PV (2 PV por ${k}). PV gastos assim só voltam com descanso.</span></label>` : ''}</div>`,
-    `<button class="btn fantasma" data-acao="fechar-modal">Cancelar</button><button class="btn sangue" data-acao="conjurar-confirmar" data-i="${i}">Conjurar</button>`);
+  const armadura = f.protecoes.filter(p => p.vestida).some(p => p.peso === 'pesada') ? 2 : f.protecoes.filter(p => p.vestida).some(p => p.peso === 'leve') ? 1 : 0;
+  abrirModal(`Conjurar · ${r.nome}`, `<p>${esc(cat.execucao ? `Execução ${cat.execucao} · alcance ${cat.alcance || '—'} · ${cat.alvo || cat.area || cat.efeitoArea || ''} · ${cat.duracao || ''}` : '')}</p>
+    <h3 class="titulo-vermelho">Forma</h3><div class="lista-hab">${formas.map(([id, nome, c, ok, req], j) => `<label class="check hab"><input type="radio" name="conj-forma" value="${id}" data-custo="${c}" ${j === 0 ? 'checked' : ''} ${ok ? '' : 'disabled'}><span><b>${nome}</b> — total <b>${r.custo + c} ${k}</b>${c ? ` (${r.custo} + ${c})` : ''}${req ? ` <small class="apagado">${esc(req)}</small>` : ''}</span></label>`).join('')}</div>
+    ${op.length ? `<h3 class="titulo-vermelho">Extras</h3><div class="lista-hab">${op.map(([id, n, c]) => `<label class="check hab"><input type="checkbox" id="conj-${id}" data-custo="${c}"><span>${esc(n)} <b>+${c} ${k}</b></span></label>`).join('')}</div>` : ''}
+    <div class="grade c2" style="margin-top:8px"><label class="campo"><span>Outro custo (${k})</span><input type="number" min="0" id="conj-outro" value="0"></label>
+      <label class="campo"><span>Concentração: DT de Vontade (0 = sem teste)</span><input type="number" min="0" id="conj-vontade" value="0"></label></div>
+    ${flagelo ? `<label class="check hab"><input type="checkbox" id="conj-flagelo"><span><b>Poder do Flagelo:</b> pagar com PV (2 PV por ${k}).</span></label>` : ''}
+    <p class="apagado" style="font-size:.88rem;margin-top:8px">${r.elemento === 'medo' ? 'Rituais de Medo não exigem o teste de Ocultismo.' : `O site rola Ocultismo contra DT 20 + custo. Se falhar, você perde Sanidade igual ao custo (e 1 permanente se falhar por 5 ou mais).${armadura ? ` Proteção ${armadura === 2 ? 'pesada (−2 dados)' : 'leve (−1 dado)'} atrapalha os gestos.` : ''}`} Limite: ${d.limiteRitual} ${k}/turno.</p>`,
+    `<button class="btn fantasma" data-acao="fechar-modal">Cancelar</button><button class="btn sangue" data-acao="conjurar-confirmar" data-i="${i}">Conjurar</button>`, true);
 }
 // Janela de SOFRER DANO: reduções automáticas (RD, bloqueio, Duro de Matar, Abraçar a Dor, Acostumado ao Extremo, Escapar da Morte)
 function janelaDano(f, d, qtd, recurso) {
@@ -503,6 +549,34 @@ function escolhaDoPoder(ctx, ficha, p, depois) {
     opcoes: ORIGENS.filter(o => o.id !== ficha.origem && (o.fonte !== 'SaH' || ficha.modo === 'sah')).map(o => ({ valor: o.id, nome: o.poder, desc: o.resumo, obs: `Origem: ${o.nome}`, tag: o.fonte === 'SaH' ? '<span class="etiqueta sah">SaH</span>' : '' })),
     aoEscolher: id => { const fx = ctx.fichaAtual(); fx.escolhas.flashback = id; depois(ORIGEM[id].poder); } });
   depois('');
+}
+
+// Depois de subir de nível: abre a janela do que ganhou (aumento de atributo, grau de treinamento)
+function abrirPendenciaDeNivel(ctx) {
+  const d = derivar(ctx.fichaAtual());
+  if (d.pendencias.some(p => p.id === 'atributo')) return janelaAumento(ctx);
+  if (d.pendencias.some(p => p.id === 'grau')) return janelaGrau(ctx);
+}
+function janelaAumento(ctx) {
+  const f = ctx.fichaAtual(), d = derivar(f);
+  const max = ehSobrevivente(f) ? 3 : temOpcional(f, 'patentes') ? 4 : 5;
+  const dicas = { agi: 'Defesa, Reflexos, Pontaria, Furtividade, Iniciativa.', for: 'Luta, Atletismo, carga e dano corpo a corpo.', int: 'Perícias de estudo e +1 perícia treinada.', pre: 'PE/PD, Vontade, perícias sociais e DT de rituais.', vig: 'PV (retroativo a todos os NEX) e Fortitude.' };
+  janelaEscolha({ titulo: 'Aumento de atributo', intro: `Você ganhou +1 em um atributo (máximo ${max} por aumento). Escolha qual:`, ordenar: false,
+    opcoes: ATRIBUTOS.map(a => ({ valor: a.id, nome: `${a.nome}: ${f.atributos[a.id]} → ${f.atributos[a.id] + 1}`, desc: dicas[a.id], desabilitado: f.atributos[a.id] >= max })),
+    aoEscolher: atr => { const fx = ctx.fichaAtual(); fx.atributos[atr]++; fx.aumentos.push(atr); fx.recursos.pv = fx.recursos.pe = fx.recursos.pd = null; ctx.salvarFicha(normalizar(fx)); Object.assign(fx, normalizar(fx)); fecharModal(); ctx.render(); ctx.avisar(`+1 em ${ATRIBUTOS.find(a => a.id === atr).nome}.`); setTimeout(() => abrirPendenciaDeNivel(ctx), 50); } });
+}
+function janelaGrau(ctx) {
+  const f = ctx.fichaAtual(), d = derivar(f);
+  const max = d.porGrau;
+  janelaMultipla({ titulo: 'Grau de treinamento', max,
+    intro: `Escolha até ${max} perícias treinadas para subir um grau (treinado → veterano${d.nivelEq >= 14 ? ', veterano → expert' : ''}).`,
+    opcoes: PERICIAS.map(x => { const g = f.pericias[x.id] || 0; const pode = (g === 1) || (g === 2 && d.nivelEq >= 14); return { valor: x.id, nome: x.nome, desc: pode ? `${GRAUS[g].nome} → ${GRAUS[g + 1].nome}` : g === 0 ? 'não treinado' : `${GRAUS[g].nome} (máximo agora)`, desabilitado: !pode }; }),
+    aoConfirmar: ids => { const fx = ctx.fichaAtual(); for (const id of ids) fx.pericias[id] = (fx.pericias[id] || 0) + 1; fx.grausAplicados++; ctx.salvarFicha(normalizar(fx)); Object.assign(fx, normalizar(fx)); fecharModal(); ctx.render(); ctx.avisar(`Grau subiu em: ${ids.map(i => PERICIA[i].nome).join(', ')}.`); } });
+}
+export function painelPendencias(d, compacto = false) {
+  if (!d.pendencias.length) return compacto ? '' : '';
+  return `<section class="painel pendencias"><div class="titulo-secao"><h2 class="faixa">A fazer na ficha</h2><span class="contador">${d.pendencias.length}</span></div>
+    <ul class="lista-pend">${d.pendencias.map(p => `<li><button class="btn pequeno" data-acao="pendencia" data-id="${p.id}">Resolver</button> ${esc(p.texto)}</li>`).join('')}</ul></section>`;
 }
 
 // Gasta PE (ou PD): primeiro os temporários. Devolve false se não tiver o bastante.
@@ -592,6 +666,12 @@ export function acoesFicha(ctx) {
       let custo = typeof u.custo === 'number' ? u.custo : 0;
       if (u.custo === 'aliados' || u.custo === 'var') { const n = prompt(u.custo === 'aliados' ? `${nome}: quantos alvos/aliados?` : `${nome}: quantos ${k}?`, '1'); if (n == null) return; custo = inteiro(n, 0, 99, 0); }
       if (u.rolarCura) return janelaParamedico(ficha, d);
+      if (u.escolhePericia && !el.dataset.escolha) {
+        const ops = PERICIAS.map(x => ({ valor: x.id, nome: x.nome, desc: `+${u.escolhePericia} em ${x.nome} (${GRAUS[d.PER[x.id].grau].nome.toLowerCase()})` }));
+        if (u.podeDefesa) ops.unshift({ valor: '__defesa', nome: 'Defesa', desc: `+${u.escolhePericia} na Defesa contra o próximo ataque` });
+        return janelaEscolha({ titulo: `${nome}: onde vai o bônus?`, intro: 'Escolha a perícia (ou a Defesa) que recebe o bônus. Depois é só desativar quando acabar.', opcoes: ops,
+          aoEscolher: v => { fecharModal(); acoesFicha(ctx)['usar']({ dataset: { nome, escolha: v } }); } });
+      }
       if (custo && !gastar(ficha, d, custo)) return ctx.avisar(`${k} insuficiente (precisa de ${custo}).`, true);
       if (u.ganhaPeTemp) {
         let ganho = u.ganhaPeTemp;
@@ -608,11 +688,15 @@ export function acoesFicha(ctx) {
       if (u.dura !== 'instante' && (u.ef || u.arma || u.dura === 'cena')) {
         const nota = u.nota || '';
         ficha.efeitos = ficha.efeitos.filter(e => e.nome !== nome);
-        ficha.efeitos.push({ uid: uid(), nome, dura: u.dura, nota, ef: { ...(u.ef || {}), ...(u.arma ? { arma: true } : {}) } });
+        let ef = { ...(u.ef || {}), ...(u.arma ? { arma: true } : {}) }, nomeEf = nome;
+        if (u.escolhePericia && el.dataset.escolha) { if (el.dataset.escolha === '__defesa') { ef.defesa = u.escolhePericia; nomeEf = `${nome}: Defesa`; } else { ef.pericia = { [el.dataset.escolha]: u.escolhePericia }; nomeEf = `${nome}: ${PERICIA[el.dataset.escolha].nome}`; } }
+        ficha.efeitos = ficha.efeitos.filter(e => !e.nome.startsWith(nome + ':'));
+        ficha.efeitos.push({ uid: uid(), nome: nomeEf, dura: u.dura, nota, ef });
       }
       ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render();
       ctx.avisar(`${nome}${custo ? `: −${custo} ${k}` : ''}${u.ganhaPeTemp ? ` (+${ficha.recursos.peTemp} ${k} temporários)` : ''}${u.dura !== 'instante' ? ` · ativo ${DURA[u.dura]}` : ''}.`);
     },
+    'desativar-nome': el => { const ficha = f(); const nome = el.dataset.nome; ficha.efeitos = ficha.efeitos.filter(e => !(e.nome === nome || e.nome.startsWith(nome + ':'))); salvar(); ctx.avisar(`${nome} desativado.`); },
     'desligar-efeito': el => { const ficha = f(); const e = ficha.efeitos[Number(el.dataset.i)]; ficha.efeitos.splice(Number(el.dataset.i), 1); salvar(); ctx.avisar(`${e?.nome || 'Efeito'} desligado.`); },
     'fim-cena': () => { const ficha = f(); ficha.efeitos = []; ficha.recursos.peTemp = 0; ficha.usosCena = {}; ficha.recursos.morrendo = 0; ficha.recursos.enlouquecendo = 0; salvar(); ctx.avisar('Fim da cena: efeitos desligados e PE temporários zerados.'); },
     'dormir-antecipar': () => { const ficha = f(); const perde = ficha.paranormais.some(p => p.id === 'antecipar-vitalidade' && p.afinidade) ? 2 : 1; ficha.cargasAntecipacao = Math.max(0, ficha.cargasAntecipacao - perde); salvar(); ctx.avisar(`Dormiu sem recuperar PV e perdeu ${perde} carga(s).`); },
@@ -649,18 +733,37 @@ export function acoesFicha(ctx) {
     'rolar-dano': el => { const a = derivar(f()).ataques[Number(el.dataset.i)]; rolarDanoUI({ titulo: `Dano · ${a.nome}`, quem: quem(), formula: a.formula }); },
     'rolar-ritual': el => { const i = Number(el.dataset.i), r = derivar(f()).rituais[i]; rolarDanoUI({ titulo: r.nome, quem: quem(), formula: r.formulaFinal || r.formula }); },
     'conjurar': el => janelaConjurar(f(), derivar(f()), Number(el.dataset.i)),
-    'conjurar-confirmar': el => {
-      const ficha = f(), d = derivar(ficha), i = Number(el.dataset.i), r = d.rituais[i], k = d.pd ? 'pd' : 'pe';
-      let custo = r.custo + inteiro(document.getElementById('conj-extra')?.value, 0, 50, 0);
+    'conjurar-confirmar': async el => {
+      const ficha = f(), d = derivar(ficha), i = Number(el.dataset.i), r = d.rituais[i], k = d.pd ? 'pd' : 'pe', K = k.toUpperCase();
+      const forma = document.querySelector('[name="conj-forma"]:checked');
+      let custo = r.custo + Number(forma?.dataset.custo || 0) + inteiro(document.getElementById('conj-outro')?.value, 0, 50, 0);
       document.querySelectorAll('[id^="conj-"][data-custo]').forEach(c => { if (c.checked) custo += Number(c.dataset.custo); });
-      if (custo > d.limiteRitual) ctx.avisar(`Atenção: ${custo} passa do limite por turno (${d.limiteRitual}).`);
-      if (document.getElementById('conj-flagelo')?.checked) {
-        const pv = custo * 2; if (d.atual.pv <= pv) return ctx.avisar('PV insuficientes para pagar com o Flagelo.', true);
-        ficha.recursos.pv = d.atual.pv - pv; fecharModal(); salvar(); return ctx.avisar(`${r.nome} conjurado pagando ${pv} PV (Poder do Flagelo).`);
-      }
-      if (!gastar(ficha, d, custo)) return ctx.avisar(`${k.toUpperCase()} insuficiente (precisa de ${custo}).`, true);
-      fecharModal(); salvar(); ctx.avisar(`${r.nome} conjurado: −${custo} ${k.toUpperCase()} · DT ${r.dt}.`);
+      const dtVontade = inteiro(document.getElementById('conj-vontade')?.value, 0, 99, 0);
+      if (custo > d.limiteRitual) ctx.avisar(`Atenção: ${custo} ${K} passa do limite por turno (${d.limiteRitual}).`);
+      if (document.getElementById('conj-flagelo')?.checked) { const pv = custo * 2; if (d.atual.pv <= pv) return ctx.avisar('PV insuficientes.', true); ficha.recursos.pv = d.atual.pv - pv; }
+      else if (!gastar(ficha, d, custo)) return ctx.avisar(`${K} insuficiente (precisa de ${custo}).`, true);
+      ctx.salvarFicha(ficha); fecharModal(); ctx.render();
+      const nomeForma = forma?.value === 'discente' ? ' (discente)' : forma?.value === 'verdadeiro' ? ' (verdadeira)' : '';
+      // concentração
+      if (dtVontade) { const pv = d.PER.vontade; const t = await rolarTesteUI({ titulo: `Concentração · ${r.nome}`, quem: quem(), dados: pv.dados, bonus: pv.bonus }); if (t.total < dtVontade) { ctx.avisar(`Falhou na concentração (${t.total} < ${dtVontade}): o ritual não funciona e os ${K} foram perdidos.`, true); return; } }
+      // O Custo do Paranormal (menos Medo)
+      if (r.elemento !== 'medo') {
+        const oc = d.PER.ocultismo, dt = 20 + custo;
+        const armadura = ficha.protecoes.filter(p => p.vestida).some(p => p.peso === 'pesada') ? -2 : ficha.protecoes.filter(p => p.vestida).some(p => p.peso === 'leve') ? -1 : 0;
+        const base = oc.dados.pior ? 2 - oc.dados.qtd : oc.dados.qtd, q = base + armadura;
+        proxima.dt = String(dt);
+        const t = await rolarTesteUI({ titulo: `Custo do Paranormal · ${r.nome}${nomeForma}`, quem: quem(), dados: q >= 1 ? { qtd: q, pior: false } : { qtd: 2 - q, pior: true }, bonus: oc.bonus });
+        proxima.dt = '';
+        if (t.total < dt) {
+          const fx = f(), dx = derivar(fx); const perm = t.total <= dt - 5;
+          if (dx.pd) fx.recursos.pd = dx.atual.pd - custo; else fx.recursos.san = dx.atual.san - custo;
+          if (perm) fx.bonus.san = (fx.bonus.san || 0) - 1;
+          ctx.salvarFicha(fx); ctx.render();
+          ctx.avisar(`Falhou no Ocultismo (${t.total} < ${dt}): −${custo} ${dx.pd ? 'PD' : 'Sanidade'}${perm ? ' e −1 de Sanidade permanente' : ''}. O ritual funciona mesmo assim.`, true);
+        } else ctx.avisar(`${r.nome}${nomeForma} conjurado: −${custo} ${K}. Passou no Ocultismo (${t.total}).`);
+      } else ctx.avisar(`${r.nome}${nomeForma} conjurado: −${custo} ${K}.`);
     },
+    'esquecer-ritual': el => { const ficha = f(); const r = ficha.rituais[Number(el.dataset.i)]; if (!confirm(`Esquecer o ritual "${r.nome}"?`)) return; ficha.rituais.splice(Number(el.dataset.i), 1); salvar(); },
     'aplicar-dano': el => {
       const ficha = f(), d = derivar(ficha), rec = el.dataset.rec; let q = inteiro(document.getElementById('dano-qtd')?.value, 0, 99999, 0);
       const marcado = id => document.getElementById('dano-' + id)?.checked; const notas = [];
@@ -696,18 +799,27 @@ export function acoesFicha(ctx) {
     'contador': el => { const ficha = f(); ficha.recursos[el.dataset.c] = Math.min(3, ficha.recursos[el.dataset.c] + 1); salvar(); if (ficha.recursos[el.dataset.c] >= 3) ctx.avisar(el.dataset.c === 'morrendo' ? 'Três turnos morrendo: o agente morreu.' : 'Três turnos enlouquecendo: o agente ficou insano.', true); },
     'condicao': el => { const ficha = f(); const id = el.dataset.id; ficha.condicoes = ficha.condicoes.includes(id) ? ficha.condicoes.filter(c => c !== id) : [...ficha.condicoes, id]; salvar(); },
     'rolar-ferimento': () => { const ficha = f(); const n = d(6); const atr = FERIMENTOS[n - 1]; if (atr) { ficha.ferimentos.push(atr); salvar(); } ctx.avisar(`1d6 = ${n}: ${atr ? 'ferimento em ' + ATRIBUTOS.find(a => a.id === atr).nome : 'ferimento superficial (nenhum atributo)'}.`); },
-    'remover': el => { const ficha = f(); const lista = ficha[el.dataset.lista]; const i = Number(el.dataset.i); const nome = lista[i]?.nome || ''; if (['poderes', 'protecoes', 'habilidadesProprias', 'itens'].includes(el.dataset.lista) && nome && !confirm(`Remover "${nome}"?`)) return; lista.splice(i, 1); salvar(); },
+    'remover': el => { const ficha = f(); const lista = ficha[el.dataset.lista]; const i = Number(el.dataset.i); const nome = lista[i]?.nome || ''; if (['poderes', 'protecoes', 'habilidadesProprias', 'itens'].includes(el.dataset.lista) && nome && !confirm(`Remover "${nome}"?`)) return; lista.splice(i, 1); fecharModal(); salvar(); },
     'limites-padrao': () => { const ficha = f(); ficha.limitesItens = null; salvar(); },
     'exposicao': el => { const ficha = f(); const antes = ficha.nexExposicao; ficha.nexExposicao = Math.min(99, antes + Number(el.dataset.nex)); salvar(); ctx.avisar(`NEX ${antes}% → ${ficha.nexExposicao}%.`); },
     'subir-nivel': () => {
       const ficha = f();
-      if (ehSobrevivente(ficha)) { if (ficha.estagio >= 5) return ctx.avisar('Estágio máximo. Se a Ordem o recrutar, crie a versão com a nova classe (Treinamento Especial).'); ficha.estagio++; }
-      else if (temOpcional(ficha, 'patentes')) { if (ficha.patenteManual) { if (ficha.patenteManual >= 5) return ctx.avisar('Já é agente de elite.'); ficha.patenteManual++; } else { const p = PATENTES.find(x => x.pp > ficha.pp); if (!p) return ctx.avisar('Já é agente de elite.'); ficha.pp = p.pp; } }
-      else if (temOpcional(ficha, 'nivelExp')) { if (ficha.nivel >= 20) return; ficha.nivel++; }
+      if (ehSobrevivente(ficha)) { if (ficha.estagio >= 5) return ctx.avisar('Estágio máximo. Se a Ordem o recrutar, use o Treinamento Especial (aba Habilidades).'); ficha.estagio++; }
+      else if (temOpcional(ficha, 'patentes')) {
+        if (ficha.patenteManual) { if (ficha.patenteManual >= 5) return ctx.avisar('Já é agente de elite.'); ficha.patenteManual++; }
+        else { const p = PATENTES.find(x => x.pp > ficha.pp); if (!p) return ctx.avisar('Já é agente de elite.'); ficha.pp = p.pp; }
+        const pat = PATENTES[(ficha.patenteManual || PATENTES.filter(x => ficha.pp >= x.pp).at(-1).n) - 1];
+        ficha.nexExposicao = Math.min(99, Math.max(ficha.nexExposicao, pat.limitePd * 5)); // NEX acompanha o nível equivalente da patente
+      }
+      else if (temOpcional(ficha, 'nivelExp')) { if (ficha.nivel >= 20) return; ficha.nivel++; ficha.nexExposicao = Math.min(99, Math.max(ficha.nexExposicao, ficha.nivel * 5)); }
       else { const i = NEX.indexOf(ficha.nex); if (i >= NEX.length - 1) return ctx.avisar('NEX 99% é o máximo.'); ficha.nex = NEX[i + 1]; }
       ficha.recursos.pv = ficha.recursos.pe = ficha.recursos.san = ficha.recursos.pd = null;
-      salvar(); const dd = derivar(ficha); ctx.avisar(`Agora: ${dd.textoNivel}. Veja a Progressão na aba Habilidades.`);
+      salvar(); const dd = derivar(ficha); ctx.avisar(`Agora: ${dd.textoNivel}.`);
+      abrirPendenciaDeNivel(ctx);
     },
+    'aumento-atributo': () => janelaAumento(ctx),
+    'grau-treinamento': () => janelaGrau(ctx),
+    'pendencia': el => { const p = derivar(f()).pendencias.find(x => x.id === el.dataset.id); if (!p) return; if (p.acao) return acoesFicha(ctx)[p.acao]({ dataset: {} }); ctx.estado.ui.aba = p.aba; ctx.render(); },
     'editar-atributos': () => {
       const at = f().atributos;
       abrirModal('Atributos', `<p class="apagado">Use para aumentos de atributo (NEX 20%, 50%, 80%, 95%) ou correções.</p><div class="grade c3">${ATRIBUTOS.map(a => `<label class="campo"><span>${a.nome}</span><input type="number" min="0" max="7" data-modal-atr="${a.id}" value="${at[a.id]}"></label>`).join('')}</div>`, '<button class="btn fantasma" data-acao="fechar-modal">Cancelar</button><button class="btn sangue" data-acao="salvar-atributos">Salvar</button>');
@@ -720,12 +832,12 @@ export function acoesFicha(ctx) {
     'add-arma': () => {
       const ficha = f(); const prof = derivar(ficha).prof;
       abrirModal('Adicionar arma', `<div class="cartoes" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">${ARMAS.map((a, i) => [a, i]).sort((x, y) => x[0].nome.localeCompare(y[0].nome, 'pt')).map(([a, i]) => `<button class="cartao" data-acao="add-arma-catalogo" data-i="${i}"><b>${esc(a.nome)}</b><small class="dossie-txt">${a.dano} ${TIPOS_DANO[a.tipo] || ''} · ${a.margem < 20 ? a.margem + '/' : ''}×${a.mult} · cat. ${cat(a.categoria)}</small><small>${a.prof === 'simples' ? 'Simples' : a.prof === 'taticas' ? 'Tática' : 'Pesada'} · ${a.uso === 'corpo' ? 'corpo a corpo' : a.uso === 'fogo' ? 'arma de fogo' : 'disparo'}${(a.prof === 'taticas' && !prof.taticas) || (a.prof === 'pesadas' && !prof.pesadas) ? ' · <span style="color:var(--perigo)">sem proficiência</span>' : ''}</small></button>`).join('')}
-        <button class="cartao" data-acao="add-arma-catalogo" data-i="-1"><b>Arma própria</b><small>Preencha os números você mesmo.</small></button></div>`, '', true);
+        <button class="cartao" data-acao="add-arma-catalogo" data-i="-1"><b>Arma personalizada</b><small>Preencha os números você mesmo.</small></button></div>`, '', true);
     },
     'add-arma-catalogo': el => {
       const i = Number(el.dataset.i); const ficha = f();
       const base = i >= 0 ? { ...ARMAS[i] } : { nome: 'Arma improvisada', prof: 'simples', uso: 'corpo', categoria: 0, dano: '1d6', margem: 20, mult: 2, alcance: '—', tipo: 'I', espacos: 1 };
-      ficha.armas.push({ ...base, uid: uid() }); fecharModal(); ctx.salvarFicha(ficha); ctx.render();
+      ficha.armas.push({ ...base, uid: uid() }); fecharModal(); ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render();
       acoesFicha(ctx)['editar-arma']({ dataset: { i: String(ficha.armas.length - 1) } });
     },
     'editar-arma': el => {
@@ -738,6 +850,11 @@ export function acoesFicha(ctx) {
         ${c('bonusAtaque', 'Bônus no ataque', 'number')}${c('bonusDano', 'Bônus no dano', 'number')}
         ${s('categoria', 'Categoria', [[0, '0'], [1, 'I'], [2, 'II'], [3, 'III'], [4, 'IV']])}${c('espacos', 'Espaços', 'number', 'min="0" step="0.5"')}
         ${c('alcance', 'Alcance')}${s('tipo', 'Tipo de dano', Object.entries(TIPOS_DANO))}${c('municao', 'Munição')}
+        <div style="grid-column:1/-1"><h3 class="titulo-vermelho">Modificações (+1 categoria cada)</h3><div class="lista-hab">${MODIFICACOES.filter(m => m.para.includes(a.uso === 'fogo' ? 'fogo' : a.uso)).sort((x, y) => x.nome.localeCompare(y.nome, 'pt')).map(m => `<label class="check hab"><input type="checkbox" data-mod-arma="${m.id}" ${(a.mods || []).includes(m.id) ? 'checked' : ''}><span><b>${esc(m.nome)}</b> <small class="apagado">${esc(m.resumo)}</small></span></label>`).join('')}</div>
+          <h3 class="titulo-vermelho">Amaldiçoar</h3><div class="grade c3"><label class="campo"><span>Maldição</span><select data-maldicao="tipo">${MALDICOES_ARMA.map(m => `<option value="${m.id}" ${a.maldicao?.tipo === m.id ? 'selected' : ''}>${esc(m.nome)}</option>`).join('')}</select></label>
+          <label class="campo"><span>Elemento</span><select data-maldicao="elemento">${['', 'sangue', 'morte', 'conhecimento', 'energia'].map(e => `<option value="${e}" ${a.maldicao?.elemento === e ? 'selected' : ''}>${e ? e[0].toUpperCase() + e.slice(1) : '—'}</option>`).join('')}</select></label>
+          <label class="campo"><span>Dano extra (ex.: 1d6)</span><input data-maldicao="dados" value="${esc(a.maldicao?.dados || '')}" placeholder="preenche sozinho"></label>
+          <label class="campo" style="grid-column:1/-1"><span>Efeito da maldição</span><textarea data-maldicao="texto">${esc(a.maldicao?.texto || '')}</textarea></label></div></div>
         ${f().trilha === 'aniquilador' ? `<label class="check"><input type="checkbox" data-modal-arma-check="favorita" ${a.favorita ? 'checked' : ''}><span>Arma favorita (Aniquilador)</span></label>` : ''}
         ${ORIGEM[f().origem]?.id === 'operario' ? `<label class="check"><input type="checkbox" data-modal-arma-check="ferramenta" ${a.ferramenta ? 'checked' : ''}><span>Ferramenta de Trabalho (Operário): +1 ataque, dano e margem</span></label>` : ''}
         ${f().trilha === 'atirador' ? `<label class="check"><input type="checkbox" data-modal-arma-check="balasLongas" ${a.balasLongas ? 'checked' : ''}><span>Usa balas longas (Mira de Elite: +Intelecto no dano)</span></label>` : ''}${c('nota', 'Anotação (modificações, maldições…)')}</div>`,
@@ -747,19 +864,32 @@ export function acoesFicha(ctx) {
       const ficha = f(), i = Number(el.dataset.i), a = { ...ficha.armas[i] };
       document.querySelectorAll('[data-modal-arma]').forEach(inp => { a[inp.dataset.modalArma] = inp.type === 'number' ? Number(inp.value) : inp.value; });
       document.querySelectorAll('[data-modal-arma-check]').forEach(inp => { a[inp.dataset.modalArmaCheck] = inp.checked; });
+      a.mods = [...document.querySelectorAll('[data-mod-arma]:checked')].map(x => x.dataset.modArma);
+      const mal = {}; document.querySelectorAll('[data-maldicao]').forEach(x => { mal[x.dataset.maldicao] = x.value; });
+      if (mal.tipo && !mal.dados) mal.dados = MALDICOES_ARMA.find(m => m.id === mal.tipo)?.dados || '';
+      a.maldicao = mal;
       a.categoria = Number(a.categoria);
       ficha.armas[i] = normalizar({ ...ficha, armas: [a] }).armas[0]; fecharModal(); salvar();
     },
     'remover-arma': el => { const ficha = f(); if (!confirm('Remover esta arma?')) return; ficha.armas.splice(Number(el.dataset.i), 1); fecharModal(); salvar(); },
-    'add-protecao': () => abrirModal('Adicionar proteção', `<div class="cartoes">${PROTECOES.map((p, i) => `<button class="cartao" data-acao="add-protecao-catalogo" data-i="${i}"><b>${esc(p.nome)}</b><small>Defesa +${p.defesa}${p.rd ? `, RD ${p.rd} (balístico, corte, impacto, perfuração)` : ''}${p.penalidade ? `, −${p.penalidade} nas perícias de carga` : ''} · cat. ${cat(p.categoria)} · ${p.espacos} esp.</small></button>`).join('')}</div>`),
-    'add-protecao-catalogo': el => { const ficha = f(); const p = PROTECOES[Number(el.dataset.i)]; ficha.protecoes.push({ ...p, rd: p.rd || 0, vestida: true, uid: uid() }); fecharModal(); salvar(); },
+    'add-protecao': () => abrirModal('Adicionar proteção', `<div class="cartoes"><button class="cartao" data-acao="add-protecao-catalogo" data-i="-1"><b>Proteção personalizada</b><small>Preencha os números você mesmo.</small></button>${PROTECOES.map((p, i) => `<button class="cartao" data-acao="add-protecao-catalogo" data-i="${i}"><b>${esc(p.nome)}</b><small>Defesa +${p.defesa}${p.rd ? `, RD ${p.rd} (balístico, corte, impacto, perfuração)` : ''}${p.penalidade ? `, −${p.penalidade} nas perícias de carga` : ''} · cat. ${cat(p.categoria)} · ${p.espacos} esp.</small></button>`).join('')}</div>`),
+    'add-protecao-catalogo': el => { const ficha = f(); const i = Number(el.dataset.i); const p = i >= 0 ? PROTECOES[i] : { nome: 'Proteção personalizada', peso: 'leve', defesa: 2, categoria: 0, espacos: 1 }; ficha.protecoes.push({ ...p, rd: p.rd || 0, vestida: true, mods: [], uid: uid() }); fecharModal(); ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render(); acoesFicha(ctx)['editar-protecao']({ dataset: { i: String(ficha.protecoes.length - 1) } }); },
+    'editar-protecao': el => {
+      const i = Number(el.dataset.i), p = f().protecoes[i];
+      const c = (k, rot, tipo = 'text') => `<label class="campo"><span>${rot}</span><input type="${tipo}" data-modal-prot="${k}" value="${esc(p[k])}"></label>`;
+      abrirModal(`Proteção · ${p.nome}`, `<div class="grade c2">${c('nome', 'Nome')}<label class="campo"><span>Tipo</span><select data-modal-prot="peso">${[['leve', 'Leve'], ['pesada', 'Pesada'], ['escudo', 'Escudo']].map(([v, n]) => `<option value="${v}" ${p.peso === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+        ${c('defesa', 'Defesa', 'number')}${c('rd', 'RD', 'number')}${c('categoria', 'Categoria (0–4)', 'number')}${c('espacos', 'Espaços', 'number')}${c('nota', 'Anotação / maldição / efeito especial')}</div>
+        <h3 class="titulo-vermelho">Modificações (+1 categoria cada)</h3><div class="lista-hab">${MODIFICACOES.filter(m => m.para.includes(p.peso)).map(m => `<label class="check hab"><input type="checkbox" data-mod-prot="${m.id}" ${p.mods.includes(m.id) ? 'checked' : ''}><span><b>${esc(m.nome)}</b> <small class="apagado">${esc(m.resumo)}</small></span></label>`).join('')}</div>`,
+        `<button class="btn perigo" data-acao="remover" data-lista="protecoes" data-i="${i}">Remover</button><span class="espaco"></span><button class="btn sangue" data-acao="salvar-protecao" data-i="${i}">Salvar</button>`, true);
+    },
+    'salvar-protecao': el => { const ficha = f(), i = Number(el.dataset.i), p = { ...ficha.protecoes[i] }; document.querySelectorAll('[data-modal-prot]').forEach(x => { p[x.dataset.modalProt] = x.type === 'number' ? Number(x.value) : x.value; }); p.mods = [...document.querySelectorAll('[data-mod-prot]:checked')].map(x => x.dataset.modProt); ficha.protecoes[i] = p; fecharModal(); ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render(); },
     'add-item': () => { const ficha = f(); ficha.itens.push({ uid: uid(), nome: 'Novo item', categoria: 0, espacos: 1, qtd: 1, nota: '' }); salvar(); },
     'add-item-lista': () => abrirModal('Adicionar item', `<div class="cartoes">${ITENS_GERAIS.map((it, i) => [it, i]).sort((x, y) => x[0].nome.localeCompare(y[0].nome, 'pt')).map(([it, i]) => `<button class="cartao" data-acao="add-item-catalogo" data-i="${i}"><b>${esc(it.nome)}</b><small>cat. ${cat(it.categoria)} · ${it.espacos} esp.</small></button>`).join('')}</div>`),
     'add-item-catalogo': el => { const ficha = f(); const it = ITENS_GERAIS[Number(el.dataset.i)]; ficha.itens.push({ ...it, qtd: 1, nota: '', uid: uid() }); fecharModal(); salvar(); },
     'add-propria': () => { const ficha = f(); ficha.habilidadesProprias.push({ uid: uid(), nome: 'Nova habilidade', resumo: '', custo: '' }); salvar(); },
     'escolher-poder': () => {
       const ficha = f(), d = derivar(ficha);
-      const lista = poderesParaFicha(ficha).sort(alfa);
+      const lista = poderesParaFicha(ficha).filter(p => !(d.transcenderSeparado && p.id === 'transcender')).sort(alfa);
       const grupos = [['Classe', p => p.classe === ficha.classe], ['Todas as classes', p => p.classe === 'todas'], ['Gerais (SaH)', p => p.classe === 'geral' || (p.classe !== ficha.classe && p.classe !== 'todas')]];
       abrirModal('Escolher poder', `<input type="search" placeholder="Procurar poder…" data-filtro-modal autofocus aria-label="Procurar poder" style="margin-bottom:10px">
         ${grupos.map(([nome, fn]) => { const ps = lista.filter(fn); return ps.length ? `<h3 class="titulo-vermelho">${nome}</h3><div class="cartoes">${ps.map(p => { const tem = ficha.poderes.some(x => x.id === p.id); const ok = cumpreRequisito(ficha, d, p.req); return `<button class="cartao" data-acao="add-poder" data-id="${p.id}" data-busca="${esc(semAcento(p.nome + ' ' + p.resumo))}" ${tem && !p.repete ? 'disabled' : ''}><span class="linha"><b>${esc(p.nome)}</b><span class="espaco"></span>${fonteTag(p.fonte)}</span>${p.req ? `<small style="color:${ok ? 'var(--ok)' : 'var(--perigo)'}">Pré: ${esc(p.req)}</small>` : ''}<small>${esc(p.resumo)}</small></button>`; }).join('')}</div>` : ''; }).join('')}`, '', true);
@@ -819,8 +949,8 @@ export function checksFicha(ctx) {
       const ficha = f(); const r = RITUAIS.find(x => x.id === el.dataset.id);
       const chave = semAcento(r.nome) + '|' + r.elemento;
       if (el.checked) {
-        ficha.rituais.push({ uid: uid(), nome: r.nome, elemento: r.elemento === 'variavel' ? 'variavel' : r.elemento, circulo: r.circulo, efeito: r.resumo });
-        if (nexSeparado(ficha) && ficha.classe !== 'sobrevivente') { const antes = ficha.nexExposicao; ficha.nexExposicao = Math.min(99, antes + r.circulo); ctx.avisar(`Aprender ${r.nome} soma ${r.circulo}% de NEX: ${antes}% → ${ficha.nexExposicao}%.`); }
+        ficha.rituais.push({ uid: uid(), nome: r.nome, elemento: r.elemento === 'variavel' ? 'variavel' : r.elemento, circulo: r.circulo, efeito: r.resumo,
+          execucao: r.execucao || '', alcance: r.alcance || '', alvo: r.alvo || r.area || r.efeitoArea || '', duracao: r.duracao || '', resistencia: r.resistencia || '', formula: r.dados || '' });
       }
       else ficha.rituais = ficha.rituais.filter(x => semAcento(x.nome) + '|' + x.elemento !== chave);
       ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render();
