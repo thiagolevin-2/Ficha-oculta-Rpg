@@ -541,3 +541,183 @@ textarea{min-height:90px;resize:vertical;line-height:1.7}
 .etiqueta{font-size:11px}
 .passos button{font-size:11px}
 @media(max-width:490px){.topo.topo-oculto nav a,.topo.topo-oculto nav button{font-size:10px}.passos button{font-size:9px}}
+
+
+/* 0.9.1 — FORMAS ORGÂNICAS
+   Ajuste pedido pelo usuário: menos quadrados e menos pontas,
+   com janelas, quadros e áreas mais curvilíneos e fluidos.
+*/
+:root[data-tema]{
+  --raio-organico: 24px 18px 28px 20px / 18px 26px 20px 30px;
+  --raio-organico-suave: 18px 14px 22px 16px / 15px 21px 16px 24px;
+  --raio-organico-forte: 30px 22px 34px 26px / 24px 34px 24px 38px;
+}
+
+.painel,
+.ritual,.hab,.chave,.acao-rapida,.ini-linha,.recurso,.cartao,.modo,.ficha-cartao,.ameaca-bloco,.vazio,
+.caixa-ritual,.modal,.historico,
+.portal-acesso,
+.invocar.principal,
+input,select,textarea,
+.abas button,
+.passos button,
+.btn,
+.icone-btn,
+.tabela,
+.resultado-grande,
+.historico,
+.retrato {
+  clip-path:none !important;
+}
+
+.painel {
+  border-radius: var(--raio-organico-forte);
+  border-top-left-radius: 34px 28px;
+  border-bottom-right-radius: 38px 30px;
+  border-top:1px solid #8c5a54;
+  border-left:1px solid #78524b;
+  overflow:hidden;
+}
+.painel::before {
+  left:14px; top:10px; width:clamp(120px,24%,280px); height:18px;
+  opacity:.82;
+}
+.painel::after {
+  right:10px; bottom:8px; opacity:.1;
+}
+
+.ritual,.hab,.chave,.acao-rapida,.ini-linha,.recurso,.cartao,.modo,.ficha-cartao,.ameaca-bloco,.vazio,
+.caixa-ritual,.historico {
+  border-radius: var(--raio-organico);
+}
+
+.modal {
+  border-radius: 34px 24px 30px 26px / 24px 34px 28px 38px;
+  overflow:hidden;
+}
+.modal header { padding-right:66px; }
+
+.recurso,.chave,.acao-rapida,.hab,.ini-linha,.cartao,.modo,.ameaca-bloco,.ficha-cartao,.caixa-ritual,.ritual {
+  border-left-width:2px;
+}
+.recurso {
+  padding:18px 18px 16px;
+}
+.recurso::before {
+  border:0;
+  width:24px;height:24px;right:10px;top:10px;
+  border-radius:50% 38% 56% 42% / 44% 50% 34% 58%;
+  background:radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--cor,var(--sangue)) 78%, white 22%), var(--cor,var(--sangue)) 68%, transparent 72%);
+  opacity:.55;
+}
+.barra { border-radius:999px; height:10px; }
+.barra b { border-radius:999px; }
+
+.hab,
+.acao-rapida,
+.ameaca-bloco,
+.ritual,
+.caixa-ritual,
+.cartao,
+.modo,
+.ficha-cartao,
+.historico {
+  overflow:hidden;
+}
+
+.chave {
+  border-bottom-width:1px;
+  border-radius: 20px 20px 24px 24px / 14px 14px 26px 26px;
+}
+
+.ficha-cabeca {
+  border-radius: 30px 22px 28px 24px / 22px 30px 24px 30px;
+  padding:24px 24px 28px 18px;
+}
+.retrato {
+  border-radius: 18px 16px 22px 14px / 16px 20px 14px 22px;
+  transform:rotate(-1.5deg);
+}
+.etiqueta,
+.selo {
+  border-radius:999px;
+}
+
+.abas {
+  gap:10px;
+  border-bottom:0;
+  padding-bottom:8px;
+}
+.abas button {
+  border:1px solid color-mix(in srgb, var(--linha-forte) 80%, transparent);
+  border-bottom-width:2px;
+  border-radius: 18px 18px 14px 14px / 20px 20px 12px 12px;
+  padding:13px 18px 11px;
+  background:color-mix(in srgb, var(--fundo-2) 78%, transparent);
+}
+.abas button::before {
+  left:14px; right:14px; bottom:7px;
+}
+.abas button:hover {
+  background:color-mix(in srgb, var(--sangue) 12%, var(--fundo-2));
+}
+.abas button[aria-selected="true"] {
+  border-color:color-mix(in srgb, var(--sangue) 68%, var(--linha-forte));
+  border-bottom-color:var(--sangue);
+  box-shadow:0 8px 18px #0000002e;
+}
+
+.passos {
+  gap:10px;
+  border-bottom:0;
+  padding-bottom:8px;
+}
+.passos button {
+  border-radius: 18px 14px 20px 16px / 16px 20px 16px 22px;
+  border-bottom-width:2px;
+}
+
+.portal-acesso {
+  border-radius: 34px 28px 22px 30px / 26px 22px 34px 30px;
+}
+.portal-acesso::after {
+  left:14px; right:14px; top:14px; bottom:14px;
+  border-radius: 28px 22px 18px 24px / 20px 18px 28px 24px;
+}
+.portal-descricao {
+  padding:34px 30px 33px;
+}
+
+.invocar.principal,
+.btn,
+.icone-btn {
+  border-radius: 18px 16px 20px 14px / 16px 20px 14px 22px;
+}
+input,select,textarea {
+  border-radius: 16px 14px 18px 12px / 14px 18px 12px 18px;
+}
+.tabela th:first-child { border-top-left-radius:18px; }
+.tabela th:last-child { border-top-right-radius:18px; }
+
+.vazio {
+  border-style:solid;
+  border-color:color-mix(in srgb, var(--linha) 72%, transparent);
+  background:linear-gradient(135deg,#ffffff05,transparent 55%),linear-gradient(180deg,#74262a12,transparent 40%),var(--fundo-2);
+}
+
+:root[data-tema="papel"] .painel,
+:root[data-tema="papel"] .ritual,:root[data-tema="papel"] .hab,:root[data-tema="papel"] .chave,
+:root[data-tema="papel"] .acao-rapida,:root[data-tema="papel"] .ini-linha,:root[data-tema="papel"] .recurso,
+:root[data-tema="papel"] .cartao,:root[data-tema="papel"] .modo,:root[data-tema="papel"] .ficha-cartao,
+:root[data-tema="papel"] .ameaca-bloco,:root[data-tema="papel"] .vazio,:root[data-tema="papel"] .caixa-ritual,
+:root[data-tema="papel"] .modal,:root[data-tema="papel"] .historico {
+  box-shadow:0 10px 24px #5d413721,inset 0 0 0 1px #a1785714;
+}
+
+@media(max-width:760px){
+  .painel { border-radius: 24px 18px 24px 18px / 18px 24px 18px 24px; }
+  .portal-acesso { border-radius: 26px 22px 20px 24px / 20px 18px 28px 24px; }
+  .modal { border-radius: 24px 18px 22px 18px / 18px 24px 18px 24px; }
+  .abas button,
+  .passos button { border-radius: 15px 14px 16px 12px / 16px 16px 12px 18px; }
+}
