@@ -2,12 +2,12 @@
 import {
   MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS,
   ARMAS, PROTECOES, ITENS_GERAIS, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL,
-} from './catalogo.js?v=0.7';
-import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.7';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.7';
-import { pentagramaAtributos } from './criador.js?v=0.7';
-import { textoTeste, d, rolar } from './dados.js?v=0.7';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.7';
+} from './catalogo.js?v=0.9';
+import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.9';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.9';
+import { pentagramaAtributos } from './criador.js?v=0.9';
+import { textoTeste, d, rolar } from './dados.js?v=0.9';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.9';
 
 export const ABAS = [['agente', 'Agente'], ['combate', 'Combate'], ['habilidades', 'Habilidades'], ['rituais', 'Rituais'], ['inventario', 'Inventário'], ['notas', 'Notas']];
 const ELEM = Object.fromEntries(ELEMENTOS.map(e => [e.id, e]));
@@ -20,7 +20,8 @@ export function telaFicha(f, ui) {
   dAtual = d;
   const aba = ui.aba || 'agente';
   const corpo = { agente: abaAgente, combate: abaCombate, habilidades: abaHabilidades, rituais: abaRituais, inventario: abaInventario, notas: abaNotas }[aba](f, d, ui);
-  return `<div class="pagina">
+  return `<div class="pagina ficha-oculta-pagina">
+  <div class="cabecalho-ritual"><span>REGISTRO DE AGENTE · ACESSO RESTRITO</span><small>AS MARCAS DO OUTRO LADO PERMANECEM</small></div>
   ${cabecalho(f, d)}
   ${d.avisos.length ? `<details class="avisos-ficha" style="margin-top:12px"><summary class="ui" style="cursor:pointer">⚠ ${d.avisos.length} aviso(s) de regra</summary><ul>${d.avisos.map(a => `<li>${esc(a)}</li>`).join('')}</ul></details>` : ''}
   <nav class="abas" role="tablist" data-guardar-rolagem="abas">${ABAS.map(([id, nome]) => `<button role="tab" data-acao="aba" data-aba="${id}" aria-selected="${aba === id}">${nome}</button>`).join('')}</nav>

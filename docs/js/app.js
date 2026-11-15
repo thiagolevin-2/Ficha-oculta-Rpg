@@ -1,15 +1,15 @@
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
-import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.7';
-import { normalizar, derivar } from './regras.js?v=0.7';
-import { carregarFichas, salvarFichas, carregarTema, salvarTema, espacoUsado } from './armazenamento.js?v=0.7';
-import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.7';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.7';
-import { telaFicha, acoesFicha, checksFicha } from './fichaUI.js?v=0.7';
-import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.7';
-import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.7';
+import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.9';
+import { normalizar, derivar } from './regras.js?v=0.9';
+import { carregarFichas, salvarFichas, carregarTema, salvarTema, espacoUsado } from './armazenamento.js?v=0.9';
+import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.9';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.9';
+import { telaFicha, acoesFicha, checksFicha } from './fichaUI.js?v=0.9';
+import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.9';
+import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.9';
 
-export const VERSAO = '0.7';
+export const VERSAO = '0.9';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -57,40 +57,50 @@ addEventListener('hashchange', () => {
 function topo() {
   const r = estado.rota.tela;
   const link = (href, nome, ativo) => `<a href="${href}" ${ativo ? 'aria-current="page"' : ''}>${nome}</a>`;
-  return `<header class="topo"><a class="marca" href="#/"><img src="assets/favicon.svg" alt=""><span>Ficha <b>Oculta</b> RPG</span></a>
+  return `<header class="topo topo-oculto"><a class="marca" href="#/"><img src="assets/selo-oculto.svg" alt=""><span>FICHA <b>OCULTA</b><small>ARQUIVO DE AGENTES</small></span></a>
     <nav>${link('#/agentes', 'Agentes', ['agentes', 'ficha', 'novo'].includes(r))}${link('#/mestre', 'Mestre', r === 'mestre')}${link('#/sobre', 'Sobre', r === 'sobre')}
     <button class="btn-ambiente" data-acao="ambiente" title="Ativar ou pausar efeitos visuais" aria-label="Ativar ou pausar efeitos visuais" aria-pressed="${ambienteAtivo}">${ambienteAtivo ? '◉ Efeitos' : '◎ Efeitos'}</button>
     <button data-acao="tema" title="Trocar tema" aria-label="Trocar tema claro/escuro" aria-pressed="${estado.tema === 'papel'}">${estado.tema === 'papel' ? '☾ Noite' : '☼ Papel'}</button></nav></header>`;
 }
 function inicio() {
-  return `<main class="pagina inicio-editorial">
-    <div class="arquivo-linha"><span><b>PROTOCOLO 001</b> · CENTRAL DE INVESTIGAÇÕES DO PARANORMAL</span><span class="status-local"><i></i> ARQUIVO LOCAL / ACESSO ATIVO</span></div>
-    <section class="abertura">
-      <div class="abertura-texto"><span class="sobretitulo"><span class="ponto-vivo" aria-hidden="true"></span> TERMINAL DE INVESTIGAÇÃO · ACESSO NÃO OFICIAL</span>
-        <h1>O OUTRO LADO<br><span class="quebra">ESTÁ <em>MAIS PERTO.</em></span></h1>
-        <p>Nem tudo deveria ser descoberto. Reúna seus agentes, documente o impossível e enfrente o desconhecido em uma central feita para sua mesa de Ordem Paranormal.</p>
-        <div class="abertura-acoes"><a class="btn sangue" href="#/novo" data-acao="novo-agente">+ Criar agente</a><a class="link-arquivo" href="#/agentes">Abrir meus arquivos <span>↗</span></a></div>
-        <div class="nota-arquivo"><span>▰ 01 — REGISTRE. INVESTIGUE. SOBREVIVA.</span><small>Seus registros. Seus rituais. Sua próxima investigação.</small></div>
+  const elementos = [['sangue','Sangue','A intensidade do sentir.'],['morte','Morte','O tempo devora tudo.'],['conhecimento','Conhecimento','O preço de saber.'],['energia','Energia','Nada permanece igual.'],['medo','Medo','O impossível tem nome.']];
+  return `<div class="inicio-oculto">
+    <section class="limiar-hero" aria-label="Bem-vindo à Ficha Oculta">
+      <div class="hero-ruido" aria-hidden="true"></div>
+      <div class="hero-gravura" aria-hidden="true"></div>
+      <div class="hero-veu" aria-hidden="true"></div>
+      <div class="hero-container pagina">
+        <div class="hero-texto">
+          <span class="sobrescrito-oculto"><span class="marca-cruz" aria-hidden="true">✦</span> REGISTRO NÃO AUTORIZADO <span class="risco-vivo" aria-hidden="true"></span></span>
+          <h1 class="titulo-limiar">A MEMBRANA<br><span>ESTÁ</span><br><em>SE ROMPENDO.</em></h1>
+          <p class="sinopse-limiar">Há coisas que não deveriam atravessar. Registre seus agentes, reúna evidências e encare o inexplicável em uma ficha feita para histórias de <i>Ordem Paranormal</i>.</p>
+          <div class="hero-acoes"><a href="#/novo" data-acao="novo-agente" class="invocar principal"><span>✠</span> CRIAR UM AGENTE</a><a href="#/agentes" class="invocar secundario">CONSULTAR ARQUIVOS <span>↗</span></a></div>
+          <div class="hero-nota"><span>REGISTROS DO OUTRO LADO</span><span>FERRAMENTA GRATUITA DE FÃS</span></div>
+          <div class="licenca-comunidade"><a href="https://ordemparanormal.com.br/licenca" target="_blank" rel="noopener noreferrer" aria-label="Ler a licença oficial da comunidade"><img src="assets/selo-comunidade-referencia.svg" alt="Aviso de projeto não oficial e não canônico; consulte o selo oficial na página da licença" loading="lazy"></a><div><strong>PROJETO NÃO OFICIAL</strong><small>Este é um conteúdo não oficial, publicado sob a Licença da Comunidade de Ordem Paranormal.</small><small>Contém material gerado por inteligência artificial.</small></div></div>
+        </div>
+        <div class="hero-selo" aria-hidden="true"><img src="assets/selo-oculto.svg" alt=""><span class="hero-selo-texto">QUANDO A REALIDADE<br>FALHA, INVESTIGUE.</span></div>
       </div>
-      <div class="composicao" aria-hidden="true">
-        <div class="portal-rastro"></div><div class="orbita-arquivo"></div><div class="documento-fundo"></div>
-        <div class="documento"><div class="doc-cabecalho"><span>DEPARTAMENTO DE OCORRÊNCIAS ANÔMALAS</span><b>OP / 001</b></div><span class="carimbo-doc">RESTRITO</span><div class="doc-simbolo"></div><div class="doc-titulo">RELATÓRIO<br>DO IMPOSSÍVEL<span>CLASSIFICAÇÃO: SIGILOS E VESTÍGIOS</span></div><div class="doc-linhas"><i></i><i></i><i></i></div><div class="doc-rodape"><span>REGISTRO DE INVESTIGAÇÃO</span><span>01 / ∞</span></div></div>
-        <span class="nota-manuscrita">não confie<br>nos sinais.</span><span class="evidencia">◈ EVIDÊNCIA Nº 001 · STATUS DESCONHECIDO</span>
+      <div class="hero-rodape" aria-hidden="true"><span>DOCUMENTO 001 / ACESSO AO OUTRO LADO</span><span>SCROLL PARA INVESTIGAR ↓</span></div>
+    </section>
+    <section class="pagina capitulo" aria-labelledby="capitulo-titulo">
+      <header class="capitulo-cabecalho"><span class="capitulo-numero">I</span><div><span class="sobrescrito-oculto">DOSSIÊ DE OPERAÇÕES</span><h2 id="capitulo-titulo">Toda investigação <em>começa aqui.</em></h2></div></header>
+      <div class="portais-acesso">
+        <a href="#/agentes" class="portal-acesso portal-jogador"><span class="portal-imagem" aria-hidden="true"></span><span class="portal-margem">ARQUIVO 01 / PESSOAL</span><span class="portal-descricao"><span class="portal-icon" aria-hidden="true">✠</span><strong>Meus agentes</strong><small>Fichas, atributos, poderes, rituais e as marcas deixadas pelo Outro Lado.</small><span class="portal-link">ABRIR REGISTROS <b>↗</b></span></span></a>
+        <a href="#/mestre" class="portal-acesso portal-mestre"><span class="portal-imagem" aria-hidden="true"></span><span class="portal-margem">ARQUIVO 02 / AMEAÇAS</span><span class="portal-descricao"><span class="portal-icon" aria-hidden="true">◈</span><strong>Área do mestre</strong><small>Controle o desconhecido, organize ameaças e registre a sua missão.</small><span class="portal-link">INVESTIGAR <b>↗</b></span></span></a>
+        <div class="portal-acesso portal-futuro" aria-label="Tabuleiro em desenvolvimento"><span class="portal-imagem" aria-hidden="true"></span><span class="portal-margem">ARQUIVO 03 / LACRADO</span><span class="portal-descricao"><span class="portal-icon" aria-hidden="true">◇</span><strong>Mesa e tabuleiro</strong><small>O próximo mistério ainda não está pronto para ser revelado.</small><span class="portal-link">DOCUMENTO LACRADO <b>✕</b></span></span></div>
       </div>
     </section>
-    <div class="indice-secao"><span>ESCOLHA SEU PRÓXIMO PASSO</span><span>ACESSO AO ARQUIVO ↓</span></div>
-    <section class="portas" aria-label="Áreas do site">
-      <a class="porta porta-agentes" href="#/agentes"><span class="porta-icone" aria-hidden="true"></span><span class="num">01 / AGENTES <span>↗</span></span><h2>Área do Jogador</h2><p>Seu personagem, suas cicatrizes. Fichas completas para Regras Padrão e Sobrevivendo ao Horror.</p><span class="porta-rodape">ACESSAR FICHAS <span>→</span></span></a>
-      <a class="porta porta-mestre" href="#/mestre"><span class="porta-icone" aria-hidden="true"></span><span class="num">02 / MISSÕES <span>↗</span></span><h2>Área do Mestre</h2><p>Prepare o desconhecido. Organize ameaças, acompanhe a iniciativa e registre sua investigação.</p><span class="porta-rodape">PREPARAR SESSÃO <span>→</span></span></a>
-      <div class="porta porta-mesa em-breve"><span class="porta-icone" aria-hidden="true"></span><span class="num">03 / CONEXÕES <span class="etiqueta">EM BREVE</span></span><h2>Tabuleiro e Mesa</h2><p>O próximo capítulo: mapas e encontros para reunir sua equipe em uma mesma mesa.</p><span class="porta-rodape">ARQUIVO EM CONSTRUÇÃO <span>—</span></span></div>
-    </section>
-    <section class="elementos-banda" aria-label="Os cinco elementos do paranormal"><div class="elementos-intro"><span>OBSERVAÇÃO / 002</span><b>O DESCONHECIDO TEM MUITAS FACES.</b><small>Elementos representados por sigilos originais desta ferramenta.</small></div><div class="elementos-lista">${[['sangue','SANGUE'], ['morte','MORTE'], ['conhecimento','CONHECIMENTO'], ['energia','ENERGIA'], ['medo','MEDO']].map(([id, nome]) => `<span class="elemento-amostra el-${id}"><span class="elemento-icone" style="--glifo:url(assets/sigilo-${id}.svg)" aria-hidden="true"></span><span>${nome}</span></span>`).join('')}</div></section>
-    <div class="nota-privacidade"><span>SEU ARQUIVO, SOB SUA GUARDA.</span><p>Os dados ficam neste navegador. Exporte suas fichas para manter uma cópia segura.</p></div>
-  </main>`;
+    <section class="elementos-ocultos" aria-labelledby="elementos-titulo"><div class="pagina">
+      <header class="capitulo-cabecalho"><span class="capitulo-numero">II</span><div><span class="sobrescrito-oculto">ALÉM DA REALIDADE</span><h2 id="elementos-titulo">Os cinco <em>elementos.</em></h2><p>Há forças que não deveriam ser compreendidas.</p></div></header>
+      <div class="circulo-elementos">${elementos.map(([id,nome,descricao]) => `<div class="elemento-placa elemento-${id}"><span class="elemento-sombra" aria-hidden="true"></span><img src="assets/glifo-${id}.svg" alt="" aria-hidden="true"><b>${nome}</b><small>${descricao}</small></div>`).join('')}</div>
+      <div class="nota-fim"><span>UMA FERRAMENTA DE FÃS · NÃO OFICIAL</span><span>OS DADOS SÃO SALVOS NESTE NAVEGADOR. EXPORTE UMA CÓPIA.</span></div>
+    </div></section>
+  </div>`;
 }
+
 function listaAgentes() {
   const fs = estado.fichas;
-  return `<div class="pagina"><div class="titulo-secao"><h1 class="faixa">Agentes</h1>
+  return `<div class="pagina arquivo-agentes"><div class="titulo-secao"><h1 class="faixa">Agentes</h1>
     <div class="linha"><a class="btn sangue" href="#/novo" data-acao="novo-agente">+ Novo agente</a><button class="btn" data-acao="importar">Importar</button>${fs.length ? '<button class="btn fantasma" data-acao="exportar-todos">Exportar todos</button>' : ''}</div></div>
     ${fs.length ? `<div class="lista-fichas">${fs.map(f => {
       const d = derivar(f);
@@ -108,7 +118,7 @@ function sobre() {
     <h3 class="titulo-vermelho">Imagens</h3><p>Você pode colocar imagens suas na pasta <span class="dossie-txt">assets/imagens/</span> do site (veja o LEIA-ME de lá): <span class="dossie-txt">capa.jpg</span>, <span class="dossie-txt">classe-combatente.jpg</span>, <span class="dossie-txt">origem-academico.jpg</span> etc. Se o arquivo existir, ele aparece; se não, o espaço some.</p>
     <h3 class="titulo-vermelho">Dados 3D</h3><label class="check"><input type="checkbox" data-acao-check="animacoes" ${animacoesLigadas() ? 'checked' : ''}> <span>Mostrar a animação dos dados 3D</span></label>
     <h3 class="titulo-vermelho">Elementos</h3><p>${[['sangue', '#c8141f', 'Sangue'], ['morte', '#8d8d8d', 'Morte'], ['conhecimento', '#d9a521', 'Conhecimento'], ['energia', '#a64dff', 'Energia'], ['medo', '#f2efe8', 'Medo']].map(([id, cor, n]) => `<span class="etiqueta" style="border-color:${cor}">${sigilo(id, cor)} ${n}</span>`).join(' ')}</p>
-    <p class="apagado" style="font-size:.88rem">Os sigilos, o círculo ritual e as pinceladas deste site são desenhos originais, não os símbolos oficiais.</p></section></div>`;
+    <p class="apagado" style="font-size:.88rem">A identidade gráfica usa artes originais criadas para esta versão, incluindo uma imagem gerada por inteligência artificial, e símbolos reinterpretados em vetores. Os livros oficiais foram usados como referência de atmosfera, sem reprodução de imagens ou logos dos livros. Este é um conteúdo não oficial, publicado sob a Licença da Comunidade de Ordem Paranormal. Contém material gerado por inteligência artificial.</p></section></div>`;
 }
 function bandeja() {
   return `<div class="bandeja"><button class="btn" data-acao="historico" aria-expanded="${estado.historicoAberto}">🎲 Rolagens</button></div>
@@ -128,7 +138,7 @@ function render() {
   else if (r.tela === 'sobre') corpo = sobre();
   else corpo = inicio();
   document.documentElement.dataset.tela = r.tela;
-  htmlMantendoFoco(app, `${topo()}<main id="conteudo">${corpo}</main><footer class="rodape">${NOME_DO_SITE} v${VERSAO} · ferramenta de fãs para Ordem Paranormal RPG · salvo só neste navegador</footer>${bandeja()}`);
+  htmlMantendoFoco(app, `${topo()}<main id="conteudo">${corpo}</main><footer class="rodape">${NOME_DO_SITE} v${VERSAO} · conteúdo não oficial · sob a Licença da Comunidade de Ordem Paranormal · contém material gerado por inteligência artificial · salvo só neste navegador</footer>${bandeja()}`);
 }
 quandoMudar(() => { if (estado.historicoAberto) render(); });
 

@@ -1,8 +1,8 @@
 // criador.js — criação de agente em passos.
 // PASSO 0 (pedido do projeto): escolher as regras ANTES de criar a ficha — Regras Padrão ou Sobrevivendo ao Horror.
-import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.7';
-import { novaFicha, normalizar, derivar } from './regras.js?v=0.7';
-import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.7';
+import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.9';
+import { novaFicha, normalizar, derivar } from './regras.js?v=0.9';
+import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.9';
 
 export const PASSOS = [
   ['modo', 'Regras'], ['conceito', 'Conceito'], ['classe', 'Classe'], ['atributos', 'Atributos'], ['origem', 'Origem'], ['pericias', 'Perícias'], ['revisao', 'Revisão'],
@@ -68,7 +68,8 @@ export function telaCriador(r) {
   const passo = PASSOS[r.passo][0];
   const corpo = { modo: passoModo, conceito: passoConceito, atributos: passoAtributos, origem: passoOrigem, classe: passoClasse, pericias: passoPericias, revisao: passoRevisao }[passo](r);
   const problemas = problemasDoPasso(r);
-  return `<div class="pagina">
+  return `<div class="pagina criador-oculto">
+    <div class="cabecalho-ritual"><span>PROTOCOLO DE RECRUTAMENTO · NOVO REGISTRO</span><small>O DESCONHECIDO OBSERVA CADA ESCOLHA</small></div>
     <div class="titulo-secao"><h1 class="faixa">Novo agente</h1>${r.modo ? `<span class="etiqueta ${r.modo === 'sah' ? 'sah' : 'lr'}">${esc(MODOS[r.modo].nome)}</span>` : ''}</div>
     <nav class="passos" aria-label="Passos da criação">${PASSOS.map(([id, nome], i) => `<button data-acao="cri-ir" data-passo="${i}" ${i === r.passo ? 'aria-current="step"' : ''} class="${i < r.passo ? 'feito' : ''}" ${i > r.passo && !podeAvancarAte(r, i) ? 'disabled' : ''}>${i + 1}. ${nome}</button>`).join('')}</nav>
     ${corpo}
@@ -87,12 +88,12 @@ function passoModo(r) {
   return `<p class="apagado">Antes de abrir a ficha, escolha com quais regras este agente vai existir. Dá para ter agentes dos dois tipos salvos ao mesmo tempo.</p>
   <div class="modos">
     <button class="modo" data-acao="cri-modo" data-modo="padrao" aria-pressed="${r.modo === 'padrao'}">
-      <span class="sigilo sigilo-grande" style="--img:url(assets/sigilo-conhecimento.svg);--cor:var(--vela)"></span>
+      <span class="sigilo sigilo-grande" style="--img:url(assets/glifo-conhecimento.svg);--cor:var(--vela)"></span>
       <span class="selo">Livro de Regras</span><h2>Regras Padrão</h2>
       <ul><li>Agente da Ordem desde o início (NEX 5%).</li><li>Combatente, Especialista ou Ocultista.</li><li>26 origens, 15 trilhas, PV, PE e Sanidade.</li><li>Evolução por NEX até 99%.</li></ul>
     </button>
     <button class="modo sah" data-acao="cri-modo" data-modo="sah" aria-pressed="${r.modo === 'sah'}">
-      <span class="sigilo sigilo-grande" style="--img:url(assets/sigilo-medo.svg);--cor:#c9a6f0"></span>
+      <span class="sigilo sigilo-grande" style="--img:url(assets/glifo-medo.svg);--cor:#c9a6f0"></span>
       <span class="selo" style="color:#c9a6f0">Sobrevivendo ao Horror</span><h2>Sobrevivendo ao Horror</h2>
       <ul><li>Tudo das regras padrão, mais:</li><li>Classe <b>Sobrevivente</b>: gente comum, por estágios.</li><li>20 novas origens e 9 novas trilhas.</li><li>Poderes gerais e regras opcionais de horror.</li></ul>
     </button>
@@ -125,10 +126,10 @@ function passoAtributos(r) {
 }
 
 export function pentagramaAtributos(at, editavel, rolavel = false) {
-  // Roda dos atributos: 5 círculos de borda irregular em volta de uma engrenagem ornamentada (desenhos originais).
+  // Constelação ritual de cinco atributos ao redor do Olho Oculto; sem elementos mecânicos.
   // AGI em cima, INT à direita, VIG e PRE embaixo, FOR à esquerda. O nome fica DENTRO do círculo, com o valor grande.
   const pos = { agi: [50, 17], int: [83, 41], vig: [69.5, 80], pre: [30.5, 80], for: [17, 41] };
-  return `<div class="roda-atr"><div class="roda-engrenagem" aria-hidden="true"></div>
+  return `<div class="roda-atr roda-sigilada"><div class="roda-centro" aria-hidden="true"><img src="assets/olho-oculto.svg" alt=""><span>OLHO DO<br>OUTRO LADO</span></div>
   ${ATRIBUTOS.map(a => {
     const miolo = `<span class="roda-nome">${a.nome}<b>${a.sigla}</b></span><span class="roda-valor">${at[a.id]}</span>`;
     return `<div class="roda-item" style="left:${pos[a.id][0]}%;top:${pos[a.id][1]}%">
