@@ -1,0 +1,755 @@
+/* FICHA OCULTA 0.8 — DOSSIÊ PROFANADO
+   Segunda passagem visual: menos "cards" e mais composição editorial de Ordem Paranormal.
+   Mantém a lógica intacta e só redefine a pele visual.
+*/
+
+:root[data-tema] {
+  --fundo:#09080c;
+  --fundo-2:#121116;
+  --painel:#151217;
+  --painel-2:#1f1a20;
+  --painel-3:#241d22;
+  --tinta:#f0e7dd;
+  --osso:#d7c9bc;
+  --apagado:#9f948a;
+  --linha:#4d4348;
+  --linha-forte:#89766d;
+  --sangue:#a72b39;
+  --sangue-texto:#f08b89;
+  --vela:#cba66a;
+  --roxo:#8c6ac8;
+  --bruma:#250d14;
+  --sombra-pesada:0 22px 58px rgba(0,0,0,.45);
+  --efeito-transicao:260ms cubic-bezier(.2,.65,.15,1);
+}
+
+:root[data-tema='papel'] {
+  --fundo:#d5c6ae;
+  --fundo-2:#e2d4bf;
+  --painel:#eee2cc;
+  --painel-2:#e8dbc5;
+  --painel-3:#f5e9d3;
+  --tinta:#221c19;
+  --osso:#2c2420;
+  --apagado:#665a50;
+  --linha:#b5a087;
+  --linha-forte:#80695a;
+  --sangue:#8e2430;
+  --sangue-texto:#8e2430;
+  --vela:#78511b;
+  --bruma:#b98f7121;
+  --sombra-pesada:0 16px 28px rgba(64,50,37,.18);
+}
+
+:root[data-tema] body {
+  background:
+    radial-gradient(circle at 82% 10%, rgba(167,43,57,.16), transparent 24%),
+    radial-gradient(circle at 18% 74%, rgba(131,77,52,.12), transparent 28%),
+    linear-gradient(180deg, rgba(255,255,255,.02), transparent 20%),
+    var(--fundo);
+}
+
+:root[data-tema] body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:.16;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,.03), transparent 25%),
+    radial-gradient(circle at 75% 60%, rgba(255,255,255,.02), transparent 20%),
+    url(assets/textura.svg),
+    url(assets/trama-oculta.svg);
+  background-size:auto, auto, 420px 420px, 280px 280px;
+  background-repeat:no-repeat, no-repeat, repeat, repeat;
+  mix-blend-mode:screen;
+}
+
+:root[data-tema] body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:.18;
+  background:
+    linear-gradient(0deg, transparent 0 96%, rgba(255,255,255,.025) 100%),
+    repeating-linear-gradient(0deg, transparent 0 19px, rgba(0,0,0,.14) 20px 21px),
+    radial-gradient(circle at 50% 50%, transparent 58%, rgba(0,0,0,.25) 100%);
+}
+
+:root[data-tema='papel'] body::before { opacity:.2; mix-blend-mode:multiply; }
+:root[data-tema='papel'] body::after { opacity:.09; }
+
+:root[data-tema] .pagina {
+  max-width: 1440px;
+  padding-inline: clamp(16px, 3.8vw, 58px);
+}
+
+:root[data-tema] .topo {
+  position:sticky;
+  top:0;
+  z-index:50;
+  gap:22px;
+  padding:14px clamp(16px,3.8vw,54px);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--fundo) 95%, transparent), color-mix(in srgb, var(--fundo) 88%, transparent)),
+    url(assets/textura.svg);
+  border:0;
+  border-bottom:1px solid var(--linha);
+  box-shadow:0 12px 42px rgba(0,0,0,.28);
+}
+
+:root[data-tema] .topo::before {
+  content:'';
+  position:absolute;
+  left:clamp(16px,3vw,46px);
+  right:clamp(16px,3vw,46px);
+  bottom:-1px;
+  height:2px;
+  background:linear-gradient(90deg, transparent, var(--sangue), transparent 72%);
+  opacity:.9;
+}
+
+:root[data-tema] .topo::after {
+  content:'ACERVO / INVESTIGAÇÃO';
+  position:absolute;
+  right:clamp(18px,4vw,50px);
+  top:7px;
+  font:700 9px/1 var(--fonte-dossie);
+  letter-spacing:.18em;
+  color:var(--apagado);
+}
+
+:root[data-tema] .marca {
+  position:relative;
+  gap:12px;
+  padding:10px 16px 10px 12px;
+  background:linear-gradient(135deg, rgba(255,255,255,.05), transparent 75%), var(--painel-2);
+  border:1px solid var(--linha);
+  clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+  box-shadow:var(--sombra-pesada);
+}
+
+:root[data-tema] .marca::after {
+  content:'';
+  position:absolute;
+  inset:6px;
+  border:1px solid rgba(255,255,255,.07);
+  pointer-events:none;
+}
+
+:root[data-tema] .topo nav {
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+:root[data-tema] .topo nav a,
+:root[data-tema] .topo nav button {
+  position:relative;
+  min-height:42px;
+  padding:10px 14px 9px;
+  border:1px solid var(--linha);
+  background:linear-gradient(180deg, rgba(255,255,255,.035), transparent), var(--painel);
+  color:var(--apagado);
+  clip-path:polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  transition:transform var(--efeito-transicao), border-color var(--efeito-transicao), color var(--efeito-transicao), background var(--efeito-transicao);
+}
+
+:root[data-tema] .topo nav a::before,
+:root[data-tema] .topo nav button::before {
+  content:'';
+  position:absolute;
+  left:9px;
+  right:9px;
+  bottom:5px;
+  height:1px;
+  background:linear-gradient(90deg, transparent, currentColor, transparent);
+  opacity:.25;
+}
+
+:root[data-tema] .topo nav a:hover,
+:root[data-tema] .topo nav button:hover,
+:root[data-tema] .topo nav a[aria-current='page'] {
+  color:var(--tinta);
+  border-color:var(--linha-forte);
+  background:linear-gradient(180deg, rgba(167,43,57,.13), transparent 72%), var(--painel-2);
+  transform:translateY(-1px);
+}
+
+:root[data-tema] .topo nav a[aria-current='page'] {
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05), 0 0 0 1px rgba(167,43,57,.2);
+}
+
+/* Capa / portas */
+:root[data-tema] .arquivo-linha,
+:root[data-tema] .indice-secao {
+  border-color:var(--linha-forte);
+}
+
+:root[data-tema] .abertura {
+  min-height:700px;
+  position:relative;
+  gap:clamp(28px,4vw,84px);
+}
+
+:root[data-tema] .abertura::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 72% 50%, rgba(167,43,57,.12), transparent 28%),
+    linear-gradient(90deg, transparent 48%, rgba(255,255,255,.03) 49%, transparent 50%);
+  opacity:.75;
+}
+
+:root[data-tema] .abertura h1 {
+  text-shadow:0 6px 30px rgba(0,0,0,.45);
+  letter-spacing:-.03em;
+}
+
+:root[data-tema] .abertura-texto > p {
+  position:relative;
+  padding:20px 24px;
+  border:1px solid var(--linha);
+  border-left:4px solid var(--sangue);
+  background:linear-gradient(135deg, rgba(255,255,255,.04), transparent 58%), rgba(0,0,0,.12);
+  clip-path:polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
+  box-shadow:var(--sombra-pesada);
+}
+
+:root[data-tema='papel'] .abertura-texto > p {
+  background:linear-gradient(135deg, rgba(255,255,255,.65), transparent 64%), rgba(255,255,255,.18);
+}
+
+:root[data-tema] .documento-fundo {
+  background:linear-gradient(180deg, rgba(255,255,255,.04), transparent), #1c171b;
+  border:1px solid #6e5a51;
+  clip-path:polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%);
+}
+
+:root[data-tema] .documento {
+  outline:none;
+  border:1px solid rgba(56,36,31,.9);
+  clip-path:polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  box-shadow:0 24px 72px rgba(0,0,0,.55);
+}
+
+:root[data-tema] .doc-cabecalho,
+:root[data-tema] .doc-rodape {
+  border-color:#7c6e63;
+}
+
+:root[data-tema] .portas {
+  gap:22px;
+}
+
+:root[data-tema] .porta {
+  min-height:320px;
+  padding:28px 28px 24px;
+  border:1px solid var(--linha-forte);
+  border-top:0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.04), transparent 16%),
+    radial-gradient(circle at 85% 18%, rgba(167,43,57,.18), transparent 26%),
+    linear-gradient(135deg, rgba(255,255,255,.02), transparent 70%),
+    var(--painel);
+  box-shadow:var(--sombra-pesada);
+  clip-path:polygon(0 14px, 14px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+}
+
+:root[data-tema] .porta::before {
+  content:'ARQUIVO 00' attr(data-slot);
+  position:absolute;
+  left:24px;
+  top:0;
+  transform:translateY(-50%);
+  padding:4px 10px 5px;
+  border:1px solid var(--linha-forte);
+  background:var(--fundo);
+  color:var(--apagado);
+  font:700 9px/1 var(--fonte-dossie);
+  letter-spacing:.18em;
+}
+
+:root[data-tema] .porta:nth-child(1)::before { content:'ARQUIVO 01'; }
+:root[data-tema] .porta:nth-child(2)::before { content:'ARQUIVO 02'; }
+:root[data-tema] .porta:nth-child(3)::before { content:'ARQUIVO 03'; }
+
+:root[data-tema] .porta::after {
+  content:'';
+  position:absolute;
+  inset:8px;
+  border:1px solid rgba(255,255,255,.06);
+  opacity:1;
+  background:none;
+  pointer-events:none;
+}
+
+:root[data-tema] .porta .num {
+  color:var(--apagado);
+}
+
+:root[data-tema] .porta h2 {
+  margin-top:6px;
+  font-size:clamp(1.5rem, 2.1vw, 2rem);
+}
+
+:root[data-tema] .porta p {
+  line-height:1.9;
+}
+
+:root[data-tema] .porta-rodape {
+  padding-top:16px;
+  border-top:1px solid var(--linha);
+}
+
+/* Títulos e seções */
+:root[data-tema] .titulo-secao {
+  align-items:flex-end;
+  gap:14px;
+  margin-bottom:18px;
+}
+
+:root[data-tema] .faixa {
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  padding:0 14px 10px 0;
+  margin:0;
+  text-transform:uppercase;
+}
+
+:root[data-tema] .faixa::before {
+  display:block;
+  content:'';
+  width:20px;
+  height:20px;
+  background:currentColor;
+  -webkit-mask:url(assets/emblema-arquivo.svg) center/contain no-repeat;
+  mask:url(assets/emblema-arquivo.svg) center/contain no-repeat;
+  opacity:.9;
+}
+
+:root[data-tema] .faixa::after {
+  display:block;
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:3px;
+  background:
+    linear-gradient(90deg, currentColor 0 32%, transparent 32% 36%, currentColor 36% 68%, transparent 68% 72%, currentColor 72% 100%);
+  opacity:.38;
+}
+
+:root[data-tema] .titulo-vermelho {
+  position:relative;
+  padding:7px 16px 7px 13px;
+  background:linear-gradient(180deg, rgba(167,43,57,.14), transparent 75%), var(--painel-2);
+  border:1px solid color-mix(in srgb, var(--sangue) 60%, var(--linha));
+  clip-path:polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 0 100%);
+}
+
+:root[data-tema] .titulo-vermelho::after {
+  width:26px;
+  background:currentColor;
+  opacity:.45;
+}
+
+/* Painéis e áreas */
+:root[data-tema] .painel,
+:root[data-tema] .ficha-cartao,
+:root[data-tema] .ameaca-bloco,
+:root[data-tema] .historico,
+:root[data-tema] .modal,
+:root[data-tema] .recurso,
+:root[data-tema] .chave,
+:root[data-tema] .hab,
+:root[data-tema] .acao-rapida,
+:root[data-tema] .ini-linha,
+:root[data-tema] .modo,
+:root[data-tema] .cartao,
+:root[data-tema] .vazio,
+:root[data-tema] .ritual,
+:root[data-tema] .caixa-ritual {
+  position:relative;
+  overflow:hidden;
+  border-radius:0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.035), transparent 12%),
+    linear-gradient(135deg, rgba(255,255,255,.03), transparent 45%),
+    var(--painel);
+  border:1px solid var(--linha);
+  box-shadow:var(--sombra-pesada);
+  clip-path:polygon(0 14px, 14px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+}
+
+:root[data-tema='papel'] :is(.painel,.ficha-cartao,.ameaca-bloco,.historico,.modal,.recurso,.chave,.hab,.acao-rapida,.ini-linha,.modo,.cartao,.vazio,.ritual,.caixa-ritual) {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.66), transparent 20%),
+    linear-gradient(135deg, rgba(255,255,255,.28), transparent 52%),
+    var(--painel);
+}
+
+:root[data-tema] :is(.painel,.ficha-cartao,.ameaca-bloco,.historico,.modal,.recurso,.chave,.hab,.acao-rapida,.ini-linha,.modo,.cartao,.vazio,.ritual,.caixa-ritual)::before {
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:5px;
+  background:linear-gradient(90deg, var(--sangue), var(--vela) 45%, transparent 90%);
+  opacity:.9;
+}
+
+:root[data-tema] :is(.painel,.ficha-cartao,.ameaca-bloco,.historico,.modal,.recurso,.chave,.hab,.acao-rapida,.ini-linha,.modo,.cartao,.vazio,.ritual,.caixa-ritual)::after {
+  content:'';
+  position:absolute;
+  inset:8px;
+  border:1px solid rgba(255,255,255,.05);
+  pointer-events:none;
+}
+
+:root[data-tema='papel'] :is(.painel,.ficha-cartao,.ameaca-bloco,.historico,.modal,.recurso,.chave,.hab,.acao-rapida,.ini-linha,.modo,.cartao,.vazio,.ritual,.caixa-ritual)::after { border-color:rgba(87,60,34,.16); }
+
+:root[data-tema] .painel + .painel { margin-top:24px; }
+:root[data-tema] .grade { gap:22px; }
+
+:root[data-tema] .painel > * ,
+:root[data-tema] .modal > *,
+:root[data-tema] .historico > * { position:relative; z-index:1; }
+
+:root[data-tema] .painel {
+  padding:clamp(18px, 2.3vw, 30px);
+}
+
+:root[data-tema] .painel:hover,
+:root[data-tema] .ficha-cartao:hover,
+:root[data-tema] .modo:hover,
+:root[data-tema] .cartao:hover,
+:root[data-tema] .ameaca-bloco:hover {
+  border-color:var(--linha-forte);
+}
+
+:root[data-tema] .ficha-cabeca {
+  position:relative;
+  padding:18px 0 34px;
+  border-bottom:1px solid var(--linha-forte);
+}
+
+:root[data-tema] .ficha-cabeca::before {
+  content:'';
+  position:absolute;
+  left:0;
+  bottom:-1px;
+  width:168px;
+  height:4px;
+  background:linear-gradient(90deg, var(--sangue), transparent 92%);
+}
+
+:root[data-tema] .ficha-cabeca::after {
+  right:0;
+  bottom:-15px;
+  padding:4px 12px;
+  border:1px solid var(--linha);
+  background:var(--fundo);
+  color:var(--apagado);
+}
+
+:root[data-tema] .retrato {
+  clip-path:polygon(0 12px, 12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+  border:2px solid var(--linha-forte);
+  outline:none;
+  box-shadow:0 0 0 5px color-mix(in srgb, var(--sangue) 45%, transparent), var(--sombra-pesada);
+}
+
+:root[data-tema] .retrato::before {
+  content:'FOTO / EVIDÊNCIA';
+  position:absolute;
+  left:12px;
+  top:12px;
+  z-index:2;
+  padding:3px 8px;
+  background:color-mix(in srgb, var(--fundo) 90%, transparent);
+  border:1px solid var(--linha);
+  font:700 9px/1 var(--fonte-dossie);
+  letter-spacing:.14em;
+  color:var(--apagado);
+}
+
+:root[data-tema] .sub-cabeca {
+  gap:10px;
+  margin-top:14px;
+}
+
+:root[data-tema] .abas {
+  gap:10px;
+  padding:0 0 14px;
+  margin:26px 0 24px;
+  border-bottom:1px solid var(--linha-forte);
+}
+
+:root[data-tema] .abas button {
+  position:relative;
+  padding:14px 18px 12px;
+  background:linear-gradient(180deg, rgba(255,255,255,.04), transparent), var(--painel-2);
+  color:var(--apagado);
+  border:1px solid var(--linha);
+  clip-path:polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  border-radius:0;
+  transition:transform var(--efeito-transicao), border-color var(--efeito-transicao), color var(--efeito-transicao), background var(--efeito-transicao);
+}
+
+:root[data-tema] .abas button::before {
+  content:'';
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height:4px;
+  background:linear-gradient(90deg, transparent, var(--linha-forte), transparent);
+  opacity:.35;
+}
+
+:root[data-tema] .abas button[aria-selected='true'] {
+  color:var(--tinta);
+  border-color:var(--sangue);
+  background:linear-gradient(180deg, rgba(167,43,57,.22), transparent 62%), var(--painel);
+  transform:translateY(-2px);
+  box-shadow:0 6px 24px rgba(0,0,0,.28);
+}
+
+:root[data-tema] .abas button[aria-selected='true']::before {
+  background:linear-gradient(90deg, var(--sangue), var(--vela), transparent);
+  opacity:1;
+}
+
+:root[data-tema] .btn,
+:root[data-tema] .icone-btn {
+  position:relative;
+  border-radius:0;
+  clip-path:polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+}
+
+:root[data-tema] .btn {
+  background:linear-gradient(180deg, rgba(255,255,255,.05), transparent), var(--painel-3);
+  border:1px solid var(--linha-forte);
+  box-shadow:inset 0 1px rgba(255,255,255,.06), 0 8px 24px rgba(0,0,0,.18);
+}
+
+:root[data-tema] .btn:hover {
+  background:linear-gradient(180deg, rgba(167,43,57,.18), transparent 72%), var(--painel-3);
+  border-color:var(--sangue-texto);
+}
+
+:root[data-tema] .btn.sangue {
+  background:linear-gradient(180deg, rgba(255,255,255,.12), transparent 30%), linear-gradient(120deg, #7f2330, #b5323f 56%, #6f1d29);
+}
+
+:root[data-tema] .icone-btn {
+  background:var(--painel-3);
+}
+
+:root[data-tema] input,
+:root[data-tema] select,
+:root[data-tema] textarea {
+  border-radius:0;
+  border:1px solid var(--linha-forte);
+  border-left:3px solid color-mix(in srgb, var(--sangue) 60%, var(--linha-forte));
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.04), transparent 40%),
+    color-mix(in srgb, var(--fundo-2) 84%, black 16%);
+  clip-path:polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+  box-shadow:inset 0 1px 6px rgba(0,0,0,.2);
+}
+
+:root[data-tema='papel'] input,
+:root[data-tema='papel'] select,
+:root[data-tema='papel'] textarea {
+  background:linear-gradient(180deg, rgba(255,255,255,.68), transparent 42%), #fff9ed;
+  box-shadow:none;
+}
+
+:root[data-tema] .campo > span,
+:root[data-tema] .rotulo {
+  font-size:11px;
+  letter-spacing:.15em;
+}
+
+:root[data-tema] .recurso {
+  padding-top:20px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--cor, var(--sangue)) 22%, transparent), transparent 34%),
+    linear-gradient(135deg, rgba(255,255,255,.03), transparent 45%),
+    var(--painel);
+}
+
+:root[data-tema] .recurso::before { background:var(--cor, var(--sangue)); }
+
+:root[data-tema] .recurso .sigla,
+:root[data-tema] .chave span {
+  color:var(--apagado);
+}
+
+:root[data-tema] .recurso .numeros,
+:root[data-tema] .chave b {
+  font-family:var(--fonte-titulo);
+  letter-spacing:.02em;
+}
+
+:root[data-tema] .barra {
+  height:12px;
+  border:1px solid var(--linha);
+  background:color-mix(in srgb, var(--fundo) 55%, var(--painel));
+  clip-path:polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+}
+
+:root[data-tema] .barra b {
+  box-shadow:0 0 14px var(--cor), inset 0 0 18px rgba(255,255,255,.12);
+}
+
+:root[data-tema] .hab {
+  padding:18px 18px 18px 22px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--sangue) 16%, transparent), transparent 22%),
+    linear-gradient(180deg, rgba(255,255,255,.03), transparent 16%),
+    var(--painel);
+}
+
+:root[data-tema] .hab b {
+  font-family:var(--fonte-titulo);
+  font-size:1.08rem;
+  letter-spacing:.02em;
+}
+
+:root[data-tema] .hab p { line-height:1.82; }
+
+:root[data-tema] .ritual {
+  background:
+    radial-gradient(circle at 86% 20%, color-mix(in srgb, var(--el, var(--sangue)) 22%, transparent), transparent 28%),
+    linear-gradient(180deg, rgba(255,255,255,.04), transparent 18%),
+    var(--painel);
+}
+
+:root[data-tema] .caixa-ritual {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--el, var(--sangue)) 14%, transparent), transparent 24%),
+    var(--painel);
+}
+
+:root[data-tema] .tabela th {
+  background:linear-gradient(180deg, rgba(255,255,255,.08), transparent 28%), color-mix(in srgb, var(--fundo-2) 86%, black 14%);
+  border-bottom:2px solid var(--sangue);
+  text-transform:uppercase;
+}
+
+:root[data-tema] .tabela td {
+  padding:12px 8px;
+}
+
+:root[data-tema] .tabela tr:nth-child(even) td {
+  background:color-mix(in srgb, var(--sangue) 6%, transparent);
+}
+
+:root[data-tema] .modal {
+  padding:clamp(18px, 2.7vw, 30px);
+  border-color:var(--linha-forte);
+  background:
+    radial-gradient(circle at 85% 14%, rgba(167,43,57,.18), transparent 24%),
+    linear-gradient(180deg, rgba(255,255,255,.05), transparent 18%),
+    var(--painel);
+  box-shadow:0 30px 90px rgba(0,0,0,.6), 0 0 60px rgba(167,43,57,.12);
+}
+
+:root[data-tema] .modal header {
+  position:relative;
+  padding:0 0 16px;
+  margin-bottom:18px;
+  border-bottom:1px solid var(--linha);
+}
+
+:root[data-tema] .modal header::after {
+  content:'ACESSO RESTRITO';
+  position:absolute;
+  right:0;
+  top:2px;
+  padding:4px 10px;
+  font:700 9px/1 var(--fonte-dossie);
+  letter-spacing:.16em;
+  color:var(--sangue-texto);
+  border:1px solid color-mix(in srgb, var(--sangue) 50%, var(--linha));
+  background:color-mix(in srgb, var(--fundo) 86%, transparent);
+}
+
+:root[data-tema] .historico,
+:root[data-tema] .ameaca-bloco,
+:root[data-tema] .ficha-cartao {
+  padding:20px;
+}
+
+:root[data-tema] .resultado-grande .total,
+:root[data-tema] .rolagem-item .total,
+:root[data-tema] .dice3d-total {
+  font-family:var(--fonte-titulo);
+  letter-spacing:.01em;
+}
+
+:root[data-tema] .resultado-grande .dados-d20 span {
+  clip-path:polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%);
+}
+
+:root[data-tema] .vazio {
+  text-align:center;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.03), transparent 18%),
+    linear-gradient(135deg, rgba(167,43,57,.08), transparent 42%),
+    var(--painel);
+  border-style:dashed;
+}
+
+:root[data-tema] .vazio::before {
+  width:82px;
+  height:82px;
+  margin-bottom:24px;
+}
+
+:root[data-tema] .rodape {
+  position:relative;
+  padding-bottom:90px;
+}
+
+:root[data-tema] .rodape::before {
+  content:'';
+  position:absolute;
+  left:50%;
+  top:-1px;
+  width:min(680px, 85%);
+  transform:translateX(-50%);
+  height:3px;
+  background:linear-gradient(90deg, transparent, var(--sangue), var(--vela), transparent);
+  opacity:.85;
+}
+
+@media (max-width: 900px) {
+  :root[data-tema] .abertura { min-height:0; }
+  :root[data-tema] .porta { min-height:280px; }
+}
+
+@media (max-width: 640px) {
+  :root[data-tema] .topo::after { display:none; }
+  :root[data-tema] .marca { width:100%; justify-content:center; }
+  :root[data-tema] .topo nav { width:100%; justify-content:space-between; }
+  :root[data-tema] .topo nav a,
+  :root[data-tema] .topo nav button { flex:1 1 calc(50% - 8px); }
+  :root[data-tema] .porta { padding:24px; }
+  :root[data-tema] .abas { overflow:auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-tema] * { transition:none !important; }
+}
