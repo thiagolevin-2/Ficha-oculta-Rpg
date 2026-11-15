@@ -224,7 +224,7 @@ function hab(nome, resumo, meta = '', chave = '', f = null, trancada = false) {
   const usar = !trancada && dAtual ? botaoUsar(base, dAtual) : '';
   const completo = textoCompleto('habilidades', base);
   const pendente = !completo && Object.hasOwn(TEXTOS?.habilidades || {},base);
-  return `<div class="hab ${trancada ? 'trancada' : ''}"><span class="meta">${meta}${usar}</span><b>${esc(nome)}</b>${completo ? `<div class="texto-completo">${esc(completo)}</div>` : pendente ? '<p class="apagado">Descrição ainda não conferida palavra por palavra. O livro digitalizado pode conter erros de OCR.</p>${abrirPaginaSah('habilidades',base)}' : (resumo ? `<p>${esc(resumo)}</p>` : '')}
+  return `<div class="hab ${trancada ? 'trancada' : ''}"><span class="meta">${meta}${usar}</span><b>${esc(nome)}</b>${completo ? `<div class="texto-completo">${esc(completo)}</div>` : pendente ? `<p class="apagado">Descrição ainda não conferida palavra por palavra. O livro digitalizado pode conter erros de OCR.</p>${abrirPaginaSah('habilidades',base)}` : (resumo ? `<p>${esc(resumo)}</p>` : '')}
     ${chave && !trancada ? `<details${nota ? ' open' : ''}><summary class="apagado" style="cursor:pointer;font-size:.85rem">Anotação</summary><textarea data-campo="notasHabilidade.${esc(chave)}" id="nota-${esc(chave)}" placeholder="Texto do livro, custo, detalhes…">${esc(nota)}</textarea></details>` : ''}</div>`;
 }
 function abaHabilidades(f, d) {
