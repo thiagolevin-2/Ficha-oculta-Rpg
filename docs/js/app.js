@@ -1,15 +1,15 @@
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
-import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.6';
-import { normalizar, derivar } from './regras.js?v=0.6';
-import { carregarFichas, salvarFichas, carregarTema, salvarTema, espacoUsado } from './armazenamento.js?v=0.6';
-import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.6';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.6';
-import { telaFicha, acoesFicha, checksFicha } from './fichaUI.js?v=0.6';
-import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.6';
-import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.6';
+import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.7';
+import { normalizar, derivar } from './regras.js?v=0.7';
+import { carregarFichas, salvarFichas, carregarTema, salvarTema, espacoUsado } from './armazenamento.js?v=0.7';
+import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.7';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.7';
+import { telaFicha, acoesFicha, checksFicha } from './fichaUI.js?v=0.7';
+import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.7';
+import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.7';
 
-export const VERSAO = '0.6';
+export const VERSAO = '0.7';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -18,6 +18,10 @@ const estado = {
   historicoAberto: false,
   tema: carregarTema(),
 };
+// Uma preferência visual apenas: não interfere nas regras ou nos dados das fichas.
+let ambienteAtivo = true;
+try { ambienteAtivo = localStorage.getItem('fichaoculta-ambiente') !== '0'; } catch {}
+document.documentElement.dataset.ambiente = ambienteAtivo ? 'ativo' : 'silencioso';
 const app = $('#app');
 definirRaizModal($('#modal-raiz'));
 document.documentElement.dataset.tema = estado.tema;
@@ -55,30 +59,32 @@ function topo() {
   const link = (href, nome, ativo) => `<a href="${href}" ${ativo ? 'aria-current="page"' : ''}>${nome}</a>`;
   return `<header class="topo"><a class="marca" href="#/"><img src="assets/favicon.svg" alt=""><span>Ficha <b>Oculta</b> RPG</span></a>
     <nav>${link('#/agentes', 'Agentes', ['agentes', 'ficha', 'novo'].includes(r))}${link('#/mestre', 'Mestre', r === 'mestre')}${link('#/sobre', 'Sobre', r === 'sobre')}
+    <button class="btn-ambiente" data-acao="ambiente" title="Ativar ou pausar efeitos visuais" aria-label="Ativar ou pausar efeitos visuais" aria-pressed="${ambienteAtivo}">${ambienteAtivo ? '◉ Efeitos' : '◎ Efeitos'}</button>
     <button data-acao="tema" title="Trocar tema" aria-label="Trocar tema claro/escuro" aria-pressed="${estado.tema === 'papel'}">${estado.tema === 'papel' ? '☾ Noite' : '☼ Papel'}</button></nav></header>`;
 }
 function inicio() {
   return `<main class="pagina inicio-editorial">
-    <div class="arquivo-linha"><span>ARQUIVO OCULTO / CENTRAL DE OPERAÇÕES</span><span class="status-local"><i></i> ARQUIVO LOCAL</span></div>
+    <div class="arquivo-linha"><span><b>PROTOCOLO 001</b> · CENTRAL DE INVESTIGAÇÕES DO PARANORMAL</span><span class="status-local"><i></i> ARQUIVO LOCAL / ACESSO ATIVO</span></div>
     <section class="abertura">
-      <div class="abertura-texto"><span class="sobretitulo">ORDEM PARANORMAL RPG · FERRAMENTA DE FÃS</span>
-        <h1>O outro lado<br>de cada <em>história.</em></h1>
-        <p>Todo agente tem um passado. Toda investigação deixa marcas. Guarde suas fichas, prepare a próxima missão e descubra o que está além da realidade.</p>
+      <div class="abertura-texto"><span class="sobretitulo"><span class="ponto-vivo" aria-hidden="true"></span> TERMINAL DE INVESTIGAÇÃO · ACESSO NÃO OFICIAL</span>
+        <h1>O OUTRO LADO<br><span class="quebra">ESTÁ <em>MAIS PERTO.</em></span></h1>
+        <p>Nem tudo deveria ser descoberto. Reúna seus agentes, documente o impossível e enfrente o desconhecido em uma central feita para sua mesa de Ordem Paranormal.</p>
         <div class="abertura-acoes"><a class="btn sangue" href="#/novo" data-acao="novo-agente">+ Criar agente</a><a class="link-arquivo" href="#/agentes">Abrir meus arquivos <span>↗</span></a></div>
-        <div class="nota-arquivo"><span>01 — REGISTRE. INVESTIGUE. SOBREVIVA.</span><small>Fichas e rolagens, do primeiro indício ao último teste.</small></div>
+        <div class="nota-arquivo"><span>▰ 01 — REGISTRE. INVESTIGUE. SOBREVIVA.</span><small>Seus registros. Seus rituais. Sua próxima investigação.</small></div>
       </div>
       <div class="composicao" aria-hidden="true">
-        <div class="orbita-arquivo"></div><div class="documento-fundo"></div>
-        <div class="documento"><div class="doc-cabecalho"><span>DIVISÃO DE INVESTIGAÇÃO</span><b>OP / 001</b></div><span class="carimbo-doc">CONFIDENCIAL</span><div class="doc-simbolo"></div><div class="doc-titulo">O que você viu<br><em>não foi imaginação.</em></div><div class="doc-linhas"><i></i><i></i><i></i></div><div class="doc-rodape"><span>RELATÓRIO DE OCORRÊNCIA</span><span>01 / 05</span></div></div>
-        <span class="nota-manuscrita">A realidade é só<br>o começo.</span><span class="evidencia">EVIDÊNCIA Nº 001</span>
+        <div class="portal-rastro"></div><div class="orbita-arquivo"></div><div class="documento-fundo"></div>
+        <div class="documento"><div class="doc-cabecalho"><span>DEPARTAMENTO DE OCORRÊNCIAS ANÔMALAS</span><b>OP / 001</b></div><span class="carimbo-doc">RESTRITO</span><div class="doc-simbolo"></div><div class="doc-titulo">RELATÓRIO<br>DO IMPOSSÍVEL<span>CLASSIFICAÇÃO: SIGILOS E VESTÍGIOS</span></div><div class="doc-linhas"><i></i><i></i><i></i></div><div class="doc-rodape"><span>REGISTRO DE INVESTIGAÇÃO</span><span>01 / ∞</span></div></div>
+        <span class="nota-manuscrita">não confie<br>nos sinais.</span><span class="evidencia">◈ EVIDÊNCIA Nº 001 · STATUS DESCONHECIDO</span>
       </div>
     </section>
     <div class="indice-secao"><span>ESCOLHA SEU PRÓXIMO PASSO</span><span>ACESSO AO ARQUIVO ↓</span></div>
     <section class="portas" aria-label="Áreas do site">
-      <a class="porta" href="#/agentes"><span class="num">01 / AGENTES <span>↗</span></span><h2>Área do Jogador</h2><p>Seu personagem, suas cicatrizes. Fichas completas para Regras Padrão e Sobrevivendo ao Horror.</p><span class="porta-rodape">ACESSAR FICHAS <span>→</span></span></a>
-      <a class="porta" href="#/mestre"><span class="num">02 / MISSÕES <span>↗</span></span><h2>Área do Mestre</h2><p>Prepare o desconhecido. Organize ameaças, acompanhe a iniciativa e registre sua investigação.</p><span class="porta-rodape">PREPARAR SESSÃO <span>→</span></span></a>
-      <div class="porta em-breve"><span class="num">03 / CONEXÕES <span class="etiqueta">EM BREVE</span></span><h2>Tabuleiro e Mesa</h2><p>O próximo capítulo: mapas e encontros para reunir sua equipe em uma mesma mesa.</p><span class="porta-rodape">ARQUIVO EM CONSTRUÇÃO <span>—</span></span></div>
+      <a class="porta porta-agentes" href="#/agentes"><span class="porta-icone" aria-hidden="true"></span><span class="num">01 / AGENTES <span>↗</span></span><h2>Área do Jogador</h2><p>Seu personagem, suas cicatrizes. Fichas completas para Regras Padrão e Sobrevivendo ao Horror.</p><span class="porta-rodape">ACESSAR FICHAS <span>→</span></span></a>
+      <a class="porta porta-mestre" href="#/mestre"><span class="porta-icone" aria-hidden="true"></span><span class="num">02 / MISSÕES <span>↗</span></span><h2>Área do Mestre</h2><p>Prepare o desconhecido. Organize ameaças, acompanhe a iniciativa e registre sua investigação.</p><span class="porta-rodape">PREPARAR SESSÃO <span>→</span></span></a>
+      <div class="porta porta-mesa em-breve"><span class="porta-icone" aria-hidden="true"></span><span class="num">03 / CONEXÕES <span class="etiqueta">EM BREVE</span></span><h2>Tabuleiro e Mesa</h2><p>O próximo capítulo: mapas e encontros para reunir sua equipe em uma mesma mesa.</p><span class="porta-rodape">ARQUIVO EM CONSTRUÇÃO <span>—</span></span></div>
     </section>
+    <section class="elementos-banda" aria-label="Os cinco elementos do paranormal"><div class="elementos-intro"><span>OBSERVAÇÃO / 002</span><b>O DESCONHECIDO TEM MUITAS FACES.</b><small>Elementos representados por sigilos originais desta ferramenta.</small></div><div class="elementos-lista">${[['sangue','SANGUE'], ['morte','MORTE'], ['conhecimento','CONHECIMENTO'], ['energia','ENERGIA'], ['medo','MEDO']].map(([id, nome]) => `<span class="elemento-amostra el-${id}"><span class="elemento-icone" style="--glifo:url(assets/sigilo-${id}.svg)" aria-hidden="true"></span><span>${nome}</span></span>`).join('')}</div></section>
     <div class="nota-privacidade"><span>SEU ARQUIVO, SOB SUA GUARDA.</span><p>Os dados ficam neste navegador. Exporte suas fichas para manter uma cópia segura.</p></div>
   </main>`;
 }
@@ -121,6 +127,7 @@ function render() {
   else if (r.tela === 'mestre') corpo = telaMestre(estado.fichas);
   else if (r.tela === 'sobre') corpo = sobre();
   else corpo = inicio();
+  document.documentElement.dataset.tela = r.tela;
   htmlMantendoFoco(app, `${topo()}<main id="conteudo">${corpo}</main><footer class="rodape">${NOME_DO_SITE} v${VERSAO} · ferramenta de fãs para Ordem Paranormal RPG · salvo só neste navegador</footer>${bandeja()}`);
 }
 quandoMudar(() => { if (estado.historicoAberto) render(); });
@@ -130,6 +137,7 @@ const acoes = {
   ...acoesCriador(ctx), ...acoesFicha(ctx), ...acoesMestre(ctx),
   'fechar-modal': () => fecharModal(),
   'fechar-modal-fundo': (el, ev) => { if (ev.target === el) fecharModal(); },
+  'ambiente': () => { ambienteAtivo = !ambienteAtivo; document.documentElement.dataset.ambiente = ambienteAtivo ? 'ativo' : 'silencioso'; try { localStorage.setItem('fichaoculta-ambiente', ambienteAtivo ? '1' : '0'); } catch {} render(); },
   'tema': () => { estado.tema = estado.tema === 'papel' ? 'noite' : 'papel'; document.documentElement.dataset.tema = estado.tema; salvarTema(estado.tema); render(); },
   'novo-agente': (el, ev) => { ev.preventDefault(); estado.criador = novoRascunho(); if (location.hash === '#/novo') render(); else location.hash = '#/novo'; },
   'historico': () => { estado.historicoAberto = !estado.historicoAberto; render(); },
