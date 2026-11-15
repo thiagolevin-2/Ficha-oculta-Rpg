@@ -1,0 +1,905 @@
+/* FICHA OCULTA — 0.9 A MEMBRANA
+   Redesenho completo. Direção: terror sobrenatural, livro de RPG,
+   matéria orgânica / papel investigativo / rastro ritual / escuridão.
+   Não introduz qualquer dependência funcional nem modifica os dados.
+*/
+:root[data-tema] {
+  --fundo:#110b0d; --fundo-2:#1d1215; --painel:#261b1d; --painel-2:#302122;
+  --tinta:#f0e6d8; --osso:#e4d5c5; --apagado:#c0afa3;
+  --pergaminho:#eee0c8; --linha:#634d48; --linha-forte:#987568;
+  --sangue:#af2730; --sangue-escuro:#5d0e1d; --sangue-texto:#ff8a8d;
+  --vela:#deb47b; --roxo:#9c6fc8; --pv:#bf2e38; --pe:#b9a15c; --san:#718eac; --pd:#986bb6;
+  --ok:#9fca91; --perigo:#fa7770;
+  --raio:0; --sombra:0 20px 60px #0008;
+  --fonte-titulo:'Cormorant Garamond', Georgia, serif;
+  --fonte-texto:'Atkinson Hyperlegible',Arial,sans-serif;
+  --fonte-dossie:'Special Elite','Courier New',monospace;
+  --fonte-ui:'Cinzel',Georgia,serif;
+  color-scheme:dark;
+}
+:root[data-tema="papel"] {
+  --fundo:#d8c5a7; --fundo-2:#cbb595; --painel:#eee0c6; --painel-2:#e6d5b9;
+  --tinta:#231614; --osso:#3a2421; --apagado:#6f5348;
+  --pergaminho:#f4e8d3; --linha:#a98975; --linha-forte:#775a4d;
+  --sangue:#88202e; --sangue-escuro:#5d0e1d; --sangue-texto:#8d1b2b;
+  --vela:#825625; --roxo:#653a87; --pv:#9e202b; --pe:#846027; --san:#435c7a; --pd:#714780;
+  --ok:#326635; --perigo:#a22328;
+  --sombra:0 10px 38px #6a382a24;
+  color-scheme:light;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  margin:0; color:var(--tinta); font-family:var(--fonte-texto); font-size:15px; line-height:1.65;
+  background:radial-gradient(ellipse at 68% 0,#41181a 0,transparent 45%),var(--fundo);
+}
+body::before {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.2;
+  background:url(assets/textura.svg) center / 380px, url(assets/manchas.svg) center / 920px;
+  mix-blend-mode:soft-light;
+}
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:radial-gradient(ellipse at center, transparent 42%,#0008 100%);
+  opacity:.7;
+}
+:root[data-tema="papel"] body {
+  background:radial-gradient(ellipse at 50% 0,#f3e6cf 0,transparent 70%),var(--fundo);
+}
+:root[data-tema="papel"] body::before { mix-blend-mode:multiply; opacity:.1; }
+:root[data-tema="papel"] body::after { opacity:.12; }
+::selection{background:#9e2631;color:#fff0d8}
+#app,#modal-raiz,#avisos { position:relative;z-index:1; }
+#conteudo { position:relative; min-height:65vh; }
+.pagina { max-width:1380px; margin:auto; padding:40px clamp(18px,4vw,58px) 90px; }
+h1,h2,h3,h4 { font-family:var(--fonte-titulo); font-weight:700; letter-spacing:.005em; line-height:1.14; }
+h1 { font-size:clamp(2.6rem,4.7vw,5rem); }
+h2 { font-size:clamp(1.65rem,2.25vw,2.65rem); }
+h3 { font-size:1.45rem; }
+p { line-height:1.72; }
+small,.apagado { color:var(--apagado); }
+a { color:var(--sangue-texto); }
+
+/* A barra lembra a lombada de um tomo e um letreiro manuscrito,
+   não um dashboard com seções retangulares. */
+.topo.topo-oculto {
+  position:sticky; top:0; z-index:45; padding:8px clamp(16px,3vw,50px);
+  min-height:90px; display:flex; align-items:center; gap:30px;
+  background:linear-gradient(180deg,#170b0cf5,#170b0cf0),url(assets/textura.svg);
+  border:0; border-bottom:1px solid #815948;
+  box-shadow:0 3px 0 #2a1112,0 15px 40px #0008;
+  backdrop-filter:blur(10px);
+}
+.topo.topo-oculto::before {
+  content:'';position:absolute; left:2%; right:2%; bottom:3px; height:3px;
+  background:linear-gradient(90deg,transparent,#7e252a 12%,#ac5b3d 50%,#7e252a 88%,transparent);
+  opacity:.9;
+}
+.topo.topo-oculto .marca {
+  display:flex; gap:13px; min-width:220px; align-items:center; text-decoration:none;
+  color:#f4e6d7; font:700 24px/.95 var(--fonte-titulo); letter-spacing:.02em;
+  text-transform:uppercase;
+}
+.topo .marca img { width:52px;height:52px;filter:drop-shadow(0 0 9px #ae303a6b); }
+.topo .marca span { display:grid; gap:1px; }
+.topo .marca b { color:#df6970; font-weight:700; }
+.topo .marca small { display:block; font:8px/1.5 var(--fonte-dossie);letter-spacing:.16em;color:#c6a99a; }
+.topo.topo-oculto nav { display:flex;align-items:center; gap:4px 20px; flex-wrap:wrap; margin-left:auto; }
+.topo.topo-oculto nav a,.topo.topo-oculto nav button {
+  font:700 10px/1.3 var(--fonte-ui); text-transform:uppercase; letter-spacing:.065em;
+  padding:11px 0 8px; background:none; border:0; border-bottom:2px solid transparent;
+  color:#d0b8a7; text-decoration:none; cursor:pointer; border-radius:0;
+  transition:color .2s, border-color .2s, text-shadow .2s;
+}
+.topo.topo-oculto nav a:hover,.topo.topo-oculto nav button:hover,
+.topo.topo-oculto nav a[aria-current="page"] {
+  color:#fff0dc; border-bottom-color:#bd3b43; text-shadow:0 0 16px #b5263590;
+}
+.topo.topo-oculto nav button { color:#c7a78c; }
+:root[data-tema="papel"] .topo.topo-oculto { background:#20100f; }
+
+/* ABERTURA: antes, painel de terminal; agora, capa de terror sobrenatural */
+.inicio-oculto { overflow:hidden; }
+.limiar-hero {
+  position:relative; min-height:min(780px,90vh); display:flex; align-items:center;
+  isolation:isolate; background:#160809; color:#f2e7d8;
+  border-bottom:16px solid #230e12;
+}
+.limiar-hero::before {
+  content:''; position:absolute;inset:0; z-index:-4;
+  background:linear-gradient(90deg, #100608 0 29%,#2a0808 62%,#0a0509 100%);
+}
+.hero-gravura { position:absolute; inset:-50px 0 0 31%; z-index:-3;
+  background:url(assets/gravura-sangue.webp) 65% 53% / cover no-repeat;
+  filter:contrast(1.25) saturate(1.05) brightness(.85);
+  opacity:.95;
+  -webkit-mask-image:linear-gradient(90deg,transparent,black 32%,black 95%);
+  mask-image:linear-gradient(90deg,transparent,black 32%,black 95%);
+}
+.hero-ruido { position:absolute;inset:0;z-index:-1;opacity:.36;pointer-events:none;
+ background:url(assets/papel-manchas.svg) center/900px, url(assets/textura.svg) center/260px;
+ mix-blend-mode:screen;
+}
+.hero-veu { position:absolute;inset:0;z-index:-2;pointer-events:none;
+ background:radial-gradient(circle at 74% 40%,transparent 0 11%,#17050736 49%,#0f0507dd 91%),linear-gradient(0deg,#110709d9,transparent 44%,#1005079c);
+}
+.hero-container { width:100%; position:relative; display:grid; grid-template-columns:1.25fr .75fr;
+ align-items:center; min-height:680px; gap:12px; padding-top:76px;padding-bottom:84px;
+}
+.hero-texto { max-width:670px;position:relative;z-index:3; }
+.sobrescrito-oculto { display:inline-flex; gap:12px;align-items:center;flex-wrap:wrap;
+ font:700 10px/1.4 var(--fonte-dossie); letter-spacing:.16em; text-transform:uppercase; color:#dfbd96;
+}
+.marca-cruz{color:#d43f4c;font-size:17px}
+.risco-vivo { width:80px;height:2px; background:#a52f3b; transform:rotate(-4deg); }
+.titulo-limiar { font-family:var(--fonte-titulo); font-weight:700; font-size:clamp(3.6rem,6.5vw,7.4rem);
+ line-height:.83; letter-spacing:-.055em; text-transform:uppercase; margin:27px 0 34px;
+ color:#f4e7d7; text-shadow:0 4px 38px #000b;
+}
+.titulo-limiar span { display:inline-block; font-weight:400; font-style:italic; font-size:.78em; letter-spacing:-.015em;color:#f8ebd9; }
+.titulo-limiar em { display:inline-block; font-weight:700; font-style:normal;color:#d04f56;
+ text-shadow:0 0 48px #a3293099,0 5px 28px #0009;
+}
+.sinopse-limiar { max-width:490px; color:#e3cfc3; font-size:15px; line-height:1.9; margin:0; padding-left:20px;
+ border-left:3px solid #ad3337;
+}
+.hero-acoes { display:flex;gap:18px; align-items:center;flex-wrap:wrap;margin-top:35px; }
+.invocar {
+ display:inline-flex;justify-content:center;align-items:center;gap:13px;
+ min-height:53px;padding:12px 22px;text-decoration:none;
+ font:700 11px/1.4 var(--fonte-ui);letter-spacing:.12em;color:#f4e8d9;
+ background:transparent;border:0;cursor:pointer;
+ transition:transform .25s,filter .25s;
+}
+.invocar.principal { background:#9a2630 url(assets/textura.svg); clip-path:polygon(0 0,98% 3%,100% 84%,90% 100%,0 97%,2% 20%);
+ box-shadow:0 15px 45px #0009;
+}
+.invocar.principal span {font-size:21px;color:#ead5c4}
+.invocar.secundario { color:#fff3e8; border-bottom:1px solid #8c6050; }
+.invocar:hover { transform:translateY(-3px); filter:brightness(1.18); }
+.hero-nota { display:flex;gap:20px;flex-wrap:wrap;font:9px/1.5 var(--fonte-dossie);letter-spacing:.13em;
+ color:#bda396;margin-top:55px; }
+.hero-selo {position:absolute; width:min(330px,28vw); aspect-ratio:1; right:4%;top:50%;transform:translateY(-50%) rotate(-8deg);
+ display:grid;place-items:center; opacity:.36;pointer-events:none;filter:drop-shadow(0 0 45px #e342474f); }
+.hero-selo img { width:100%; height:100%; filter:sepia(.5) brightness(1.4); }
+.hero-selo-texto{position:absolute;bottom:-14%;text-align:center;font:9px/1.5 var(--fonte-dossie);letter-spacing:.16em;color:#fff}
+.hero-rodape {position:absolute;left:4%;right:4%;bottom:15px;display:flex;justify-content:space-between;gap:18px;
+ font:9px/1.4 var(--fonte-dossie);letter-spacing:.1em;color:#bba79d; }
+
+.capitulo { padding-top:78px; }
+.capitulo-cabecalho { display:flex;align-items:start;gap:20px; margin-bottom:35px; }
+.capitulo-numero { font:italic 90px/.77 var(--fonte-titulo); color:#b63b3f;min-width:65px; }
+.capitulo-cabecalho h2 { margin:6px 0 0; font-size:clamp(2.4rem,4.5vw,4.8rem); letter-spacing:-.035em;
+ line-height:1; text-transform:uppercase; }
+.capitulo-cabecalho h2 em { font-weight:400; font-style:italic;color:var(--sangue-texto); }
+.capitulo-cabecalho p { color:var(--apagado); margin:14px 0 0; }
+:root[data-tema="papel"] .capitulo-cabecalho h2 em { color:var(--sangue); }
+.portais-acesso { display:grid;grid-template-columns:1.03fr 1.03fr .8fr;gap:17px; }
+.portal-acesso {
+ min-height:385px; position:relative; display:flex;flex-direction:column; justify-content:flex-end;
+ isolation:isolate;overflow:hidden;text-decoration:none;color:#f5e7da;
+ background:#1b0a0c;
+ clip-path:polygon(0 0,100% 0,100% 95%,95% 100%,0 100%);
+ transition:transform .3s ease,filter .3s ease;
+}
+.portal-acesso:hover { transform:translateY(-6px);filter:brightness(1.11); }
+.portal-imagem {position:absolute;inset:0;z-index:-2;
+ background:linear-gradient(0deg,#0e0507 3%,#170b12ae 58%,#30080913 100%),url(assets/presenca-do-outro-lado.webp) 50% 30%/cover no-repeat;
+ filter:saturate(.88) contrast(1.13);
+ transition:transform .7s ease;
+}
+.portal-acesso:hover .portal-imagem {transform:scale(1.05)}
+.portal-mestre .portal-imagem {background-image:linear-gradient(0deg,#0b060b 3%,#130810b0 60%,transparent),url(assets/gravura-entidade.webp);
+ background-position:center,center 40%;}
+.portal-futuro .portal-imagem { background-image:linear-gradient(0deg,#140909 0%,#2a0817db 62%,#12070988),url(assets/gravura-limiar.webp);
+ background-position:center,center 38%;filter:grayscale(.4) contrast(1.05); }
+.portal-acesso::after {content:'';position:absolute;left:12px;right:12px;top:12px;bottom:12px;z-index:0;
+ pointer-events:none;border:1px solid #ecdfd42b;}
+.portal-margem {position:absolute;top:27px;left:29px;z-index:1;padding-bottom:6px;border-bottom:1px solid #c25b4d;
+ font:700 10px/1.3 var(--fonte-dossie); letter-spacing:.08em; }
+.portal-descricao {position:relative;z-index:1;padding:32px 30px 31px;display:flex;flex-direction:column;align-items:flex-start;gap:9px;}
+.portal-icon {font-size:25px;color:#d85e61;line-height:1;}
+.portal-descricao strong {font:700 clamp(2rem,2.6vw,3.4rem)/1 var(--fonte-titulo);text-transform:uppercase;letter-spacing:.02em;}
+.portal-descricao small {color:#dfd2c8;font:13px/1.7 var(--fonte-texto);max-width:320px;}
+.portal-link {margin-top:15px;display:flex;gap:26px;border-top:1px solid #c4a99a8c;align-items:center;
+ padding-top:13px;font:700 10px/1.4 var(--fonte-dossie);letter-spacing:.11em;}
+.portal-link b {font-size:17px;}
+.portal-futuro{opacity:.72;filter:grayscale(.5)}
+.portal-futuro:hover{transform:none;filter:grayscale(.5)}
+
+.elementos-ocultos {position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(21,8,10,.94),rgba(13,5,8,.98)),url(assets/gravura-limiar.webp) center/cover no-repeat;
+ border-top:4px solid #3b191f;border-bottom:5px solid #5a1c24; }
+.elementos-ocultos .pagina{position:relative;padding-top:65px;padding-bottom:80px;}
+.elementos-ocultos .capitulo-cabecalho h2 {color:#f7e8d7}
+.elementos-ocultos .capitulo-cabecalho p{color:#e1bfb6}
+.circulo-elementos {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;margin:40px 0 32px;}
+.elemento-placa {display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;min-width:0;position:relative;
+ padding:21px 10px 22px;isolation:isolate;color:#f5e5d6;
+ border-top:1px solid #dbbaaa4d;border-bottom:1px solid #a56c6738;
+}
+.elemento-placa::before {content:'';position:absolute;inset:1px;z-index:-1;opacity:.2;
+ background:radial-gradient(ellipse at center,var(--elemento),transparent 70%);}
+.elemento-placa img{width:clamp(58px,7.2vw,110px);height:110px;object-fit:contain;
+ filter:drop-shadow(0 0 18px var(--elemento));}
+.elemento-placa b{font:700 clamp(1.1rem,1.7vw,1.7rem)/1 var(--fonte-titulo);text-transform:uppercase;letter-spacing:.06em}
+.elemento-placa small {font:11px/1.5 var(--fonte-texto);color:#d1bcb2;}
+.elemento-sangue{--elemento:#d83f4e;color:#f3747c}.elemento-morte{--elemento:#afb7a0;color:#b5b7ac}
+.elemento-conhecimento{--elemento:#d0aa52;color:#f2d78d}.elemento-energia{--elemento:#bd65d6;color:#d99df0}.elemento-medo{--elemento:#b1dce6;color:#b5e6f2}
+.nota-fim {padding-top:16px;border-top:1px solid #735459;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+ color:#a99591;font:9px/1.6 var(--fonte-dossie);letter-spacing:.1em; }
+
+/* UI INTEIRA: monólitos texturizados, páginas de grimório, marcas de sangue.
+   Remover a linguagem de cards com cantos digitais. */
+.titulo-secao {align-items:flex-end;margin-bottom:22px;gap:16px;}
+.faixa {display:inline-block;position:relative;margin:0 0 14px;isolation:isolate;
+ font:700 clamp(1.8rem,2.9vw,3.35rem)/1.06 var(--fonte-titulo); letter-spacing:.025em;
+ text-transform:uppercase; color:var(--tinta); padding:0 7px 10px 0; }
+.faixa::before {content:'';position:absolute;left:0;bottom:0;width:100%;height:12px;z-index:-1;
+ background:var(--sangue);mask:url(assets/risco.svg) center/100% 100% no-repeat;
+ -webkit-mask:url(assets/risco.svg) center/100% 100% no-repeat;}
+.faixa.sangue {color:var(--sangue-texto)}
+.faixa.sangue::before {background:var(--vela)}
+h1.faixa {font-size:clamp(2.5rem,4.4vw,5.1rem)}
+.titulo-vermelho {display:inline-block;margin:22px 0 14px;padding:6px 22px 7px 14px;
+ font:700 1.1rem/1.25 var(--fonte-ui);letter-spacing:.025em;text-transform:uppercase;color:#f7e7db;
+ position:relative;isolation:isolate;}
+.titulo-vermelho::before {content:'';position:absolute;inset:0;z-index:-1;background:#73232b;
+ -webkit-mask:url(assets/pincel-2.svg) center/100% 100% no-repeat;mask:url(assets/pincel-2.svg) center/100% 100% no-repeat;}
+:root[data-tema="papel"] .titulo-vermelho{color:#f9eee0}
+.painel {background:
+ radial-gradient(ellipse at 85% 0,#4d272540,transparent 40%),
+ linear-gradient(160deg,#ffffff05,transparent 40%),var(--painel);
+ border:0;border-top:2px solid #854a45;border-left:1px solid #69423b;
+ padding:clamp(18px,2.2vw,31px);border-radius:0 3px 11px 2px;
+ box-shadow:0 18px 48px #0006,inset 0 0 0 1px #e9c6af0a;
+ position:relative;isolation:isolate;overflow:visible;
+}
+.painel::before {content:'';position:absolute;left:-7px;top:-11px;width:clamp(130px,26%,360px);height:24px;
+ background:var(--sangue);opacity:.91;z-index:0;
+ -webkit-mask:url(assets/pincel.svg) center/100% 100% no-repeat;mask:url(assets/pincel.svg) center/100% 100% no-repeat;}
+.painel::after {content:'';position:absolute;right:1px;bottom:2px;width:160px;height:135px;pointer-events:none;
+ background:url(assets/papel-manchas.svg) center/contain no-repeat;opacity:.12;border:0;}
+.painel:nth-of-type(3n+2)::before {width:180px;background:var(--vela)}
+.painel + .painel{margin-top:26px}
+.grade{gap:23px}
+.grade.c2{grid-template-columns:repeat(auto-fit,minmax(min(100%,370px),1fr))}
+.grade.c3{grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+
+/* Layers e agrupamentos menos rígidos */
+.ritual,.hab,.chave,.acao-rapida,.ini-linha,.recurso,.cartao,.modo,.ficha-cartao,.ameaca-bloco,.vazio {
+ border-radius:0;position:relative;border:1px solid var(--linha);box-shadow:0 6px 18px #0003;
+ background:linear-gradient(130deg,#ffffff07,transparent 55%),var(--fundo-2);
+}
+.recurso,.chave,.acao-rapida,.hab,.ini-linha,.cartao,.modo,.ameaca-bloco,.ficha-cartao {border-left:4px solid #8f403d}
+.recurso {border-left-color:var(--cor,var(--sangue));border-top:1px solid var(--linha);min-width:0;padding:17px 16px;}
+.recurso::before {content:'';position:absolute;right:0;top:0;border-top:14px solid var(--cor,var(--sangue));border-left:14px solid transparent;opacity:.65}
+.recurso .sigla {font:700 11px/1.3 var(--fonte-ui);color:var(--osso);letter-spacing:.05em;}
+.recurso .numeros{font:700 1.7rem/1 var(--fonte-titulo);}
+.recurso .numeros input{width:67px;background:none!important;border:0!important;border-bottom:1px dashed var(--linha-forte)!important;box-shadow:none!important;font:inherit;min-height:34px;}
+.recurso .acoes-rec input{min-height:37px;max-width:75px;}
+.barra{border:1px solid #4d302e;background:#100908;height:9px;overflow:hidden;border-radius:0;margin:12px 0;}
+.barra b{background:linear-gradient(90deg,var(--cor,var(--sangue)),color-mix(in srgb,var(--cor,var(--sangue)) 72%,white));box-shadow:0 0 12px var(--cor);}
+.chave{text-align:center;border-left:0;border-bottom:2px solid var(--linha-forte);padding:13px 6px;}
+.chave b{font:700 2rem/1.1 var(--fonte-titulo);color:var(--tinta);}
+.chave span{font:700 10px/1.3 var(--fonte-dossie);letter-spacing:.03em;color:var(--apagado);}
+.hab{padding:17px 18px;background:linear-gradient(90deg,#7c1a2515,transparent 26%),var(--fundo-2);}
+.hab b{font:700 1.28rem/1.2 var(--fonte-titulo)}
+.hab p{color:var(--osso)}
+.acao-rapida{padding:15px}
+.ameaca-bloco{border-left-color:var(--el,var(--sangue));padding:23px;background:radial-gradient(circle at 100% 0,color-mix(in srgb,var(--el,var(--sangue)) 15%,transparent),transparent 50%),var(--painel)}
+.ameaca-bloco h3{font:700 2rem/1.1 var(--fonte-titulo)}
+.ritual{border-left:4px solid var(--el,var(--sangue));padding:20px;background:linear-gradient(90deg,color-mix(in srgb,var(--el,var(--sangue)) 12%,transparent),transparent 50%),var(--painel)}
+.caixa-ritual {position:relative;min-width:0;background:var(--fundo-2);border:1px solid var(--linha);border-left:4px solid var(--el,var(--sangue));border-radius:0;padding:12px;}
+.caixa-ritual.marcada,.caixa-ritual:hover{background:color-mix(in srgb,var(--el,var(--sangue)) 12%,var(--fundo-2));}
+.ficha-cartao{border-left-color:var(--sangue);padding:23px;transition:transform .25s,border-color .25s;}
+.ficha-cartao:hover{transform:translateY(-4px);border-color:var(--sangue)}
+.ficha-cartao b{font:700 1.7rem/1.2 var(--fonte-titulo)}
+.ficha-cartao .mini{border-radius:50%;font:700 2rem var(--fonte-titulo);color:var(--sangue-texto);}
+.vazio{padding:64px 24px;text-align:center;border-style:dashed;}
+
+/* Ficha do agente / recrutamento: prontuário investigativo, sem engrenagens */
+.cabecalho-ritual {display:flex;gap:15px;justify-content:space-between;flex-wrap:wrap;
+ padding:0 0 15px;margin:0 0 28px;border-bottom:1px solid var(--linha);
+ font:700 10px/1.5 var(--fonte-dossie);color:var(--sangue-texto);letter-spacing:.07em;}
+.cabecalho-ritual small{font:10px/1.4 var(--fonte-dossie);letter-spacing:.06em;color:var(--apagado);}
+.ficha-cabeca{position:relative;display:grid;gap:27px;align-items:center;
+ background:linear-gradient(90deg,#401d1f80,transparent 70%),url(assets/gravura-limiar.webp) 95% 45%/220px auto no-repeat;
+ padding:24px 24px 26px 10px;margin:0 0 30px;border-bottom:3px solid var(--sangue);}
+.ficha-cabeca::before{content:'';position:absolute;left:0;right:0;bottom:-10px;height:16px;background:var(--sangue);
+ -webkit-mask:url(assets/risco.svg) center/100% 100% no-repeat;mask:url(assets/risco.svg) center/100% 100% no-repeat;opacity:.8;}
+.ficha-cabeca h1 input {border:0!important;border-bottom:1px dashed var(--linha-forte)!important;background:transparent!important;
+ font:700 clamp(1.9rem,3.6vw,3.5rem)/1.05 var(--fonte-titulo);text-transform:uppercase;box-shadow:none!important;}
+.retrato{width:120px;height:152px;transform:rotate(-2deg);border:8px solid var(--pergaminho);border-radius:0;
+ box-shadow:0 8px 20px #0008,0 0 0 1px #7c504d;font:10px/1.5 var(--fonte-dossie);color:var(--apagado);}
+.sub-cabeca{gap:7px;margin-top:12px}
+.etiqueta{border-radius:0;background:#10090966;border:1px solid var(--linha-forte);color:var(--osso);font:700 10px/1.5 var(--fonte-dossie);letter-spacing:.035em;padding:4px 8px;white-space:normal;}
+.etiqueta.alerta{border-color:var(--sangue);color:var(--sangue-texto)}
+.etiqueta.sah{border-color:var(--roxo);color:var(--roxo)}
+.etiqueta.lr{border-color:var(--vela);color:var(--vela)}
+.selo{border:2px solid var(--sangue);padding:4px 10px;transform:rotate(-4deg);border-radius:0;font:700 11px var(--fonte-dossie);color:var(--sangue-texto);}
+.abas{display:flex;gap:0;margin:27px 0 33px;padding:0 0 4px;overflow-x:auto;border:0;border-bottom:2px solid var(--linha-forte);scrollbar-width:thin;}
+.abas button{position:relative;flex:none;background:transparent;padding:16px 19px 13px;letter-spacing:.03em;font:700 12px/1.3 var(--fonte-ui);
+ text-transform:uppercase;color:var(--apagado);border:0;border-bottom:4px solid transparent;border-radius:0;cursor:pointer;}
+.abas button::before{content:'';position:absolute;left:16px;right:16px;bottom:9px;height:1px;background:var(--linha-forte);opacity:.3;}
+.abas button:hover{color:var(--tinta);background:#7e31321b;}
+.abas button[aria-selected="true"]{color:var(--tinta);background:linear-gradient(0deg,#8d28333e,transparent 82%);border-color:var(--sangue);}
+.abas button[aria-selected="true"]::before{opacity:.8;background:var(--sangue)}
+.passos{display:flex;gap:8px;margin:0 0 27px;padding-bottom:15px;border-bottom:1px solid var(--linha);}
+.passos button {flex:1 1 auto;min-width:90px;background:var(--fundo-2);border:1px solid var(--linha);border-bottom:3px solid #825445;
+ padding:15px 8px;color:var(--apagado);font:700 10px/1.4 var(--fonte-dossie);border-radius:0;}
+.passos button[aria-current="step"]{background:#63252b4d;color:var(--tinta);border-color:var(--sangue);border-bottom-color:var(--sangue)}
+.passos button.feito{border-bottom-color:var(--vela)}
+.passos button:disabled{opacity:.4;cursor:default}
+.modos{gap:20px;}
+.modo{min-height:300px;display:flex;flex-direction:column;gap:15px;padding:28px;cursor:pointer;}
+.modo::after {content:'';position:absolute;bottom:15px;right:15px;width:110px;height:120px;opacity:.1;background:var(--sangue);
+ -webkit-mask:url(assets/selo-oculto.svg) center/contain no-repeat;mask:url(assets/selo-oculto.svg) center/contain no-repeat;pointer-events:none;}
+.modo h2{font:700 2.3rem/1 var(--fonte-titulo);text-transform:uppercase}
+.modo[aria-pressed="true"]{border-color:var(--sangue);background:#54202a44}
+.modo.sah[aria-pressed="true"]{border-color:var(--roxo);background:#442a5244}
+.modo .sigilo-grande{opacity:.63;}
+.cartoes{gap:14px}
+.cartao{display:flex;flex-direction:column;gap:8px;text-align:left;padding:19px;cursor:pointer;border-left-width:3px;}
+.cartao b{font:700 1.33rem/1.2 var(--fonte-titulo);letter-spacing:0}
+.cartao small{line-height:1.5}
+.cartao:hover{border-color:var(--linha-forte);transform:translateY(-2px)}
+.cartao[aria-pressed="true"]{background:#662e3449;border-color:var(--sangue);box-shadow:inset 4px 0 var(--sangue),0 0 24px #9e2f3028;}
+.cartao .img-classe{height:156px;object-fit:cover;filter:saturate(.82);border-radius:0}
+
+/* O olho ritual substitui explicitamente a antiga roda mecânica */
+.roda-atr.roda-sigilada {width:min(430px,100%);aspect-ratio:1;position:relative;margin:6px auto 18px;
+ background:radial-gradient(circle,#4f10151c,transparent 49%);}
+.roda-sigilada::before{content:'';position:absolute;inset:9%;background:var(--sangue);opacity:.19;
+ -webkit-mask:url(assets/circulo-ritual.svg) center/contain no-repeat;mask:url(assets/circulo-ritual.svg) center/contain no-repeat;}
+.roda-centro{position:absolute;left:50%;top:50%;width:39%;aspect-ratio:1;transform:translate(-50%,-50%);
+ display:grid;place-items:center;opacity:.88;}
+.roda-centro img {width:100%;height:100%;filter:drop-shadow(0 0 18px #ab32394c);}
+.roda-centro span{position:absolute;top:112%;font:9px/1.4 var(--fonte-dossie);color:var(--apagado);letter-spacing:.1em;text-align:center;white-space:nowrap;}
+.roda-item{position:absolute;width:30%;transform:translate(-50%,-50%);display:grid;justify-items:center;z-index:1;gap:5px;}
+.roda-circulo{position:relative;width:100%;aspect-ratio:1;display:grid;align-content:center;justify-items:center;gap:4px;
+ border:0;border-radius:50%;background:radial-gradient(circle at 40% 30%,#49252a,#170c11 75%);
+ color:#e8d5c5;box-shadow:inset 0 0 22px #0009,0 5px 22px #0008;text-align:center;padding:8px 0;}
+button.roda-circulo{cursor:pointer}
+.roda-circulo::before{content:'';position:absolute;inset:-7%;background:#a5444d;
+ -webkit-mask:url(assets/anel-grunge.svg) center/contain no-repeat;mask:url(assets/anel-grunge.svg) center/contain no-repeat;
+ filter:drop-shadow(0 0 11px #d4404a44);}
+button.roda-circulo:hover::before{background:#e06b6f}
+.roda-nome{display:grid;font:700 9px/1.1 var(--fonte-dossie);letter-spacing:.06em;text-transform:uppercase;color:#ddc2b4;}
+.roda-nome b{font:700 14px/1.2 var(--fonte-titulo);color:#f7e7d8}
+.roda-valor{font:700 37px/.9 var(--fonte-titulo);color:#fff3dc;text-shadow:0 0 8px #a22c3b88;}
+.roda-ajuste{display:flex;gap:5px}
+.roda-ajuste button{width:31px;height:29px;cursor:pointer;font:700 18px/1 var(--fonte-titulo);border:1px solid var(--linha-forte);background:var(--painel);color:var(--tinta)}
+.roda-ajuste button:hover{border-color:var(--sangue)}
+:root[data-tema="papel"] .roda-circulo{background:radial-gradient(circle at 40% 30%,#fff9e7,#dfccb0 75%);color:#321b18;}
+:root[data-tema="papel"] .roda-nome,:root[data-tema="papel"] .roda-nome b,:root[data-tema="papel"] .roda-valor{color:#321b18;text-shadow:none}
+:root[data-tema="papel"] .roda-centro img{filter:brightness(.38) sepia(1) saturate(2)}
+
+/* Formulários, botões e resultados: tinta, recortes e fragmentos de manuscrito */
+.btn,.icone-btn {position:relative;border-radius:0;transition:background .2s,border-color .2s,transform .15s;}
+.btn{min-height:43px;padding:9px 15px;display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ font:700 10px/1.4 var(--fonte-ui);letter-spacing:.02em;text-transform:uppercase;color:var(--tinta);
+ background:linear-gradient(180deg,#ffffff0a,transparent 70%),var(--painel-2);border:1px solid var(--linha-forte);cursor:pointer;}
+.btn:hover{background:#613437;border-color:var(--sangue);transform:translateY(-1px)}
+.btn.sangue{background:linear-gradient(120deg,#741921,#bd3f43 59%,#85222d);color:#fff1df;border:0;
+ box-shadow:inset 0 0 0 1px #d68c8055,0 5px 17px #0004;}
+.btn.sangue:hover{background:linear-gradient(120deg,#98242d,#d84c52 59%,#992d3c)}
+.btn.fantasma{background:transparent;border-color:transparent;color:var(--apagado)}
+.btn.fantasma:hover{border-color:var(--linha);color:var(--tinta)}
+.btn.pequeno{padding:7px 10px;min-height:35px;font-size:9px}
+.btn[disabled]{opacity:.44;cursor:not-allowed;transform:none}
+.icone-btn{width:36px;height:36px;background:var(--painel-2);color:var(--osso);border:1px solid var(--linha);cursor:pointer;}
+.icone-btn:hover{border-color:var(--sangue);color:var(--tinta)}
+input,select,textarea{width:100%;min-width:0;max-width:100%;padding:10px 12px;min-height:42px;
+ background:#120a0c;color:var(--tinta);border:1px solid var(--linha-forte);border-bottom:2px solid #8c403b;
+ font:15px/1.5 var(--fonte-texto);border-radius:0;box-shadow:inset 0 2px 8px #0003;}
+input[type="checkbox"],input[type="radio"]{accent-color:var(--sangue);width:18px;height:18px;min-height:0;box-shadow:none}
+input[type="number"]{font-family:var(--fonte-dossie)}
+textarea{min-height:90px;resize:vertical;line-height:1.7}
+.campo>span,.rotulo{font:700 10px/1.3 var(--fonte-dossie);letter-spacing:.06em;color:var(--apagado);}
+::placeholder{color:#9d8579;opacity:1}
+:root[data-tema="papel"] input,:root[data-tema="papel"] select,:root[data-tema="papel"] textarea{
+ background:#fff9ed;color:#251915;border-color:#97745d;box-shadow:inset 0 1px 6px #68422114}
+:root[data-tema="papel"] ::placeholder{color:#826657}
+:focus-visible{outline:2px solid var(--vela)!important;outline-offset:3px}
+.tabela th {background:#4b2228;color:#fff2e5;font:700 10px/1.5 var(--fonte-dossie);letter-spacing:.06em;border-bottom:3px solid var(--sangue);}
+.tabela td{border-bottom:1px solid var(--linha);padding:11px 9px}
+.tabela tr:nth-child(even) td{background:#a42d3210}
+.rolavel .d{display:inline-block;background:var(--painel-2);color:var(--vela);border:1px solid var(--linha);border-radius:0;
+ padding:4px 7px;font:700 11px var(--fonte-dossie);}
+.rolavel:hover .d{background:#5c2a2f;border-color:var(--sangue)}
+.fundo-modal {background:radial-gradient(circle at center,#3a0f14bc,#070507ed 72%);backdrop-filter:blur(9px);}
+.modal {width:min(680px,100%);max-height:calc(100vh - 30px);overflow:auto;position:relative;padding:clamp(20px,3vw,35px);
+ color:var(--tinta);background:
+ radial-gradient(ellipse at 94% 4%,#6d263142,transparent 35%),
+ linear-gradient(0deg,#08040836,transparent 45%),var(--painel);
+ border:2px solid #9b6259;border-radius:0;box-shadow:0 35px 95px #000e,inset 0 0 0 7px #3b19172a;
+}
+.modal::before{content:'';position:absolute;right:20px;top:14px;width:94px;height:94px;
+ background:var(--sangue);opacity:.11;pointer-events:none;
+ -webkit-mask:url(assets/selo-oculto.svg) center/contain no-repeat;mask:url(assets/selo-oculto.svg) center/contain no-repeat;}
+.modal::after{content:'';position:absolute;left:-5px;top:-5px;width:230px;height:26px;background:#b6333b;
+ -webkit-mask:url(assets/pincel-2.svg) center/100% 100% no-repeat;mask:url(assets/pincel-2.svg) center/100% 100% no-repeat;pointer-events:none;}
+.modal header{position:relative;padding:15px 0 18px;border-bottom:1px solid var(--linha-forte);margin-bottom:20px;}
+.modal header h2,.modal header h3{font:700 clamp(1.8rem,3vw,3rem)/1.07 var(--fonte-titulo);letter-spacing:0}
+.modal .titulo-vermelho{font-size:.9rem}
+.resultado-grande .total{font:700 clamp(4rem,9vw,7rem)/1 var(--fonte-titulo);color:var(--sangue-texto);text-shadow:0 0 25px #c52c4680}
+.historico{background:var(--painel);border:2px solid var(--linha-forte);border-radius:0;padding:21px;box-shadow:var(--sombra)}
+.historico::before{content:'';position:absolute;left:0;right:0;top:0;height:8px;background:#9c272e;
+ -webkit-mask:url(assets/risco.svg) center/100% 100% no-repeat;mask:url(assets/risco.svg) center/100% 100% no-repeat;}
+.bandeja .btn{border-radius:0;background:#7e222a;border:1px solid #d27364;box-shadow:0 10px 26px #0008;color:#fff2e5}
+.dice3d-overlay{background:radial-gradient(circle,#460c19ed,#080509fb 75%)}
+.dice3d-title{font-family:var(--fonte-titulo)}
+.aviso{background:#2d1115;color:#f9ecdc;border:1px solid #c65a58;border-left:5px solid var(--sangue);border-radius:0;}
+
+/* Papel: uma edição de arquivo envelhecido, não um modo branco-tech */
+:root[data-tema="papel"] .painel,:root[data-tema="papel"] .hab,:root[data-tema="papel"] .chave,
+:root[data-tema="papel"] .recurso,:root[data-tema="papel"] .modo,:root[data-tema="papel"] .cartao,
+:root[data-tema="papel"] .ficha-cartao,:root[data-tema="papel"] .ameaca-bloco,
+:root[data-tema="papel"] .ritual,:root[data-tema="papel"] .vazio,:root[data-tema="papel"] .acao-rapida,
+:root[data-tema="papel"] .ini-linha,:root[data-tema="papel"] .caixa-ritual,
+:root[data-tema="papel"] .modal,:root[data-tema="papel"] .historico {
+ background:linear-gradient(160deg,#fff3da,transparent 40%),var(--painel);color:var(--tinta);
+ box-shadow:0 8px 25px #5d413729,inset 0 0 0 3px #9a75521c;
+}
+:root[data-tema="papel"] .recurso .numeros input {color:var(--tinta)}
+:root[data-tema="papel"] .etiqueta{background:#f9ebd2;color:var(--tinta)}
+:root[data-tema="papel"] .etiqueta.alerta{color:var(--sangue-texto)}
+:root[data-tema="papel"] .hab p{color:var(--osso)}
+:root[data-tema="papel"] .ficha-cabeca{background:linear-gradient(90deg,#a6695261,transparent 75%),url(assets/gravura-limiar.webp) 95% 45%/220px auto no-repeat}
+:root[data-tema="papel"] .titulo-vermelho{color:#f7e8da}
+:root[data-tema="papel"] .passos button{background:#e3d1b5}
+:root[data-tema="papel"] .passos button[aria-current="step"]{background:#b88279;color:#241816}
+:root[data-tema="papel"] .portal-acesso{color:#fff1e2}
+:root[data-tema="papel"] .elementos-ocultos { background:linear-gradient(180deg,#1b0b0de8,#0f0608f0),url(assets/gravura-limiar.webp) center/cover no-repeat; }
+
+.rodape {position:relative;padding:35px 15px 60px;border-top:1px solid var(--linha);
+ font:11px/1.7 var(--fonte-dossie);letter-spacing:.02em;color:var(--apagado);text-align:center;}
+.rodape::before{content:'✠';display:block;font:26px/1 var(--fonte-titulo);color:var(--sangue);margin:0 0 13px}
+
+@media(max-width:1120px) {
+ .portais-acesso{grid-template-columns:repeat(2,minmax(0,1fr));}
+ .portal-futuro{grid-column:1/-1;min-height:245px;}
+ .hero-container{grid-template-columns:1fr .3fr;}
+ .hero-gravura{left:18%;}
+ .topo.topo-oculto nav{gap:4px 13px}
+}
+@media(max-width:760px) {
+ .topo.topo-oculto{position:relative;flex-wrap:wrap;padding:11px 17px 15px;gap:10px;}
+ .topo.topo-oculto .marca{min-width:0;font-size:20px}
+ .topo .marca img{width:42px;height:42px}
+ .topo.topo-oculto nav{width:100%;margin-left:0;gap:7px 13px;justify-content:space-between;}
+ .topo.topo-oculto nav a,.topo.topo-oculto nav button{padding:8px 2px 9px;letter-spacing:0;font-size:9px}
+ .limiar-hero{min-height:660px;}
+ .hero-container{min-height:620px;display:block;padding-top:70px;padding-bottom:100px;}
+ .hero-gravura{inset:0 -40% 0 4%;opacity:.47;mask-image:none;-webkit-mask-image:none;}
+ .hero-veu{background:linear-gradient(90deg,#15080cf5,#160708b0),linear-gradient(0deg,#13070bef,transparent)}
+ .hero-selo{display:none}
+ .titulo-limiar{font-size:clamp(3.9rem,12vw,6rem);line-height:.89}
+ .sinopse-limiar{max-width:560px;}
+ .hero-nota{margin-top:34px}
+ .portais-acesso{grid-template-columns:1fr}
+ .portal-acesso,.portal-futuro{grid-column:auto;min-height:325px}
+ .circulo-elementos{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+ .elemento-placa img{height:90px}
+ .capitulo-cabecalho{gap:12px}
+ .capitulo-numero{font-size:65px;min-width:46px}
+ .ficha-cabeca{grid-template-columns:110px minmax(0,1fr);gap:15px;}
+ .ficha-cabeca .acoes-cabeca{grid-column:1/-1}
+ .retrato{width:97px;height:127px}
+ .grade.c2,.grade.c3{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:490px) {
+ .pagina{padding:27px 16px 65px}
+ .limiar-hero{min-height:690px}
+ .hero-container{padding:60px 19px 98px;}
+ .titulo-limiar{font-size:clamp(3.4rem,13.1vw,4.6rem)}
+ .hero-acoes{gap:8px}
+ .invocar{padding:13px 17px}
+ .hero-rodape{display:none}
+ .capitulo{padding-top:48px}
+ .capitulo-cabecalho h2{font-size:clamp(2.35rem,9vw,3.5rem)}
+ .circulo-elementos{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .elemento-placa:last-child{grid-column:1/-1;max-width:280px;width:100%;justify-self:center}
+ .elemento-placa img{height:75px}
+ .portal-acesso{min-height:335px}
+ .painel{padding:19px 15px}
+ .passos{gap:5px}
+ .passos button{min-width:75px;font-size:9px;padding:11px 5px}
+ .abas button{font-size:10px;padding:12px 12px}
+ .titulo-secao{align-items:flex-start}
+ .titulo-secao .linha{gap:6px}
+ .ficha-cabeca{grid-template-columns:85px minmax(0,1fr)}
+ .retrato{width:77px;height:100px;padding:3px;font-size:9px;border-width:5px}
+ .ficha-cabeca h1 input{font-size:clamp(1.5rem,6vw,2.2rem)}
+ .roda-valor{font-size:27px}.roda-nome{font-size:7px}.roda-nome b{font-size:11px}
+ .roda-ajuste button{width:27px;height:26px}
+ .roda-centro span{font-size:7px}
+ .recurso .numeros{font-size:1.3rem}.recurso .numeros input{width:58px}
+ .modal{padding:20px 14px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{
+ body{background:#fff;color:#211816}body::before,body::after{display:none}
+ .topo,.bandeja,.limiar-hero,.portais-acesso,.elementos-ocultos,.hero-selo{display:none!important}
+ .pagina{max-width:100%;padding:0}.painel{break-inside:avoid;box-shadow:none;color:#211816}
+}
+/* Identificação pública clara; primeiro tenta o selo fornecido pela página oficial.
+   Para publicação totalmente offline, substitua por download oficial conforme LEIA-ME. */
+.licenca-comunidade {display:flex;align-items:center;gap:17px;max-width:540px;margin-top:24px;color:#d9bfb4;}
+.licenca-comunidade a {display:block;flex:0 0 125px;height:125px;}
+.licenca-comunidade img{width:125px;height:125px;object-fit:contain;filter:drop-shadow(0 4px 14px #000b);}
+.licenca-comunidade>div{display:grid;gap:6px;max-width:310px;}
+.licenca-comunidade strong{font:700 12px/1.3 var(--fonte-dossie);letter-spacing:.1em;color:#fff0e1;}
+.licenca-comunidade small{color:#d4bfb2;font:11px/1.55 var(--fonte-texto);}
+@media(max-width:600px){.licenca-comunidade a{flex-basis:105px;height:105px}.licenca-comunidade img{width:105px;height:105px}.licenca-comunidade{gap:10px;}.licenca-comunidade small{font-size:10px}.limiar-hero{min-height:790px}.hero-container{padding-bottom:120px}.hero-nota{margin-top:26px}}
+
+/* Refinamentos de leitura em interação, sem perder a tipografia ritualística. */
+.topo.topo-oculto nav a,.topo.topo-oculto nav button{font-size:11px}
+.invocar{font-size:12px}
+.btn{font-size:11px}
+.btn.pequeno{font-size:10px}
+.etiqueta{font-size:11px}
+.passos button{font-size:11px}
+@media(max-width:490px){.topo.topo-oculto nav a,.topo.topo-oculto nav button{font-size:10px}.passos button{font-size:9px}}
+
+
+/* 0.9.1 — FORMAS ORGÂNICAS
+   Ajuste pedido pelo usuário: menos quadrados e menos pontas,
+   com janelas, quadros e áreas mais curvilíneos e fluidos.
+*/
+:root[data-tema]{
+  --raio-organico: 24px 18px 28px 20px / 18px 26px 20px 30px;
+  --raio-organico-suave: 18px 14px 22px 16px / 15px 21px 16px 24px;
+  --raio-organico-forte: 30px 22px 34px 26px / 24px 34px 24px 38px;
+}
+
+.painel,
+.ritual,.hab,.chave,.acao-rapida,.ini-linha,.recurso,.cartao,.modo,.ficha-cartao,.ameaca-bloco,.vazio,
+.caixa-ritual,.modal,.historico,
+.portal-acesso,
+.invocar.principal,
+input,select,textarea,
+.abas button,
+.passos button,
+.btn,
+.icone-btn,
+.tabela,
+.resultado-grande,
+.historico,
+.retrato {
+  clip-path:none !important;
+}
+
+.painel {
+  border-radius: var(--raio-organico-forte);
+  border-top-left-radius: 34px 28px;
+  border-bottom-right-radius: 38px 30px;
+  border-top:1px solid #8c5a54;
+  border-left:1px solid #78524b;
+  overflow:hidden;
+}
+.painel::before {
+  left:14px; top:10px; width:clamp(120px,24%,280px); height:18px;
+  opacity:.82;
+}
+.painel::after {
+  right:10px; bottom:8px; opacity:.1;
+}
+
+.ritual,.hab,.chave,.acao-rapida,.ini-linha,.recurso,.cartao,.modo,.ficha-cartao,.ameaca-bloco,.vazio,
+.caixa-ritual,.historico {
+  border-radius: var(--raio-organico);
+}
+
+.modal {
+  border-radius: 34px 24px 30px 26px / 24px 34px 28px 38px;
+  overflow:hidden;
+}
+.modal header { padding-right:66px; }
+
+.recurso,.chave,.acao-rapida,.hab,.ini-linha,.cartao,.modo,.ameaca-bloco,.ficha-cartao,.caixa-ritual,.ritual {
+  border-left-width:2px;
+}
+.recurso {
+  padding:18px 18px 16px;
+}
+.recurso::before {
+  border:0;
+  width:24px;height:24px;right:10px;top:10px;
+  border-radius:50% 38% 56% 42% / 44% 50% 34% 58%;
+  background:radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--cor,var(--sangue)) 78%, white 22%), var(--cor,var(--sangue)) 68%, transparent 72%);
+  opacity:.55;
+}
+.barra { border-radius:999px; height:10px; }
+.barra b { border-radius:999px; }
+
+.hab,
+.acao-rapida,
+.ameaca-bloco,
+.ritual,
+.caixa-ritual,
+.cartao,
+.modo,
+.ficha-cartao,
+.historico {
+  overflow:hidden;
+}
+
+.chave {
+  border-bottom-width:1px;
+  border-radius: 20px 20px 24px 24px / 14px 14px 26px 26px;
+}
+
+.ficha-cabeca {
+  border-radius: 30px 22px 28px 24px / 22px 30px 24px 30px;
+  padding:24px 24px 28px 18px;
+}
+.retrato {
+  border-radius: 18px 16px 22px 14px / 16px 20px 14px 22px;
+  transform:rotate(-1.5deg);
+}
+.etiqueta,
+.selo {
+  border-radius:999px;
+}
+
+.abas {
+  gap:10px;
+  border-bottom:0;
+  padding-bottom:8px;
+}
+.abas button {
+  border:1px solid color-mix(in srgb, var(--linha-forte) 80%, transparent);
+  border-bottom-width:2px;
+  border-radius: 18px 18px 14px 14px / 20px 20px 12px 12px;
+  padding:13px 18px 11px;
+  background:color-mix(in srgb, var(--fundo-2) 78%, transparent);
+}
+.abas button::before {
+  left:14px; right:14px; bottom:7px;
+}
+.abas button:hover {
+  background:color-mix(in srgb, var(--sangue) 12%, var(--fundo-2));
+}
+.abas button[aria-selected="true"] {
+  border-color:color-mix(in srgb, var(--sangue) 68%, var(--linha-forte));
+  border-bottom-color:var(--sangue);
+  box-shadow:0 8px 18px #0000002e;
+}
+
+.passos {
+  gap:10px;
+  border-bottom:0;
+  padding-bottom:8px;
+}
+.passos button {
+  border-radius: 18px 14px 20px 16px / 16px 20px 16px 22px;
+  border-bottom-width:2px;
+}
+
+.portal-acesso {
+  border-radius: 34px 28px 22px 30px / 26px 22px 34px 30px;
+}
+.portal-acesso::after {
+  left:14px; right:14px; top:14px; bottom:14px;
+  border-radius: 28px 22px 18px 24px / 20px 18px 28px 24px;
+}
+.portal-descricao {
+  padding:34px 30px 33px;
+}
+
+.invocar.principal,
+.btn,
+.icone-btn {
+  border-radius: 18px 16px 20px 14px / 16px 20px 14px 22px;
+}
+input,select,textarea {
+  border-radius: 16px 14px 18px 12px / 14px 18px 12px 18px;
+}
+.tabela th:first-child { border-top-left-radius:18px; }
+.tabela th:last-child { border-top-right-radius:18px; }
+
+.vazio {
+  border-style:solid;
+  border-color:color-mix(in srgb, var(--linha) 72%, transparent);
+  background:linear-gradient(135deg,#ffffff05,transparent 55%),linear-gradient(180deg,#74262a12,transparent 40%),var(--fundo-2);
+}
+
+:root[data-tema="papel"] .painel,
+:root[data-tema="papel"] .ritual,:root[data-tema="papel"] .hab,:root[data-tema="papel"] .chave,
+:root[data-tema="papel"] .acao-rapida,:root[data-tema="papel"] .ini-linha,:root[data-tema="papel"] .recurso,
+:root[data-tema="papel"] .cartao,:root[data-tema="papel"] .modo,:root[data-tema="papel"] .ficha-cartao,
+:root[data-tema="papel"] .ameaca-bloco,:root[data-tema="papel"] .vazio,:root[data-tema="papel"] .caixa-ritual,
+:root[data-tema="papel"] .modal,:root[data-tema="papel"] .historico {
+  box-shadow:0 10px 24px #5d413721,inset 0 0 0 1px #a1785714;
+}
+
+@media(max-width:760px){
+  .painel { border-radius: 24px 18px 24px 18px / 18px 24px 18px 24px; }
+  .portal-acesso { border-radius: 26px 22px 20px 24px / 20px 18px 28px 24px; }
+  .modal { border-radius: 24px 18px 22px 18px / 18px 24px 18px 24px; }
+  .abas button,
+  .passos button { border-radius: 15px 14px 16px 12px / 16px 16px 12px 18px; }
+}
+
+
+/* 0.9.2 — PALETAS DO OUTRO LADO + PAPEL DE FOLHA + BLOCOS ORGÂNICOS */
+:root[data-tema="noite"] {
+  --fx-fundo: #150b0f;
+  --fx-fundo-2: #241419;
+}
+:root[data-tema="noite"][data-efeito="sangue"] {
+  --fundo:#110b0d; --fundo-2:#1d1215; --painel:#261b1d; --painel-2:#302122;
+  --linha:#634d48; --linha-forte:#987568; --sangue:#af2730; --sangue-escuro:#5d0e1d;
+  --sangue-texto:#ff8a8d; --vela:#deb47b; --roxo:#9c6fc8;
+}
+:root[data-tema="noite"][data-efeito="energia"] {
+  --fundo:#0d0a14; --fundo-2:#171226; --painel:#211733; --painel-2:#2c1f45;
+  --linha:#5c4c88; --linha-forte:#8c78c3; --sangue:#8f46e8; --sangue-escuro:#4a2382;
+  --sangue-texto:#e4beff; --vela:#6bc9ff; --roxo:#d27dff; --pv:#9f64ff; --pe:#77c8ff; --san:#a2a5ff; --pd:#c97cff;
+}
+:root[data-tema="noite"][data-efeito="conhecimento"] {
+  --fundo:#13100a; --fundo-2:#221c11; --painel:#2e2616; --painel-2:#3a301b;
+  --linha:#7b6541; --linha-forte:#b08a52; --sangue:#b4852c; --sangue-escuro:#6a4b17;
+  --sangue-texto:#f1d08e; --vela:#f6e2b6; --roxo:#cc9d47; --pv:#be9442; --pe:#e5cb7d; --san:#b3a98f; --pd:#d2a257;
+}
+:root[data-tema="noite"][data-efeito="morte"] {
+  --fundo:#0c100d; --fundo-2:#151c17; --painel:#1c251e; --painel-2:#243128;
+  --linha:#516554; --linha-forte:#83a088; --sangue:#617a63; --sangue-escuro:#324534;
+  --sangue-texto:#cfdfcc; --vela:#aab89a; --roxo:#8ca18d; --pv:#768e72; --pe:#aab89a; --san:#9cb0a0; --pd:#8ba08c;
+}
+
+/* Recoloração de áreas que antes tinham vermelhos fixos */
+:root[data-tema="noite"] body {
+  background:radial-gradient(ellipse at 68% 0, color-mix(in srgb, var(--sangue) 32%, transparent) 0, transparent 45%), var(--fundo);
+}
+:root[data-tema="noite"] .topo.topo-oculto::before,
+:root[data-tema="noite"] .sobrescrito-oculto .risco-vivo,
+:root[data-tema="noite"] .faixa::before,
+:root[data-tema="noite"] .modal::after,
+:root[data-tema="noite"] .historico::before,
+:root[data-tema="noite"] .ficha-cabeca::before,
+:root[data-tema="noite"] .painel::before { background: var(--sangue); }
+:root[data-tema="noite"] .titulo-vermelho::before,
+:root[data-tema="noite"] .invocar.principal,
+:root[data-tema="noite"] .bandeja .btn,
+:root[data-tema="noite"] .tabela th { background: color-mix(in srgb, var(--sangue) 74%, black 26%); }
+:root[data-tema="noite"] .sinopse-limiar,
+:root[data-tema="noite"] .portal-margem,
+:root[data-tema="noite"] .topo.topo-oculto nav a:hover,
+:root[data-tema="noite"] .topo.topo-oculto nav button:hover,
+:root[data-tema="noite"] .topo.topo-oculto nav a[aria-current="page"] { border-color: var(--sangue); }
+:root[data-tema="noite"] .hero-selo img,
+:root[data-tema="noite"] .roda-centro img { filter: drop-shadow(0 0 18px color-mix(in srgb, var(--sangue) 42%, transparent)); }
+:root[data-tema="noite"][data-efeito="energia"] .hero-gravura,
+:root[data-tema="noite"][data-efeito="energia"] .portal-imagem,
+:root[data-tema="noite"][data-efeito="energia"] .hero-ruido { filter:hue-rotate(64deg) saturate(1.05) brightness(.92); }
+:root[data-tema="noite"][data-efeito="conhecimento"] .hero-gravura,
+:root[data-tema="noite"][data-efeito="conhecimento"] .portal-imagem,
+:root[data-tema="noite"][data-efeito="conhecimento"] .hero-ruido { filter:hue-rotate(132deg) sepia(.28) saturate(.88) brightness(.94); }
+:root[data-tema="noite"][data-efeito="morte"] .hero-gravura,
+:root[data-tema="noite"][data-efeito="morte"] .portal-imagem,
+:root[data-tema="noite"][data-efeito="morte"] .hero-ruido { filter:hue-rotate(188deg) saturate(.55) brightness(.88); }
+
+/* Janelinha de efeitos no topo */
+.caixa-efeitos { position:relative; display:flex; align-items:center; }
+.menu-efeitos {
+  position:absolute; top:calc(100% + 10px); right:0; width:min(340px, 86vw); z-index:60;
+  padding:16px 14px 14px; color:var(--tinta);
+  background:linear-gradient(180deg, rgba(255,255,255,.06), transparent 28%), var(--painel);
+  border:1px solid var(--linha-forte);
+  border-radius: 28px 18px 26px 22px / 18px 30px 20px 34px;
+  box-shadow:0 24px 70px rgba(0,0,0,.42);
+}
+.menu-efeitos::before {
+  content:''; position:absolute; right:24px; top:-8px; width:18px; height:18px; transform:rotate(45deg);
+  background:var(--painel); border-left:1px solid var(--linha-forte); border-top:1px solid var(--linha-forte);
+}
+.menu-efeitos-titulo {
+  font:700 11px/1.4 var(--fonte-dossie); letter-spacing:.14em; text-transform:uppercase; color:var(--apagado); margin-bottom:10px;
+}
+.menu-efeitos-opcoes { display:grid; gap:9px; }
+.fx-op {
+  display:grid; grid-template-columns:18px 1fr; align-items:center; gap:12px; width:100%; text-align:left;
+  padding:11px 13px; color:var(--tinta); background:color-mix(in srgb, var(--fundo-2) 74%, transparent);
+  border:1px solid var(--linha); border-radius: 18px 14px 22px 16px / 16px 22px 16px 24px;
+}
+.fx-op b { display:block; font:700 1.02rem/1.1 var(--fonte-titulo); }
+.fx-op small { display:block; margin-top:2px; color:var(--apagado); font:11px/1.35 var(--fonte-texto); }
+.fx-op[aria-pressed="true"] { border-color:var(--sangue); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sangue) 40%, transparent), 0 8px 18px rgba(0,0,0,.15); }
+.fx-bolha {
+  width:16px; height:16px; border-radius:43% 57% 50% 50% / 44% 40% 60% 56%;
+  background:currentColor; box-shadow:0 0 12px currentColor;
+}
+.fx-sangue { color:#d9545a; }
+.fx-energia { color:#b96cff; }
+.fx-conhecimento { color:#d1ab4d; }
+.fx-morte { color:#91aa93; }
+.fx-ambiente-toggle {
+  width:100%; margin-top:12px; padding:10px 14px; color:var(--tinta);
+  border:1px solid var(--linha); background:color-mix(in srgb, var(--fundo-2) 72%, transparent);
+  border-radius: 16px 12px 18px 14px / 14px 18px 14px 20px;
+}
+.fx-aviso { display:block; margin-top:9px; color:var(--apagado); font:10px/1.45 var(--fonte-texto); }
+
+/* Formatos ainda mais orgânicos, inspirados na referência enviada */
+.painel:nth-of-type(3n+1), .modal:nth-of-type(3n+1) { border-radius: 34px 22px 38px 24px / 24px 36px 22px 40px; }
+.painel:nth-of-type(3n+2), .modal:nth-of-type(3n+2) { border-radius: 24px 36px 22px 34px / 34px 22px 38px 24px; }
+.painel:nth-of-type(3n+3), .modal:nth-of-type(3n+3) { border-radius: 30px 18px 32px 26px / 20px 34px 24px 36px; }
+:is(.cartao,.modo,.ficha-cartao,.ameaca-bloco,.recurso,.caixa-ritual,.ritual,.hab,.acao-rapida,.historico,.vazio):nth-child(4n+1) { border-radius: 28px 18px 30px 20px / 18px 28px 22px 30px; }
+:is(.cartao,.modo,.ficha-cartao,.ameaca-bloco,.recurso,.caixa-ritual,.ritual,.hab,.acao-rapida,.historico,.vazio):nth-child(4n+2) { border-radius: 20px 30px 18px 28px / 28px 18px 30px 22px; }
+:is(.cartao,.modo,.ficha-cartao,.ameaca-bloco,.recurso,.caixa-ritual,.ritual,.hab,.acao-rapida,.historico,.vazio):nth-child(4n+3) { border-radius: 32px 22px 26px 18px / 24px 30px 18px 28px; }
+:is(.cartao,.modo,.ficha-cartao,.ameaca-bloco,.recurso,.caixa-ritual,.ritual,.hab,.acao-rapida,.historico,.vazio):nth-child(4n+4) { border-radius: 22px 28px 22px 34px / 30px 20px 34px 22px; }
+.portal-acesso, .menu-efeitos, .ficha-cabeca, .retrato { box-shadow:0 16px 36px rgba(0,0,0,.25); }
+
+/* Modo papel: mais cara de folha real, com linhas regulares e sublinhados limpos */
+:root[data-tema="papel"] body {
+  background:
+    linear-gradient(90deg, transparent 0 52px, rgba(156,61,61,.16) 52px 54px, transparent 54px),
+    repeating-linear-gradient(180deg, transparent 0 31px, rgba(78,117,177,.16) 31px 32px),
+    radial-gradient(ellipse at 50% 0,#f3e6cf 0,transparent 70%),
+    var(--fundo);
+}
+:root[data-tema="papel"] body::before { opacity:.08; }
+:root[data-tema="papel"] .painel,
+:root[data-tema="papel"] .hab,
+:root[data-tema="papel"] .chave,
+:root[data-tema="papel"] .recurso,
+:root[data-tema="papel"] .modo,
+:root[data-tema="papel"] .cartao,
+:root[data-tema="papel"] .ficha-cartao,
+:root[data-tema="papel"] .ameaca-bloco,
+:root[data-tema="papel"] .ritual,
+:root[data-tema="papel"] .vazio,
+:root[data-tema="papel"] .acao-rapida,
+:root[data-tema="papel"] .ini-linha,
+:root[data-tema="papel"] .caixa-ritual,
+:root[data-tema="papel"] .modal,
+:root[data-tema="papel"] .historico {
+  background:
+    linear-gradient(90deg, transparent 0 46px, rgba(156,61,61,.12) 46px 48px, transparent 48px),
+    repeating-linear-gradient(180deg, transparent 0 31px, rgba(78,117,177,.14) 31px 32px),
+    linear-gradient(160deg,#fff3da,transparent 40%), var(--painel);
+}
+:root[data-tema="papel"] .faixa::before {
+  -webkit-mask:none; mask:none; height:2px; bottom:3px; border-radius:999px;
+  background:linear-gradient(90deg, rgba(136,32,46,.05), rgba(136,32,46,.8) 8%, rgba(136,32,46,.8) 92%, rgba(136,32,46,.05));
+}
+:root[data-tema="papel"] .titulo-vermelho {
+  color:var(--sangue); padding:0 0 6px; background:none;
+}
+:root[data-tema="papel"] .titulo-vermelho::before {
+  inset:auto 0 0 0; height:2px; background:var(--sangue); -webkit-mask:none; mask:none; border-radius:999px;
+}
+:root[data-tema="papel"] .campo>span,
+:root[data-tema="papel"] .rotulo,
+:root[data-tema="papel"] .etiqueta,
+:root[data-tema="papel"] .capitulo-cabecalho p {
+  text-decoration-skip-ink:none;
+}
+:root[data-tema="papel"] .campo>span,
+:root[data-tema="papel"] .rotulo {
+  display:inline-block; padding-bottom:2px; border-bottom:1px solid rgba(99,85,120,.28);
+}
+:root[data-tema="papel"] .topo.topo-oculto nav a,
+:root[data-tema="papel"] .topo.topo-oculto nav button {
+  border-bottom-width:1px;
+}
+:root[data-tema="papel"] input,
+:root[data-tema="papel"] select,
+:root[data-tema="papel"] textarea {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.68), transparent 42%),
+    repeating-linear-gradient(180deg, transparent 0 29px, rgba(78,117,177,.1) 29px 30px),
+    #fff9ed;
+}
+:root[data-tema="papel"] .sinopse-limiar,
+:root[data-tema="papel"] .portal-link,
+:root[data-tema="papel"] .passos,
+:root[data-tema="papel"] .cabecalho-ritual,
+:root[data-tema="papel"] .ficha-cabeca,
+:root[data-tema="papel"] .titulo-secao { border-color: rgba(104,78,64,.4); }
+
+@media(max-width:760px){
+  .menu-efeitos { right:-10px; width:min(320px, 92vw); }
+}
