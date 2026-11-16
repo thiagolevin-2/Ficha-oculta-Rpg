@@ -1,0 +1,341 @@
+{
+  "academico": {
+    "livro": "base",
+    "pagina": 26,
+    "texto": "Você era um pesquisador ou professor universitário. De forma proposital ou não, seus estudos tocaram em assuntos misteriosos e chamaram a atenção da Ordo Realitas. \n\nPerícias treinadas. Ciências e Investigação. Saber é Poder. Quando faz um teste usando Intelecto, você pode gastar 2 PE para receber +5 nesse teste."
+  },
+  "agente-saude": {
+    "livro": "base",
+    "pagina": 26,
+    "texto": "Você era um profissional da saúde, como um enfermeiro, farmacêutico, médico, psicólogo ou socorrista, treinado no atendimento e cuidado de pessoas. Você pode ter sido surpreendido por um evento paranormal durante o trabalho ou mesmo cuidado de um agente da Ordem em uma emergência, que ficou surpreso com o quão bem você lidou com a situação. \n\nPerícias treinadas. Intuição e Medicina. Técnica Medicinal. Sempre que cura um personagem, você adiciona seu Intelecto no total de PV curados."
+  },
+  "amnesico": {
+    "livro": "base",
+    "pagina": 26,
+    "texto": "Você perdeu a maior parte da memória. Sabe apenas o próprio nome, ou nem isso. Sua amnésia pode ser resultado de um trauma paranormal ou mesmo de um ritual. Talvez você tenha sido vítima de cultistas? Talvez você tenha sido um cultista? Seja como for, hoje a Ordem é a única família que conhece. Quem sabe, cumprindo missões, você descubra algo sobre seu passado. \n\nPerícias treinadas. Duas à escolha do mestre. Vislumbres do Passado. Uma vez por sessão, você pode fazer um teste de Intelecto (DT 10) para reconhecer pessoas ou lugares familiares, que tenha encontrado antes de perder a memória. Se passar, recebe 1d4 PE temporários e, a critério do mestre, uma informação útil."
+  },
+  "artista": {
+    "livro": "base",
+    "pagina": 27,
+    "texto": "Você era um ator, músico, escritor, dançarino, influenciador… Seu trabalho pode ter sido inspirado por uma experiência paranormal do passado e o que o público acha que é pura criatividade, a Ordem sabe que tem um lado mais sombrio. \n\nPerícias treinadas. Artes e Enganação. Magnum Opus. Você é famoso por uma de suas obras. Uma vez por missão, pode determinar que uma pessoa envolvida em uma cena de interação o reconheça. Você recebe +5 em testes de Presença e de perícias baseadas em Presença contra aquela pessoa. A critério do mestre, pode receber esse bônus em outras situações nas quais seria reconhecido."
+  },
+  "atleta": {
+    "livro": "base",
+    "pagina": 27,
+    "texto": "Você competia em um esporte individual ou coletivo, como natação ou futebol. Seu desempenho pode ser fruto de uma influência paranormal que nem mesmo você conhecia ou você pode ter se envolvido em algum evento relacionado ao Outro Lado em uma de suas competições. \n\nPerícias treinadas. Acrobacia e Atletismo. 110%. Quando faz um teste de perícia usando Força ou Agilidade (exceto Luta e Pontaria) você pode gastar 2 PE para receber +5 nesse teste."
+  },
+  "chef": {
+    "livro": "base",
+    "pagina": 27,
+    "texto": "Você é um cozinheiro amador ou profissional. Talvez trabalhasse em um restaurante, talvez simplesmente gostasse de cozinhar para a família e amigos. Como sua comida fez com que você se envolvesse com o paranormal? Ninguém sabe. Mas os outros agentes adoram quando você vai para a missão! \n\nPerícias treinadas. Fortitude e Profissão (cozinheiro). Ingrediente Secreto. Em cenas de interlúdio, você pode fazer a ação alimentar-se para cozinhar um prato especial. Você, e todos os membros do grupo que fizeram a ação alimentar-se, recebem o benefício de dois pratos (caso o mesmo benefício seja escolhido duas vezes, seus efeitos se acumulam)."
+  },
+  "criminoso": {
+    "livro": "base",
+    "pagina": 27,
+    "texto": "Você vivia uma vida fora da lei, seja como mero batedor de carteiras, seja como membro de uma facção criminosa. Em algum momento, você se envolveu em um assunto da Ordem — talvez tenha roubado um item amaldiçoado? A organização, por sua vez, achou melhor recrutar seus talentos do que ter você como um estorvo. \n\nPerícias treinadas. Crime e Furtividade. O Crime Compensa. No final de uma missão, escolha um item encontrado na missão. Em sua próxima missão, você pode incluir esse item em seu inventário sem que ele conte em seu limite de itens por patente."
+  },
+  "cultista": {
+    "livro": "base",
+    "pagina": 28,
+    "texto": "Você fez parte de um culto paranormal. Talvez fossem ignorantes iludidos, que acreditavam estar contatando entidades benevolentes. Talvez soubessem exatamente o que estavam fazendo. Seja como for, algo abriu seus olhos e agora você luta pelo lado certo — embora carregue para sempre traços de sua vida pregressa. Outros membros da Ordem podem desconfiar de sua conversão e você sabe que precisará se esforçar para conquistar a confiança de todos. \n\nPerícias treinadas. Ocultismo e Religião. Traços do Outro Lado. Você possui um poder paranormal à sua escolha. Porém, começa o jogo com metade da Sanidade normal para sua classe."
+  },
+  "desgarrado": {
+    "livro": "base",
+    "pagina": 28,
+    "texto": "Você não vivia de acordo com as normas da sociedade. Podia ser um eremita, uma pessoa em situação de rua ou simplesmente alguém que descobriu o paranormal e abandonou sua rotina — sabendo o quão frágil era a existência humana, não conseguia simplesmente continuar indo para o trabalho todo dia. De qualquer forma, a vida sem os confortos modernos o deixou mais forte. \n\nPerícias treinadas. Fortitude e Sobrevivência. Calejado. Você recebe +1 PV para cada 5% de NEX."
+  },
+  "engenheiro": {
+    "livro": "base",
+    "pagina": 28,
+    "texto": "Enquanto os acadêmicos estão preocupados com teorias, você coloca a mão na massa, seja como engenheiro profissional, seja como inventor de garagem. Provavelmente você criou algum dispositivo paranormal que chamou a atenção da Ordem. \n\nPerícias treinadas. Profissão e Tecnologia. Ferramenta Favorita. Um item a sua escolha (exceto armas) conta como uma categoria abaixo (por exemplo, um item de categoria II conta como categoria I para você)."
+  },
+  "executivo": {
+    "livro": "base",
+    "pagina": 28,
+    "texto": "Você possuía um trabalho de escritório em uma grande empresa, banco ou corporação. Era um administrador, advogado, contador ou de qualquer outra profissão que lida com papelada e burocracia. Sua vida era bastante normal, até que você descobriu algo que não devia. Talvez o sucesso da empresa residisse em um ritual? Talvez toda a corporação fosse fachada para um culto e o presidente, um líder cultista envolvido com entidades paranormais? Após essa descoberta, você foi recrutado pela Ordem e trocou seu trabalho de escritório por missões de campo — hoje, sua vida é tudo, menos normal. \n\nPerícias treinadas. Diplomacia e Profissão. Processo Otimizado. Sempre que faz um teste de perícia durante um teste estendido, ou uma ação para revisar documentos (físicos ou digitais), pode pagar 2 PE para receber +5 nesse teste."
+  },
+  "investigador": {
+    "livro": "base",
+    "pagina": 29,
+    "texto": "Você era um investigador do governo, como um perito forense ou policial federal, ou privado, como um detetive particular. Pode ter tido contato com o paranormal em algum caso ou ter sido recrutado pela Ordem por suas habilidades de resolução de mistérios. \n\nPerícias treinadas. Investigação e Percepção. Faro para Pistas. Uma vez por cena, quando fizer um teste para procurar pistas, você pode gastar 1 PE para receber +5 nesse teste."
+  },
+  "lutador": {
+    "livro": "base",
+    "pagina": 29,
+    "texto": "Você pratica uma arte marcial ou esporte de luta, ou cresceu em um bairro perigoso onde aprendeu briga de rua. Já quebrou muitos ossos, tanto seus quanto dos outros. Pode ter conhecido a Ordem após um torneio secreto envolvendo entidades do Outro Lado ou ter sido recrutado pela sua capacidade de luta. \n\nPerícias treinadas. Luta e Reflexos. Mão Pesada. Você recebe +2 em rolagens de dano com ataques corpo a corpo."
+  },
+  "magnata": {
+    "livro": "base",
+    "pagina": 30,
+    "texto": "Você possui muito dinheiro ou patrimônio. Pode ser o herdeiro de uma família antiga ligada ao oculto, ter criado e vendido uma empresa e decidido usar sua riqueza para uma causa maior, ou ter ganho uma loteria após inadvertidamente escolher números amaldiçoados que formavam um ritual. \n\nPerícias treinadas. Diplomacia e Pilotagem. Patrocinador da Ordem. Seu limite de crédito é sempre considerado um acima do atual."
+  },
+  "mercenario": {
+    "livro": "base",
+    "pagina": 30,
+    "texto": "Você é um soldado de aluguel, que trabalha sozinho ou como parte de alguma organização que vende serviços militares. Escoltas e assassinatos fizeram parte de sua rotina por tempo o suficiente para você se envolver em alguma situação com o paranormal. \n\nPerícias treinadas. Iniciativa e Intimidação. Posição de Combate. No primeiro turno de cada cena de ação, você pode gastar 2 PE para receber uma ação de movimento adicional."
+  },
+  "militar": {
+    "livro": "base",
+    "pagina": 30,
+    "texto": "Você serviu em uma força militar, como o exército ou a marinha. Passou muito tempo treinando com armas de fogo, até se tornar um perito no uso delas. Acostumado a obedecer ordens e partir em missões, está em casa na Ordo Realitas. O inimigo é diferente, mas um tiro bem dado continua resolvendo o problema. \n\nPerícias treinadas. Pontaria e Tática. Para Bellum. Você recebe +2 em rolagens de dano com armas de fogo."
+  },
+  "operario": {
+    "livro": "base",
+    "pagina": 30,
+    "texto": "Pedreiro, industriário, operador de máquinas em uma fábrica… Você passou uma parte de sua vida em um emprego braçal, desempenhando atividades práticas que lhe deram uma visão pragmática do mundo. Sua rotina mundana, entretanto, foi confrontada de alguma forma pelo paranormal, e você não consegue mais esquecer tudo que viu sobre os mistérios do mundo. \n\nPerícias treinadas. Fortitude e Profissão. Ferramenta de Trabalho. Escolha uma arma simples ou tática que, a critério do mestre, poderia ser usada como ferramenta em sua profissão (como uma marreta para um pedreiro). Você sabe usar a arma escolhida e recebe +1 em testes de ataque, rolagens de dano e margem de ameaça com ela."
+  },
+  "policial": {
+    "livro": "base",
+    "pagina": 30,
+    "texto": "Você fez parte de uma força de segurança pública, civil ou militar. Em alguma patrulha ou chamado se deparou com um caso paranormal e sobreviveu para contar a história. \n\nPerícias treinadas. Percepção e Pontaria. Patrulha. Você recebe +2 em Defesa."
+  },
+  "religioso": {
+    "livro": "base",
+    "pagina": 30,
+    "texto": "Você é devoto ou sacerdote de uma fé. Independentemente da religião que pratica, se dedica a auxiliar as pessoas com problemas espirituais. A partir disso, teve contato com o paranormal, o que fez com que fosse convocado pela Ordem. \n\nPerícias treinadas. Religião e Vontade. Acalentar. Você recebe +5 em testes de Religião para acalmar. Além disso, quando acalma uma pessoa, ela recebe um número de pontos de Sanidade igual a 1d6 + a sua Presença."
+  },
+  "servidor": {
+    "livro": "base",
+    "pagina": 30,
+    "texto": "Você possuía carreira em um órgão do governo, lidando com burocracia e atendendo pessoas. Sua rotina foi quebrada quando você viu que o prefeito era um cultista ou que a câmara de vereadores se reunia à noite para realizar rituais. Quando os próprios representantes do povo estão dispostos a sacrificá-lo para entidades malignas, onde reside nossa esperança? Hoje, você sabe a resposta para essa pergunta: na Ordo Realitas. \n\nPerícias treinadas. Intuição e Vontade. Espírito Cívico. Sempre que faz um teste para ajudar, você pode gastar 1 PE para aumentar o bônus concedido em +2."
+  },
+  "teorico": {
+    "livro": "base",
+    "pagina": 31,
+    "texto": "A humanidade nunca pisou na lua. Reptilianos ocupam importantes cargos públicos. A Terra é plana… E secretamente governada pelos Illuminati. Você sabe isso tudo, pois investigou a fundo esses importantes assuntos. Quando sua pesquisa esbarrou no paranormal, você foi recrutado. Na Ordem, sua loucura determinação será usada para um bom propósito. \n\nPerícias treinadas. Investigação e Ocultismo. Eu Já Sabia. Você não se abala tanto com entidades ou anomalias. Afinal, sempre soube que isso tudo existia. Você recebe resistência a dano mental igual ao seu Intelecto."
+  },
+  "ti": {
+    "livro": "base",
+    "pagina": 31,
+    "texto": ". Programador, engenheiro de software ou simplesmente “o cara da T.I.”, você tem treinamento e experiência para lidar com sistemas informatizados. Seu talento (ou curiosidade exagerada) chamou a atenção da Ordem. \n\nPerícias treinadas. Investigação e Tecnologia. Motor de Busca. A critério do mestre, sempre que tiver acesso a internet, você pode gastar 2 PE para substituir um teste de perícia qualquer por um teste de Tecnologia."
+  },
+  "rural": {
+    "livro": "base",
+    "pagina": 31,
+    "texto": "Você trabalhava no campo ou em áreas isoladas, como fazendeiro, pescador, biólogo, veterinário… Você se acostumou com o convívio com a natureza e os animais e talvez tenha ouvido uma ou outra história de fantasmas ao redor da fogueira. Em algum momento da sua vida, porém, descobriu que muitas dessas histórias são verdadeiras. \n\nPerícias treinadas. AdestramentoeSobrevivência. Desbravador. Quando faz um teste de Adestramento ou Sobrevivência, você pode gastar 2 PE para receber +5 nesse teste. Além disso, você não sofre penalidade em deslocamento por terreno difícil."
+  },
+  "trambiqueiro": {
+    "livro": "base",
+    "pagina": 31,
+    "texto": "Uma vida digna exige muito trabalho, então é melhor nem tentar. Você vivia de pequenos golpes, jogatina ilegal e falcatruas. Certo dia, enganou a pessoa errada; no dia seguinte, se viu servindo à Ordem. Pelo menos agora tem a chance de usar sua lábia para o bem. \n\nPerícias treinadas. Crime e Enganação. Impostor. Uma vez por cena, você pode gastar 2 PE para substituir um teste de perícia qualquer por um teste de Enganação."
+  },
+  "universitario": {
+    "livro": "base",
+    "pagina": 31,
+    "texto": "Você era aluno de uma faculdade. Em sua rotina de estudos, provas e festas, acabou descobrindo algo — talvez um livro amaldiçoado na antiga biblioteca do campus? Por seu achado, foi convocado pela Ordem. Agora, estuda com mais afinco: nesse novo curso, ouviu dizer que as provas podem ser mortais. \n\nPerícias treinadas. Atualidades e Investigação. Dedicação. Você recebe +1 PE, e mais 1 PE adicional a cada NEX ímpar (15%, 25%…). Além disso, seu limite de PE por turno aumenta em 1 (em NEX 5% seu limite é 2, em NEX 10% é 3 e assim por diante; isso não afeta a DT de seus efeitos)."
+  },
+  "vitima": {
+    "livro": "base",
+    "pagina": 31,
+    "texto": "Em algum momento de sua vida — infância, juventude ou início da vida adulta — você encontrou o paranormal… E a experiência não foi nada boa. Você viu os espíritos dos mortos, foi atacado por uma entidade ou mesmo foi sequestrado para ser sacrificado em um ritual impedido no último momento. A experiência foi traumática, mas você não se abateu; em vez disso, decidiu lutar para impedir que outros inocentes passem pelo mesmo. E, já tendo sido vítima do paranormal, se tornou habilidoso em evitar perigos. \n\nPerícias treinadas. Reflexos e Vontade. Cicatrizes Psicológicas. Você recebe +1 de Sanidade para cada 5% de NEX."
+  },
+  "ferido-por-ritual": {
+    "livro": "as01",
+    "pagina": 43,
+    "texto": "Você tinha uma vida ordinária, até sofrer os efeitos paranormais de um ritual (escolha entre Sangue, Morte, Conhecimento ou Energia). A partir de então, sua existência mundana foi deturpada pelo Outro Lado. \n\nPerícias treinadas. Ocultismo e 1 perícia definida pelo elemento do ritual (Fortitude para Sangue, Vontade para Morte e Conhecimento ou Reflexos para Energia). Mácula Ritualística. A entidade marcou você com um ritual de 1º círculo a sua escolha do elemento correspondente. Você aprende a conjurar o ritual. Além disso, uma vez por cena, pode conjurá-lo sem gastar PE (mas ainda precisa gastar PE para qualquer efeito adicional, como formas avançadas). Esse ritual não conta no seu limite de rituais conhecidos. Em contrapartida, sofre –O em testes de resistência contra efeitos (como rituais ou poderes paranormais) desse elemento."
+  },
+  "transtornado-arrependido": {
+    "livro": "as01",
+    "pagina": 43,
+    "texto": "Você já caminhou entre os Transtornados. Talvez tenha sido um seguidor cego, seduzido pelas promessas de transcendência por meio da carne e da dor. Talvez tenha conhecido a natureza visceral do culto desde o início e ainda assim escolheu mergulhar no delírio. Seja como for, em algum momento algo rompeu o ciclo. Você se libertou, mas ainda sente o eco dos rituais e a presença do Sangue sussurrando na própria carne. \n\nPerícias treinadas. Luta e Ocultismo. Sofrimento de Sangue. Eles podem tentar... mas já não dói mais. Você recebe RD 2/mental. Para cada dois rituais de Sangue ou poderes paranormais de Sangue que possua, a RD aumenta em +1. Contudo, a lembrança das desgraças que você viveu causa pesadelos horríveis, que o impedem de repousar tranquilamente. Sua condição de descanso é sempre uma categoria pior (luxuosa se torna confortável, confortável se torna normal e normal se torna precária)."
+  },
+  "cacador-de-recompensas": {
+    "livro": "as04",
+    "pagina": 64,
+    "texto": "Sua sede pelo dinheiro fácil sempre te guiou na exploração dos locais mais obscuros. Você sabe muito bem que as situações mais insalubres guardam as melhores recompensas. \n\nPerícias treinadas. Crime e Investigação. Quem Não Arrisca, Não Petisca. Você recebe +2 em testes para resistir à condições mentais e de medo. Além disso, caso falhe em algum desses testes, você recebe +1d20 no próximo teste que fizer. Esse bônus termina no fim da cena e não é cumulativo com ele mesmo."
+  },
+  "influencer-paranormal": {
+    "livro": "as04",
+    "pagina": 64,
+    "texto": "De início, você nunca acreditou nas lendas urbanas e vídeos de fantasmas, então resolveu se aproveitar daqueles que acreditam. Foi produzindo conteúdos falsos e duvidosos para a internet que você descobriu a dura verdade por trás da Membrana. \n\nPerícias treinadas. Enganação e Tecnologia. Registrar o Paranormal. Uma vez por cena, você pode gastar uma ação padrão e 2 PE para criar um registro de uma criatura paranormal ou ritual que tenha sido conjurado na mesma cena. A ação padrão deve ser gasta para tirar uma foto, fazer um vídeo ou algum tipo de registro desse tipo. Você recebe +5 em testes contra presença perturbadora de criaturas que tenham sido registradas previamente. Além disso, pode gastar uma ação de interlúdio para memorizar um único ritual registrado, podendo conjurá-lo como se o conhecesse até a próxima cena de interlúdio, desde que tenha o NEX necessário (1º círculo a partir do NEX 5%, 2º círculo a partir do NEX 25%, 3º círculo a partir do NEX 55% e 4º círculo a partir do NEX 85%)."
+  },
+  "ufologo": {
+    "livro": "as05",
+    "pagina": 54,
+    "texto": "Você sempre soube que não estávamos sozinhos no universo. Muitos já te consideraram um lunático, mas algo dizia que suas teorias sempre estavam no caminho certo. As intermináveis pesquisas sobre o espaço, sinais no céu e seres de outros planetas eventualmente te fizeram perceber que o oculto não mede distâncias. Onde há medo, há algo incompreensível para espreitar. \n\nPerícias treinadas. Ciências e Ocultismo. Minha Teoria Absurda. Uma vez por cena de interlúdio, você pode gastar uma ação para apresentar ao seu grupo sua tese sobre as prováveis respostas para a investigação com a qual estão lidando. Obviamente, isso deve ser feito antes de terem todas as respostas. A critério do mestre, se suas teorias forem boas (não necessariamente corretas), você recebe 1d4+1 PE temporários que duram até serem gastos. Se, quando a missão acabar, uma de suas teorias se provar correta, você recebe +1 PE máximo e atual."
+  },
+  "funcionario-de-beira-de-estrada": {
+    "livro": "as05",
+    "pagina": 54,
+    "texto": "Longe das grandes concentrações urbanas, você dava o seu melhor para atender os viajantes cansados. Entre madrugadas adentro e caminhões barulhentos, as lendas urbanas e relatos horripilantes eventualmente chegaram aos seus ouvidos e atiçaram a sua curiosidade. \n\nPerícias treinadas. Fortitude e Intuição. Turno Invertido. Uma vez por missão, durante uma cena de interlúdio, você pode receber os benefícios da ação dormir sem precisar realizá-la. Além disso, recebe +2 em testes contra qualquer efeito que tente te deixar inconsciente."
+  },
+  "cientista-ex-panacea": {
+    "livro": "as06",
+    "pagina": 66,
+    "texto": "Ingênuo, você passou anos trabalhando para a Panacea Industries até descobrir que prestava serviços para uma grande organização responsável por aprisionar e utilizar criaturas paranormais que pesquisam para enfrentarem umas às outras. Quando soube do uso de cobaias humanas nesses experimentos, decidiu parar de apoiar as pesquisas e se voltou contra a multinacional. \n\nPerícias treinadas. Atualidades e Ciências. Existe uma Explicação. Acostumado a ver o paranormal como um assunto científico, você prefere lidar com o sobrenatural através de teorias, cálculos e testes experimentais. Quando faz um teste de Ocultismo, você pode gastar 2 PE para usar Ciências no lugar dessa perícia."
+  },
+  "cobaia-sobrevivente": {
+    "livro": "as06",
+    "pagina": 66,
+    "texto": "Você foi pego pelas Indústrias Panacea (ou outra organização semelhante) ainda pequeno, mas, após anos como cobaia, conseguiu sobreviver aos experimentos com o mínimo de sequelas mentais e/ou físicas. Após escapar das garras da multinacional, passou a dedicar a sua vida a encontrar meios de salvar outras pessoas do destino trágico que você evitou. \n\nPerícias treinadas. Fortitude e Vontade. Forças para Enfrentar. Ser uma cobaia por anos marcou você com experiências horríveis, mas que, às vezes, podem ser usadas como força para continuar sobrevivendo. Descreva para o mestre a parte mais traumática da sua história como cobaia. Quando estiver em uma cena em que há algo relacionado a esse trauma, à critério do mestre, você fica abalado. Entretanto, quando isso acontecer, você pode gastar 2 PE para, até o fim da cena, receber imunidade a efeitos de medo (se aplica também ao abalado desta habilidade)."
+  },
+  "seguranca-ex-panacea": {
+    "livro": "as06",
+    "pagina": 66,
+    "texto": "Acreditando que trabalhava em uma multinacional dedicada à saúde e bem-estar da população, você quase enlouqueceu quando descobriu que fazia a segurança para cientistas dispostos a usar cobaias humanas em seus experimentos com o paranormal. Assim que soube a verdade, abandonou as Indústrias Panacea para acabar com a existência dela. \n\nPerícias treinadas. Luta e Pontaria. Técnicas de Contenção. Você domina técnicas de luta para conter pessoas que podem causar problemas. Quando faz uma manobra de combate, você pode gastar 2 PE para receber +5 no teste de manobra."
+  },
+  "exorcizado": {
+    "livro": "as07",
+    "pagina": 80,
+    "texto": "Você já esteve sob influência de uma grande força sobrenatural opressora, que dominou seu corpo para realizar façanhas incompreensíveis. \n\nPerícias treinadas. Fortitude e Ocultismo. O Que Restou. Uma parte da criatura paranormal que o possuiu continua dentro de você. Escolha um elemento (exceto Medo). Você recebe RD 5 contra o tipo do elemento escolhido. Entretanto, sempre que entrar em contato com esse elemento pela primeira vez em uma cena (seja ao presenciar rituais, ítens amaldiçoados, criaturas ou poderes paranormais), você perde 2 SAN."
+  },
+  "sensitivo-rebelde": {
+    "livro": "as07",
+    "pagina": 80,
+    "texto": "Apesar de lutar contra sua sensitividade paranormal, ela nunca te abandonou. Não importa o quanto você tentou negar, as visões continuavam voltando. Para você, nunca foi uma questão de fé. O sobrenatural sempre foi sua realidade. \n\nPerícias treinadas. Intuição e Vontade. Sussurros e Vultos. Ao lidar com outras pessoas, inesperadamente surgem vozes e vultos na sua cabeça que, por mais assustadoras que sejam, ajudam a compreendê-las. Quando faz um teste de Diplomacia, Enganação, Intimidação ou Intuição, você pode escolher perder 2 SAN para receber +5 nesse teste."
+  },
+  "veterano-de-conflito-armado": {
+    "livro": "as09",
+    "pagina": 38,
+    "texto": "Você já vivenciou muitos conflitos armados na sua vida. Seja participando de tiroteios como um membro da SWAT ou mesmo tendo vivido a sua juventude em zonas de conflito, isso marcou a sua forma de ver o mundo. A constante exposição a violência te tornou um sobrevivente calejado, capaz de suportar a dor e seguir em frente, mesmo que o peso dos amigos caídos pelo caminho fiquem ao seu lado. \n\nPerícias treinadas. Luta e Pontaria. Full Metal Jacket. Independentemente da humanidade em seu interior, por fora, você tem um metafórico invólucro duro como metal — nada vai te impedir de continuar socando ou apertando o gatilho. Quando faz um teste de Luta ou Pontaria com alguma penalidade, você pode gastar 2 PE para ignorar a penalidade nesse teste."
+  },
+  "treinado-pela-hell-hunters": {
+    "livro": "as09",
+    "pagina": 38,
+    "texto": "Você foi treinado pela organização Hell Hunter no combate contra o paranormal. Foi árduo, doloroso, cruel, mas nenhuma outra organização poderia te preparar melhor. \n\nPerícias treinadas. Escolha entre Luta e Fortitude ou Pontaria e Reflexos. Resistência do Treinamento. O maior rendimento do seu treinamento foi a carga extra de resistência que você adquiriu para continuar na briga. Se escolheu treinamento em Luta e Fortitude, você recebe +2 PV no NEX 5% e +1 PV para cada 10% de NEX. Se escolheu treinamento em Pontaria e Reflexos, você recebe +1 PE no NEX 5% e +1 PE para cada 10% de NEX."
+  },
+  "amigo-animais": {
+    "livro": "sah",
+    "pagina": 8,
+    "imagens": [
+      "amigo-animais-1.jpg",
+      "amigo-animais-2.jpg"
+    ]
+  },
+  "astronauta": {
+    "livro": "sah",
+    "pagina": 9,
+    "imagens": [
+      "astronauta-1.jpg"
+    ]
+  },
+  "chef-outro-lado": {
+    "livro": "sah",
+    "pagina": 9,
+    "imagens": [
+      "chef-outro-lado-1.jpg",
+      "chef-outro-lado-2.jpg"
+    ]
+  },
+  "colegial": {
+    "livro": "sah",
+    "pagina": 10,
+    "imagens": [
+      "colegial-1.jpg"
+    ]
+  },
+  "cosplayer": {
+    "livro": "sah",
+    "pagina": 10,
+    "imagens": [
+      "cosplayer-1.jpg"
+    ]
+  },
+  "diplomata": {
+    "livro": "sah",
+    "pagina": 10,
+    "imagens": [
+      "diplomata-1.jpg",
+      "diplomata-2.jpg"
+    ]
+  },
+  "explorador": {
+    "livro": "sah",
+    "pagina": 10,
+    "imagens": [
+      "explorador-1.jpg"
+    ]
+  },
+  "experimento": {
+    "livro": "sah",
+    "pagina": 10,
+    "imagens": [
+      "experimento-1.jpg"
+    ]
+  },
+  "fanatico": {
+    "livro": "sah",
+    "pagina": 11,
+    "imagens": [
+      "fanatico-1.jpg"
+    ]
+  },
+  "fotografo": {
+    "livro": "sah",
+    "pagina": 11,
+    "imagens": [
+      "fotografo-1.jpg"
+    ]
+  },
+  "inventor": {
+    "livro": "sah",
+    "pagina": 11,
+    "imagens": [
+      "inventor-1.jpg",
+      "inventor-2.jpg"
+    ]
+  },
+  "jovem-mistico": {
+    "livro": "sah",
+    "pagina": 12,
+    "imagens": [
+      "jovem-mistico-1.jpg"
+    ]
+  },
+  "legista": {
+    "livro": "sah",
+    "pagina": 12,
+    "imagens": [
+      "legista-1.jpg"
+    ]
+  },
+  "mateiro": {
+    "livro": "sah",
+    "pagina": 13,
+    "imagens": [
+      "mateiro-1.jpg"
+    ]
+  },
+  "mergulhador": {
+    "livro": "sah",
+    "pagina": 13,
+    "imagens": [
+      "mergulhador-1.jpg"
+    ]
+  },
+  "motorista": {
+    "livro": "sah",
+    "pagina": 14,
+    "imagens": [
+      "motorista-1.jpg"
+    ]
+  },
+  "nerd": {
+    "livro": "sah",
+    "pagina": 14,
+    "imagens": [
+      "nerd-1.jpg"
+    ]
+  },
+  "profetizado": {
+    "livro": "sah",
+    "pagina": 14,
+    "imagens": [
+      "profetizado-1.jpg"
+    ]
+  },
+  "psicologo": {
+    "livro": "sah",
+    "pagina": 14,
+    "imagens": [
+      "psicologo-1.jpg"
+    ]
+  },
+  "reporter": {
+    "livro": "sah",
+    "pagina": 14,
+    "imagens": [
+      "reporter-1.jpg"
+    ]
+  }
+}

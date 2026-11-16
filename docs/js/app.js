@@ -1,17 +1,17 @@
-import { aplicarContaminacao, htmlContaminacao } from './contaminacao.js?v=0.18';
+import { aplicarContaminacao, htmlContaminacao } from './contaminacao.js?v=0.20.2';
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
-import { ELEMENTOS_VISUAIS, aplicarElemento } from './temas.js?v=0.18';
-import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.18';
-import { normalizar, derivar } from './regras.js?v=0.18';
-import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, espacoUsado } from './armazenamento.js?v=0.18';
-import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.18';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.18';
-import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.18-sah';
-import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.18';
-import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.18';
+import { ELEMENTOS_VISUAIS, aplicarElemento } from './temas.js?v=0.20.2';
+import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.20.2';
+import { normalizar, derivar } from './regras.js?v=0.20.2';
+import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, espacoUsado } from './armazenamento.js?v=0.20.2';
+import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.20.2';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.20.2';
+import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.20.2-sah';
+import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.20.2';
+import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.20.2';
 
-export const VERSAO = '0.18';
+export const VERSAO = '0.20.2';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -30,22 +30,22 @@ let buscaLivroDigital = '';
 async function abrirLivroDigital(id, pagina=1) {
   if (!LIVROS_DIGITALIZADOS.some(v=>v.id===id)) return;
   try {
-    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.18-sah', {cache:'no-cache'});
+    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.20.2-sah', {cache:'no-cache'});
     if (!resp.ok) throw new Error('Não foi possível carregar esta transcrição.');
     livroDigital = await resp.json(); paginaDigital = Math.min(Math.max(1, Number(pagina)||1),livroDigital.paginas.length); buscaLivroDigital = '';
     render();
-    if (id === 'sah' && location.hash.startsWith('#/acervo/sah/')) {
+    if (location.hash.startsWith(`#/acervo/${id}/`)) {
       requestAnimationFrame(() => document.getElementById('leitor-privado')?.scrollIntoView({block:'start'}));
     }
   } catch (e) { avisar('Falha ao abrir livro digitalizado: '+e.message,true); }
 }
 
 async function carregarSuplementos(){
-  try { const r=await fetch('dados/suplementos.json?v=0.18'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
+  try { const r=await fetch('dados/suplementos.json?v=0.20.2'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
 }
 async function carregarReferenciasSAH(){
   try {
-    const r = await fetch('dados/sah_referencias.json?v=0.18', {cache:'no-cache'});
+    const r = await fetch('dados/sah_referencias.json?v=0.20.2', {cache:'no-cache'});
     if(r.ok) SAH_REF = await r.json();
   } catch(e){ console.warn('Índice do Sobrevivendo ao Horror não disponível', e); }
 }
@@ -66,7 +66,7 @@ const ctx = {
 function lerRota() {
   const h = location.hash.replace(/^#\/?/, '');
   const [tela, id, pagina] = h.split('/');
-  if (tela === 'acervo' && id === 'sah') return {tela:'acervo', livro:'sah', pagina:Math.max(1,Number(pagina)||1)};
+  if (tela === 'acervo' && ['sah', 'base', 'as01', 'as02', 'as03', 'as04', 'as05', 'as06', 'as07', 'as09'].includes(id)) return {tela:'acervo', livro:id, pagina:Math.max(1,Number(pagina)||1)};
   if (tela === 'agente' && id) return { tela: 'ficha', id };
   if (['agentes', 'novo', 'mestre', 'sobre', 'acervo'].includes(tela)) return { tela };
   return { tela: 'inicio' };
@@ -77,8 +77,8 @@ addEventListener('hashchange', () => {
   if (estado.rota.tela === 'novo' && !estado.criador) estado.criador = novoRascunho();
   if (estado.rota.tela === 'ficha' && antes.id !== estado.rota.id) estado.ui.aba = 'agente';
   fecharModal();
-  if(estado.rota.tela==='acervo' && estado.rota.livro==='sah') {
-    abrirLivroDigital('sah',estado.rota.pagina);
+  if(estado.rota.tela==='acervo' && estado.rota.livro) {
+    abrirLivroDigital(estado.rota.livro, estado.rota.pagina);
   }
   render(); scrollTo(0, 0);
 });
@@ -225,7 +225,8 @@ const acoes = {
   'buscar-livro-digital': () => { buscaLivroDigital=document.getElementById('biblioteca-buscar')?.value||''; render(); document.getElementById('leitor-privado')?.scrollIntoView({block:'start'}); },
   'historico': () => { estado.historicoAberto = !estado.historicoAberto; render(); },
   'limpar-historico': () => limparHistorico(),
-  'rolar-dano-ultimo': el => { const u = ultimaRolagem(); if (!u) return; fecharModal(); rolarDanoUI({ titulo: u.tituloDano || u.titulo.replace(/^Ataque/, 'Dano'), quem: u.quem, formula: u.formulaDano, multiplicador: el.dataset.crit === '1' ? u.mult : 1, rotulo: u.rotuloDano || '' }); },
+  'resolver-efeito-ritual': el => resolverEfeitoRitual(el.dataset.token),
+  'rolar-dano-ultimo': el => { const u = ultimaRolagem(); if (!u) return; fecharModal(); rolarDanoUI({ titulo: u.tituloDano || u.titulo.replace(/^Ataque/, 'Dano'), quem: u.quem, formula: u.formulaDano, gruposCritico: u.gruposCritico, multiplicador: el.dataset.crit === '1' ? u.mult : 1, rotulo: u.rotuloDano || '' }); },
   'importar': async () => {
     const arq = await escolherArquivo('.json,application/json'); if (!arq) return;
     if (arq.size > 3_000_000) return avisar('Arquivo grande demais.', true);
@@ -268,9 +269,9 @@ function aoEditar(ev, final) {
   if (el.dataset.prox) { proxima[el.dataset.prox] = el.dataset.prox === 'dt' ? el.value : inteiro(el.value, -50, 50, 0); return; }
   if (el.dataset.ritFiltro) { estado.ui.ritFiltro[el.dataset.ritFiltro] = el.value; if (final || el.type === 'search') render(); return; }
   if ('filtroModal' in el.dataset) { const q = el.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); document.querySelectorAll('.modal [data-busca]').forEach(b => { b.hidden = q && !b.dataset.busca.includes(q); }); return; }
-  const m = campoMestre(el);
+  const m = campoMestre(el, ctx, final);
   if (m) { if (final && m === 'cheio') render(); return; }
-  const c = campoCriador(ctx, el);
+  const c = campoCriador(ctx, el, final);
   if (c) {
     if (c === 'cheio' && (final || el.type === 'search')) render();
     else { // digitação: só atualiza o botão Avançar e a dica, sem redesenhar
@@ -293,7 +294,7 @@ function aoEditar(ev, final) {
   const precisa = final || el.tagName === 'SELECT' || tipo === 'bool';
   if (precisa) { const n = normalizar(f); Object.assign(f, n); }
   ctx.salvarFicha(f);
-  if (precisa && (el.tagName === 'SELECT' || tipo || el.type === 'checkbox')) render();
+  if (precisa && (el.tagName === 'SELECT' || tipo || el.type === 'checkbox' || el.dataset.campo === 'idade')) render();
 }
 document.addEventListener('input', ev => { if(ev.target.matches('[data-acervo-busca]')){
   const q=ev.target.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -306,7 +307,7 @@ document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && $('#moda
 // ---------- Início ----------
 estado.rota = lerRota();
 if (estado.rota.tela === 'novo') estado.criador = novoRascunho();
-if (estado.rota.tela === 'acervo' && estado.rota.livro === 'sah') abrirLivroDigital('sah',estado.rota.pagina);
+if (estado.rota.tela === 'acervo' && estado.rota.livro) abrirLivroDigital(estado.rota.livro, estado.rota.pagina);
 render();
 Promise.all([carregarTextos(),carregarSuplementos(),carregarReferenciasSAH()]).then(render);
 try { navigator.storage?.persist?.(); } catch {}

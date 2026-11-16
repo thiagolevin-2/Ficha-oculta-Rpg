@@ -1,11 +1,15 @@
+import { sofrerDano, resolverCondicoesDoTurno } from './dano.js?v=0.20.2';
+import { AMEACAS_BASE } from './bestiario.js?v=0.20.2';
 // mestre.js — Área do Mestre (primeira versão): Ameaças, Combate (iniciativa), Anotações e Backup.
 // Ideia do dm-manager do Arcana, com o "bloco de ameaça" do Ordem Paranormal.
-import { ELEMENTOS, ATRIBUTOS } from './catalogo.js?v=0.18';
-import { derivar } from './regras.js?v=0.18';
-import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.18';
-import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal } from './util.js?v=0.18';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.18';
-import { rolarTeste } from './dados.js?v=0.18';
+import { ELEMENTOS, ATRIBUTOS, CONDICOES } from './catalogo.js?v=0.20.2';
+import { iniciarTurno, encerrarTurno, fimDeCena } from './turnos.js?v=0.20.2';
+import { temPeso } from './idade.js?v=0.20.2';
+import { derivar } from './regras.js?v=0.20.2';
+import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.20.2';
+import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal } from './util.js?v=0.20.2';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.20.2';
+import { d as dado, rolarTeste } from './dados.js?v=0.20.2';
 
 const txt = (v, m = 200) => (typeof v === 'string' ? v : v == null ? '' : String(v)).slice(0, m);
 const FORMULA = /^[0-9d+\-\s]{0,40}$/i;
@@ -30,7 +34,7 @@ export function normalizarAmeaca(a) {
 function normalizarMestre(m) {
   m = m && typeof m === 'object' ? m : {};
   return {
-    aba: ['combate', 'ameacas', 'anotacoes'].includes(m.aba) ? m.aba : 'combate',
+    aba: ['combate', 'ameacas', 'anotacoes', 'cenas'].includes(m.aba) ? m.aba : 'combate',
     ameacas: (Array.isArray(m.ameacas) ? m.ameacas : []).slice(0, 300).map(normalizarAmeaca),
     combate: {
       rodada: inteiro(m.combate?.rodada, 1, 999, 1), vez: inteiro(m.combate?.vez, 0, 99, 0), ativo: !!m.combate?.ativo,
@@ -38,6 +42,15 @@ function normalizarMestre(m) {
         uid: txt(p?.uid, 60) || uid(), nome: txt(p?.nome, 80) || '?', tipo: p?.tipo === 'agente' ? 'agente' : 'ameaca', ref: txt(p?.ref, 60),
         ini: p?.ini == null || p.ini === '' ? null : inteiro(p.ini, -50, 99, 0), pv: inteiro(p?.pv, -9999, 99999, 0), pvMax: inteiro(p?.pvMax, 1, 99999, 1), nota: txt(p?.nota, 200),
       })),
+    },
+    cenas: {
+      tipo: ['investigacao', 'perseguicao', 'furtividade', 'fabricacao', 'interpretacao'].includes(m.cenas?.tipo) ? m.cenas.tipo : 'investigacao',
+      nome: txt(m.cenas?.nome, 100), objetivo: txt(m.cenas?.objetivo, 200),
+      rodada: inteiro(m.cenas?.rodada, 1, 999, 1), sucessos: inteiro(m.cenas?.sucessos, 0, 999), falhas: inteiro(m.cenas?.falhas, 0, 999),
+      agentes: Object.fromEntries(Object.entries(m.cenas?.agentes || {}).slice(0, 40).map(([id, p]) => [id, {
+        sucessos: inteiro(p?.sucessos, 0, 99), falhas: inteiro(p?.falhas, 0, 99), visibilidade: inteiro(p?.visibilidade, 0, 99),
+      }])),
+      registro: (Array.isArray(m.cenas?.registro) ? m.cenas.registro : []).slice(-80).map(x => txt(x, 300)),
     },
     anotacoes: txt(m.anotacoes, 40000),
   };
@@ -48,24 +61,30 @@ export const pegarMestre = () => mestre;
 
 // ---------- Telas ----------
 export function telaMestre(fichas) {
-  const abas = [['combate', 'Combate'], ['ameacas', `Ameaças (${mestre.ameacas.length})`], ['anotacoes', 'Anotações']];
-  const corpo = mestre.aba === 'ameacas' ? abaAmeacas() : mestre.aba === 'anotacoes' ? abaAnotacoes() : abaCombate(fichas);
+  const abas = [['combate', 'Combate'], ['ameacas', `Ameaças (${mestre.ameacas.length})`], ['cenas', 'Cenas'], ['anotacoes', 'Anotações']];
+  const corpo = mestre.aba === 'ameacas' ? abaAmeacas() : mestre.aba === 'anotacoes' ? abaAnotacoes() : mestre.aba === 'cenas' ? abaCenas(fichas) : abaCombate(fichas);
   return `<div class="pagina"><div class="titulo-secao"><h1 class="faixa sangue">Área do Mestre</h1><div class="linha"><button class="btn pequeno" data-acao="m-backup">Backup</button><button class="btn pequeno fantasma" data-acao="m-restaurar">Restaurar</button></div></div>
   <nav class="abas" role="tablist">${abas.map(([id, n]) => `<button role="tab" data-acao="m-aba" data-aba="${id}" aria-selected="${mestre.aba === id}">${n}</button>`).join('')}</nav>${corpo}</div>`;
 }
 
 function abaCombate(fichas) {
   const c = mestre.combate;
-  const ordem = [...c.participantes];
+  const ordem = c.participantes.map(p => {
+    const ficha = p.tipo === 'agente' && p.ref ? fichas.find(f => f.id === p.ref) : null;
+    if (!ficha) return p;
+    const d = derivar(ficha);
+    return { ...p, nome: ficha.nome || p.nome, pv: d.atual.pv, pvMax: d.pv, condicoes: ficha.condicoes };
+  });
   return `<div class="grade c2" style="grid-template-columns:minmax(0,2fr) minmax(260px,1fr)">
   <section class="painel"><div class="titulo-secao"><h2 class="faixa">Rodada ${c.rodada}</h2>
-    <div class="linha"><button class="btn pequeno" data-acao="m-rolar-ini">Rolar iniciativa das ameaças</button><button class="btn pequeno" data-acao="m-ordenar">Ordenar</button><button class="btn pequeno sangue" data-acao="m-proximo">Próximo turno →</button></div></div>
+    <div class="linha"><button class="btn pequeno" data-acao="m-rolar-ini">Rolar iniciativa das ameaças</button><button class="btn pequeno" data-acao="m-ordenar">Ordenar</button><button class="btn pequeno sangue" data-acao="m-proximo">${c.ativo ? 'Próximo turno →' : 'Iniciar turnos'}</button></div></div>
     ${ordem.length ? `<div class="iniciativa">${ordem.map((p, i) => `<div class="ini-linha ${i === c.vez ? 'vez' : ''} ${p.pv <= 0 ? 'caido' : ''}">
       <input type="number" class="ini" data-m-part="${i}.ini" id="mp-ini-${i}" value="${p.ini ?? ''}" placeholder="—" aria-label="Iniciativa de ${esc(p.nome)}">
       <div><b>${esc(p.nome)}</b> <small class="apagado">${p.tipo === 'agente' ? 'agente' : 'ameaça'}</small>
         <div class="linha" style="gap:6px;margin-top:4px"><span class="dossie-txt">PV</span><input type="number" style="width:80px" data-m-part="${i}.pv" id="mp-pv-${i}" value="${p.pv}" aria-label="PV de ${esc(p.nome)}"><span class="apagado">/ ${p.pvMax}</span>
         <input type="number" style="width:70px" id="mp-q-${i}" placeholder="qtd" aria-label="Quantidade"><button class="btn pequeno" data-acao="m-dano" data-i="${i}" data-s="-1">Dano</button><button class="btn pequeno" data-acao="m-dano" data-i="${i}" data-s="1">Cura</button>
         ${p.tipo === 'ameaca' ? `<span class="etiqueta">${estadoPV(p)}</span>` : ''}</div>
+        ${p.condicoes ? `<button class="btn pequeno" data-acao="m-condicoes" data-i="${i}">Condições</button> <small>${p.condicoes.map(id => esc(CONDICOES.find(c => c.id === id)?.nome || id)).join(' · ')}</small>` : ''}
         <input data-m-part="${i}.nota" id="mp-nota-${i}" value="${esc(p.nota)}" placeholder="condições, anotações…" style="margin-top:4px;min-height:30px;font-size:.9rem" aria-label="Anotação"></div>
       <div class="linha" style="flex-direction:column;gap:2px">${p.tipo === 'ameaca' ? `<button class="icone-btn" data-acao="m-ver" data-ref="${esc(p.ref)}" aria-label="Ver ficha">👁</button>` : ''}<button class="icone-btn" data-acao="m-tirar" data-i="${i}" aria-label="Tirar do combate">✕</button></div>
     </div>`).join('')}</div>` : '<p class="vazio">Ninguém no combate. Adicione agentes e ameaças ao lado.</p>'}
@@ -82,7 +101,7 @@ function abaCombate(fichas) {
 function estadoPV(p) { const r = p.pv / p.pvMax; return p.pv <= 0 ? 'Caído' : r <= 0.5 ? 'Machucado' : r < 1 ? 'Ferido' : 'Ileso'; }
 
 function abaAmeacas() {
-  return `<div class="linha" style="margin-bottom:12px"><button class="btn sangue" data-acao="m-nova-ameaca">+ Nova ameaça</button><button class="btn" data-acao="m-importar-ameaca">Importar</button></div>
+  return `<div class="linha" style="margin-bottom:12px"><button class="btn sangue" data-acao="m-nova-ameaca">+ Nova ameaça</button><button class="btn" data-acao="m-importar-ameaca">Importar</button><button class="btn" data-acao="m-bestiario">Bestiário inicial</button></div>
   ${mestre.ameacas.length ? `<div class="grade c2">${mestre.ameacas.map(blocoAmeaca).join('')}</div>` : '<p class="vazio">Nenhuma ameaça. Crie a primeira com os números do livro (VD, PV, Defesa, ataques…).</p>'}`;
 }
 function blocoAmeaca(a) {
@@ -101,6 +120,45 @@ function blocoAmeaca(a) {
     <div class="linha fim" style="margin-top:8px"><button class="btn pequeno" data-acao="m-editar-ameaca" data-id="${a.id}">Editar</button><button class="btn pequeno" data-acao="m-duplicar-ameaca" data-id="${a.id}">Duplicar</button><button class="btn pequeno perigo" data-acao="m-apagar-ameaca" data-id="${a.id}">Apagar</button></div>
   </article>`;
 }
+function progressoCena(cena, id) {
+  if (!Object.hasOwn(cena.agentes, id)) Object.defineProperty(cena.agentes, id, { enumerable: true, value: { sucessos: 0, falhas: 0, visibilidade: 0 } });
+  return cena.agentes[id];
+}
+
+const TIPOS_CENA = { investigacao: 'Investigação', perseguicao: 'Perseguição', furtividade: 'Furtividade', fabricacao: 'Fabricação em campo', interpretacao: 'Interpretação' };
+
+function abaCenas(fichas) {
+  const cena = mestre.cenas;
+  const dicas = {
+    investigacao: 'Registre pistas, eventos e ações. O mestre define a urgência e a DT de cada ação.',
+    perseguicao: 'Registre os resultados da presa. O mestre resolve a captura e a fuga segundo o cenário e os poderes ativos.',
+    furtividade: 'Registre o objetivo e os obstáculos. O mestre determina quem percebe cada ação.',
+    fabricacao: 'Anote o item, material e ferramentas antes de resolver o teste.',
+    interpretacao: 'Registre decisões e resultados da cena.',
+  };
+  return `<section class="painel"><div class="titulo-secao"><h2 class="faixa">Cena</h2><span class="etiqueta">Rodada ${cena.rodada}</span></div>
+    <div class="grade c3">
+      <label class="campo"><span>Tipo</span><select data-m-cena="tipo">${Object.entries(TIPOS_CENA).map(([id, nome]) => `<option value="${id}" ${cena.tipo === id ? 'selected' : ''}>${nome}</option>`).join('')}</select></label>
+      <label class="campo"><span>Nome</span><input data-m-cena="nome" value="${esc(cena.nome)}"></label>
+      <label class="campo"><span>Objetivo</span><input data-m-cena="objetivo" value="${esc(cena.objetivo)}"></label>
+    </div><p class="apagado">${dicas[cena.tipo]}</p>
+    <div class="linha"><button class="btn" data-acao="m-cena-rodada">Próxima rodada</button><button class="btn" data-acao="m-cena-contar" data-id="sucessos">Sucesso · ${cena.sucessos}</button><button class="btn" data-acao="m-cena-contar" data-id="falhas">Falha · ${cena.falhas}</button></div>
+    <div class="grade c3" style="margin-top:12px"><label class="campo"><span>Agente</span><select id="cena-agente"><option value="">—</option>${fichas.map(f => `<option value="${esc(f.id)}">${esc(f.nome || 'Agente')}</option>`).join('')}</select></label><label class="campo"><span>DT</span><input type="number" id="cena-dt" min="1" max="99" value="15"></label><label class="campo"><span>Resultado do teste</span><input id="cena-resultado" type="number"></label></div>
+    ${['perseguicao', 'furtividade'].includes(cena.tipo) ? `<div class="lista-hab">${fichas.map(f => {
+      const p = cena.agentes[f.id] || { sucessos: 0, falhas: 0, visibilidade: 0 };
+      const falhas = f.trilha === 'perseverante' && derivar(f).trilhaHabs.some(h => h.nome === 'Fuga Obstinada' && h.liberada) ? 4 : 3;
+      return `<div class="hab"><b>${esc(f.nome || 'Agente')}</b> · ${cena.tipo === 'perseguicao'
+        ? `${p.sucessos}/3 sucessos · ${p.falhas}/${falhas} falhas ${p.sucessos >= 3 ? '· venceu' : p.falhas >= falhas ? '· perdeu' : ''}`
+        : `Visibilidade ${p.visibilidade} ${p.visibilidade >= 3 ? '· exposto' : ''} <button class="btn pequeno" data-acao="m-visibilidade" data-id="${esc(f.id)}" data-d="-1">−1</button> <button class="btn pequeno" data-acao="m-visibilidade" data-id="${esc(f.id)}" data-d="1">+1</button>`}</div>`;
+    }).join('')}</div>` : ''}
+    ${cena.tipo === 'furtividade' ? `<p>Visibilidade total: ${fichas.reduce((total, f) => total + (cena.agentes[f.id]?.visibilidade || 0), 0)}. Na regra de grupo, com 5 ou mais ao fim da rodada, personagens com visibilidade positiva são vistos.</p>` : ''}
+    ${cena.tipo === 'fabricacao' ? `<ul>${fichas.flatMap(f => f.projetosFabricacao.map(p => `<li>${esc(f.nome)} · ${esc(p.nome)} · DT ${p.dt} · ${p.feitas}/${p.exigidas} ações</li>`)).join('')}</ul>` : ''}
+    <div class="linha"><input id="cena-registro" aria-label="Evento, pista ou ação" placeholder="Evento, pista ou ação"><button class="btn sangue" data-acao="m-cena-registrar">Registrar</button></div>
+    <ul>${cena.registro.slice().reverse().map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+    <button class="btn perigo" data-acao="m-cena-reiniciar">Nova cena</button>
+  </section>`;
+}
+
 function abaAnotacoes() {
   return `<section class="painel"><h2 class="faixa">Anotações do mestre</h2><textarea id="m-anotacoes" data-m-anotacoes style="min-height:50vh" placeholder="Pistas, NPCs, cronologia da missão, segredos…">${esc(mestre.anotacoes)}</textarea><p class="apagado">Salva sozinho, só neste navegador. Use Backup para guardar.</p></section>`;
 }
@@ -129,6 +187,22 @@ function lerForm(base) {
 }
 
 // ---------- Ações ----------
+function fichaVinculada(ctx, participante) {
+  return participante?.tipo === 'agente' && participante.ref ? ctx?.fichas().find(f => f.id === participante.ref) : undefined;
+}
+
+function atualizaPv(ctx, participante, valor) {
+  const ficha = fichaVinculada(ctx, participante);
+  const dd = ficha ? derivar(ficha) : null;
+  const pv = Math.min(dd?.pv ?? participante.pvMax, Number(valor) || 0);
+  participante.pv = pv;
+  if (ficha) {
+    ficha.recursos.pv = pv;
+    if (pv > 0) ficha.recursos.morrendo = 0;
+    ctx.salvarFicha(ficha);
+  }
+}
+
 export function acoesMestre(ctx) {
   const att = () => { gravar(); ctx.render(); };
   const ameaca = id => mestre.ameacas.find(a => a.id === id);
@@ -149,8 +223,71 @@ export function acoesMestre(ctx) {
       const arq = await escolherArquivo('.json,application/json'); if (!arq) return;
       try { const j = JSON.parse(await arq.text()); const lista = Array.isArray(j) ? j : j.ameacas || [j]; lista.slice(0, 300).forEach(a => mestre.ameacas.push(normalizarAmeaca({ ...a, id: uid() }))); att(); ctx.avisar(`${lista.length} ameaça(s) importada(s).`); } catch { ctx.avisar('Arquivo inválido.', true); }
     },
+    'm-cena-rodada': () => {
+      const cena = mestre.cenas;
+      cena.rodada = Math.min(999, cena.rodada + 1);
+      att();
+    },
+    'm-cena-contar': el => {
+      const k = el.dataset.id;
+      if (k === 'sucessos' || k === 'falhas') mestre.cenas[k]++;
+      att();
+    },
+    'm-visibilidade': el => {
+      const ficha = ctx.fichas().find(f => f.id === el.dataset.id);
+      if (!ficha) return;
+      const p = progressoCena(mestre.cenas, ficha.id);
+      p.visibilidade = Math.min(99, Math.max(0, p.visibilidade + (Number(el.dataset.d) < 0 ? -1 : 1)));
+      att();
+    },
+    'm-cena-registrar': () => {
+      const cena = mestre.cenas, entrada = document.getElementById('cena-registro').value.trim();
+      const resultado = document.getElementById('cena-resultado').value;
+      if (!entrada && resultado === '') return;
+      const ficha = ctx.fichas().find(f => f.id === document.getElementById('cena-agente').value);
+      const dt = inteiro(document.getElementById('cena-dt').value, 1, 99, 15);
+      let teste = '';
+      if (resultado !== '') {
+        const sucesso = Number(resultado) >= dt;
+        const chave = sucesso ? 'sucessos' : 'falhas';
+        cena[chave]++;
+        if (ficha && cena.tipo === 'perseguicao') progressoCena(cena, ficha.id)[chave]++;
+        teste = ` · ${sucesso ? 'sucesso' : 'falha'} (${resultado} / DT ${dt})`;
+      }
+      cena.registro = [...cena.registro, txt(`R${cena.rodada} · ${ficha ? ficha.nome + ' · ' : ''}${entrada || 'Teste'}${teste}`, 300)].slice(-80);
+      att();
+    },
+    'm-cena-reiniciar': () => {
+      if (!confirm('Limpar os registros desta cena?')) return;
+      mestre.cenas = normalizarMestre({}).cenas;
+      att();
+    },
+    'm-condicoes': el => {
+      const ficha = fichaVinculada(ctx, mestre.combate.participantes[Number(el.dataset.i)]);
+      if (!ficha) return;
+      abrirModal('Condições · ' + ficha.nome, `<div class="grade c2">${CONDICOES.map(c => `<label class="check"><input type="checkbox" data-m-cond="${c.id}" ${ficha.condicoes.includes(c.id) ? 'checked' : ''}><span>${esc(c.nome)}</span></label>`).join('')}</div>`,
+        `<button class="btn sangue" data-acao="m-salvar-condicoes" data-i="${Number(el.dataset.i)}">Salvar</button>`, true);
+    },
+    'm-salvar-condicoes': el => {
+      const ficha = fichaVinculada(ctx, mestre.combate.participantes[Number(el.dataset.i)]);
+      if (!ficha) return;
+      ficha.condicoes = [...document.querySelectorAll('[data-m-cond]:checked')].map(x => x.dataset.mCond);
+      ctx.salvarFicha(ficha); fecharModal(); att();
+    },
+    'm-bestiario': () => abrirModal('Bestiário inicial', `<div class="cartoes">${AMEACAS_BASE.map((a, i) => `<button class="cartao" data-acao="m-bestiario-incluir" data-i="${i}"><b>${esc(a.nome)}</b><small>VD ${a.vd} · ${a.pv} PV · Defesa ${a.defesa}</small></button>`).join('')}</div>`, ''),
+    'm-bestiario-incluir': el => {
+      const entrada = AMEACAS_BASE[Number(el.dataset.i)];
+      if (!entrada) return;
+      mestre.ameacas.push(normalizarAmeaca(entrada)); fecharModal(); att();
+    },
     'm-add-agente': el => {
       const f = ctx.fichas().find(x => x.id === el.dataset.id); if (!f) return; const d = derivar(f);
+      if (mestre.combate.participantes.some(p => p.tipo === 'agente' && p.ref === f.id)) return;
+      if (mestre.combate.rodada === 1 && temPeso(f, 'distraido')) {
+        f.condicoes = [...new Set([...f.condicoes, 'surpreendido'])];
+        f.usosCena.surpresaIdade = 1;
+        ctx.salvarFicha(f);
+      }
       mestre.combate.participantes.push({ uid: uid(), nome: f.nome || 'Agente', tipo: 'agente', ref: f.id, ini: null, pv: d.atual.pv, pvMax: d.pv, nota: '' }); att();
     },
     'm-add-livre': () => { const i = document.getElementById('m-nome-livre'); const nome = i?.value.trim(); if (!nome) return i?.focus(); mestre.combate.participantes.push({ uid: uid(), nome, tipo: 'agente', ref: '', ini: null, pv: 1, pvMax: 1, nota: '' }); att(); },
@@ -163,10 +300,51 @@ export function acoesMestre(ctx) {
       mestre.combate.participantes.sort((x, y) => (y.ini ?? -99) - (x.ini ?? -99)); mestre.combate.vez = 0; att(); ctx.avisar('Iniciativa das ameaças rolada. Peça aos jogadores as deles.');
     },
     'm-ordenar': () => { mestre.combate.participantes.sort((x, y) => (y.ini ?? -99) - (x.ini ?? -99)); mestre.combate.vez = 0; att(); },
-    'm-proximo': () => { const c = mestre.combate; if (!c.participantes.length) return; c.vez++; if (c.vez >= c.participantes.length) { c.vez = 0; c.rodada++; } att(); },
-    'm-dano': el => { const i = Number(el.dataset.i); const q = inteiro(document.getElementById('mp-q-' + i)?.value, 0, 99999, 0); if (!q) return; const p = mestre.combate.participantes[i]; p.pv = Math.min(p.pvMax, p.pv + q * Number(el.dataset.s)); att(); },
+    'm-proximo': () => {
+      const c = mestre.combate;
+      if (!c.participantes.length) return;
+      const atual = fichaVinculada(ctx, c.participantes[c.vez]);
+      if (c.ativo && atual) { encerrarTurno(atual); ctx.salvarFicha(atual); }
+      if (c.ativo && ++c.vez >= c.participantes.length) {
+        c.vez = 0; c.rodada++;
+        for (const p of c.participantes) {
+          const ficha = fichaVinculada(ctx, p);
+          if (ficha?.usosCena.surpresaIdade) {
+            ficha.condicoes = ficha.condicoes.filter(x => x !== 'surpreendido');
+            delete ficha.usosCena.surpresaIdade;
+            ctx.salvarFicha(ficha);
+          }
+        }
+      }
+      c.ativo = true;
+      const ficha = fichaVinculada(ctx, c.participantes[c.vez]);
+      if (ficha) {
+        iniciarTurno(ficha);
+        const d = derivar(ficha);
+        for (const msg of resolverCondicoesDoTurno(ficha, derivar)) ctx.avisar(`${ficha.nome}: ${msg}`);
+        if (d.atual.pv <= 0) ficha.recursos.morrendo = Math.min(3, ficha.recursos.morrendo + 1);
+        if (!d.pd && d.atual.san <= 0) ficha.recursos.enlouquecendo = Math.min(3, ficha.recursos.enlouquecendo + 1);
+        if (temPeso(ficha, 'tosse') && dado(6) === 1) ctx.avisar(`${ficha.nome}: crise de tosse, perde este turno.`);
+        ctx.salvarFicha(ficha);
+      }
+      att();
+    },
+    'm-dano': el => { const i = Number(el.dataset.i); const q = inteiro(document.getElementById('mp-q-' + i)?.value, 0, 99999, 0); if (!q) return; const p = mestre.combate.participantes[i]; if (!p) return; const ficha = fichaVinculada(ctx, p); const d = ficha ? derivar(ficha) : null;
+      if (ficha && Number(el.dataset.s) < 0) {
+        sofrerDano(ficha, d, q, { rd: d.rd });
+        p.pv = ficha.recursos.pv;
+        ctx.salvarFicha(ficha);
+      } else atualizaPv(ctx, p, (d?.atual.pv ?? p.pv) + q * Number(el.dataset.s));
+      att(); },
     'm-tirar': el => { mestre.combate.participantes.splice(Number(el.dataset.i), 1); mestre.combate.vez = Math.min(mestre.combate.vez, Math.max(0, mestre.combate.participantes.length - 1)); att(); },
-    'm-encerrar': () => { if (!confirm('Encerrar o combate e limpar a lista?')) return; mestre.combate = { rodada: 1, vez: 0, ativo: false, participantes: [] }; att(); },
+    'm-encerrar': () => { if (!confirm('Encerrar o combate e limpar a lista?')) return; for (const p of mestre.combate.participantes) {
+      const ficha = fichaVinculada(ctx, p);
+      if (ficha) {
+        if (ficha.usosCena.surpresaIdade) ficha.condicoes = ficha.condicoes.filter(x => x !== 'surpreendido');
+        fimDeCena(ficha); ctx.salvarFicha(ficha);
+      }
+    }
+    mestre.combate = { rodada: 1, vez: 0, ativo: false, participantes: [] }; att(); },
     'm-backup': () => baixarArquivo(`backup-mestre-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ tipo: 'fichaoculta-mestre', versao: 1, mestre }, null, 2)),
     'm-restaurar': async () => {
       const arq = await escolherArquivo('.json,application/json'); if (!arq) return;
@@ -174,8 +352,16 @@ export function acoesMestre(ctx) {
     },
   };
 }
-export function campoMestre(el) {
-  if (el.dataset.mPart) { const [i, k] = el.dataset.mPart.split('.'); const p = mestre.combate.participantes[Number(i)]; if (!p) return false; p[k] = k === 'nota' ? txt(el.value, 200) : el.value === '' ? null : inteiro(el.value, -9999, 99999, 0); gravar(); return k === 'nota' ? 'leve' : 'leve'; }
+export function campoMestre(el, ctx, final = true) {
+  if (el.dataset.mCena) {
+    const k = el.dataset.mCena;
+    if (k === 'tipo' && !final) return 'leve';
+    if (k === 'tipo' && Object.hasOwn(TIPOS_CENA, el.value)) mestre.cenas.tipo = el.value;
+    if (['nome', 'objetivo'].includes(k)) mestre.cenas[k] = txt(el.value, k === 'nome' ? 100 : 200);
+    gravar();
+    return k === 'tipo' ? 'cheio' : 'leve';
+  }
+  if (el.dataset.mPart) { const [i, k] = el.dataset.mPart.split('.'); const p = mestre.combate.participantes[Number(i)]; if (!p) return false; if (k === 'pv') { if (!final) return 'leve'; atualizaPv(ctx, p, inteiro(el.value, -9999, 99999)); gravar(); return 'cheio'; } p[k] = k === 'nota' ? txt(el.value, 200) : el.value === '' ? null : inteiro(el.value, -9999, 99999, 0); gravar(); return k === 'nota' ? 'leve' : 'leve'; }
   if ('mAnotacoes' in el.dataset) { mestre.anotacoes = txt(el.value, 40000); gravar(); return 'leve'; }
   return false;
 }

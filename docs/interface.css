@@ -314,3 +314,8 @@
  :root[data-tema] .roda-circulo,:root[data-tema] .recurso,:root[data-tema] .chave {background:white;color:#20231e;box-shadow:none}
  :root[data-tema] .tabela-rolagem {overflow:visible}
 }
+
+
+.etiqueta-origem { cursor: pointer; text-decoration: underline; text-underline-offset: 0.18em; }
+.origem-facsimile { display: flex; flex-wrap: wrap; gap: 12px; }
+.origem-facsimile img { display: block; max-width: 100%; width: auto; height: auto; object-fit: contain; align-self: flex-start; border-radius: 6px; }

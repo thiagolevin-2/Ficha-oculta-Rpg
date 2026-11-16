@@ -1,9 +1,10 @@
+import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.20.2';
 // catalogo.js — as regras do sistema escritas como DADOS.
 // Tudo aqui são números e nomes das regras + resumos curtos, escritos com outras palavras.
 // O texto oficial está nos livros (Livro de Regras = "LR"; Sobrevivendo ao Horror = "SaH").
 // Para mudar uma regra, mude aqui: as telas e o motor (regras.js) leem deste arquivo.
 
-import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.18';
+import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.20.2';
 
 export const NOME_DO_SITE = 'Ficha Oculta RPG';
 
@@ -15,6 +16,8 @@ export const MODOS = {
 
 // Regras opcionais do Sobrevivendo ao Horror (só aparecem no modo "sah")
 export const OPCIONAIS = {
+  idade: { nome: 'Personagens de Idade Variada', pagina: 'LR pp. 172–174', resumo: 'A faixa etária altera atributos, origem, recursos e progressão.' },
+  municao: { nome: 'Contagem de Munição', pagina: 'LR p. 174', resumo: 'Controla disparos, carregador e reserva por arma.' },
   determinacao: { nome: 'Jogando sem Sanidade (Determinação)', pagina: 'SaH p. 104', resumo: 'PE e Sanidade viram uma só reserva: Pontos de Determinação (PD). Dano mental e custos saem dos PD.' },
   nivelExp: { nome: 'NEX & Nível de Experiência', pagina: 'SaH p. 98', resumo: 'A evolução da classe passa a ser por nível (1 a 20). O NEX vira só a exposição ao paranormal e começa em 0%.' },
   patentes: { nome: 'Evolução por Patentes', pagina: 'SaH p. 108', resumo: 'Em vez de 20 níveis, o agente sobe por 5 patentes. Fichas mais leves e agentes menos poderosos. Exige Determinação.' },
@@ -108,6 +111,14 @@ const progPadrao = extra => {
 };
 
 export const CLASSES = {
+  mundano: {
+    nome: 'Mundano', fonte: 'LR', lema: 'Uma pessoa comum antes do primeiro contato.',
+    pv: [8, 0], pe: [1, 0], san: [8, 0], pd: [4, 0],
+    patente: { pv: [8, 0], pd: [4, 0] },
+    pericias: { fixas: [], livres: 1 }, proficiencias: ['Armas simples'], prof: { simples: true },
+    grauTreinamento: 0, prog: {},
+    habilidades: [{ nome: 'Empenho', nivel: 1, resumo: 'Gaste 1 PE para receber +2 em um teste de perícia.' }],
+  },
   combatente: {
     nome: 'Combatente', fonte: 'LR',
     lema: 'Linha de frente: armas, força e coragem.',
@@ -363,14 +374,14 @@ export const TRILHAS = [
   T('perseverante', 'Perseverante', 'especialista', [
     [2, 'Soluções Improvisadas', 'Quando um teste dá errado, pode rolar de novo dados desse teste (uma vez por teste) e ficar com o melhor resultado. O custo não saiu legível no livro digitalizado.'],
     [8, 'Fuga Obstinada', 'Bônus em testes para fugir de um inimigo (dentro ou fora de perseguição); como presa numa perseguição, aguenta até 4 falhas antes de ser pego.'],
-    [13, 'Determinação Inquestionável', 'Resiste melhor a condições e efeitos que o derrubariam.'],
-    [20, 'Só Mais um Passo', 'Mesmo à beira da morte, continua de pé por mais um pouco.'],
+    [13, 'Determinação Inquestionável', 'Uma vez por cena, uma ação padrão e 5 PE removem uma condição de medo, mental ou de paralisia permitida pelo mestre. SaH p. 24.'],
+    [20, 'Só Mais um Passo', 'Uma vez por rodada, 5 PE deixam você com 1 PV quando um dano o reduziria a 0. Dano massivo ignora esta habilidade. SaH p. 24.'],
   ], 'SaH', { aviso: 'NEX 65% e 99%: o texto dessas habilidades não saiu no livro digitalizado; os resumos são aproximados. Confira no livro Sobrevivendo ao Horror, p. 24 (PDF p. 25).' }),
   T('muambeiro', 'Muambeiro', 'especialista', [
     [2, 'Mascate', 'Treina uma Profissão (armeiro, engenheiro ou químico), +5 de carga e fabrica itens improvisados mais fácil.', { carga: 5 }],
     [8, 'Fabricação Própria', 'Fabrica itens mundanos na metade do tempo.'],
-    [13, 'Laboratório de Campo', 'Pode fabricar e consertar itens paranormais em campo.'],
-    [20, 'Achado Conveniente', 'Consegue o item certo na hora certa, com mais frequência.'],
+    [13, 'Laboratório de Campo', 'Escolha treinamento em Profissão (armeiro, engenheiro ou químico), ou +5 numa delas se já tiver treino. Pode fabricar e consertar itens paranormais. A fabricação usa três ações de interlúdio, inclusive não consecutivas. SaH p. 25.'],
+    [20, 'Achado Conveniente', 'Ação completa e 5 PE produzem um item não paranormal de até categoria III, com justificativa aprovada pelo mestre. O item deixa de funcionar ao fim da cena. SaH p. 25.'],
   ], 'SaH', { aviso: 'NEX 65% e 99%: o texto dessas habilidades não saiu no livro digitalizado; os resumos são aproximados. Confira no livro Sobrevivendo ao Horror, p. 25 (PDF p. 26).' }),
   // Ocultista (LR)
   T('conduite', 'Conduíte', 'ocultista', [
@@ -573,6 +584,7 @@ const A = (nome, prof, uso, cat, dano, critico, alcance, tipo, espacos, maos = 1
   const [margem, mult] = String(critico).includes('/') ? [Number(critico.split('/')[0]), Number(critico.split('/')[1].slice(1))] : critico.startsWith('x') ? [20, Number(critico.slice(1))] : [Number(critico), 2];
   return { nome, prof, uso, categoria: cat, dano, margem, mult, alcance, tipo, espacos, maos };
 };
+const ASaH = (...args) => ({ ...A(...args), fonte: 'SaH' });
 export const ARMAS = [
   A('Coronhada', 'simples', 'corpo', 0, '1d4', 'x2', '—', 'I', 0),
   A('Faca', 'simples', 'corpo', 0, '1d4', '19', 'Curto', 'C', 1),
@@ -609,11 +621,32 @@ export const ARMAS = [
   A('Bazuca', 'pesadas', 'fogo', 3, '10d8', 'x2', 'Médio', 'I', 2, 2),
   A('Lança-chamas', 'pesadas', 'fogo', 3, '6d6', 'x2', 'Curto', 'F', 2, 2),
   A('Metralhadora', 'pesadas', 'fogo', 2, '2d12', '19/x3', 'Médio', 'B', 2, 2),
+  { ...A('Garra do Harpia', 'taticas', 'corpo', 1, '2d8', '19', 'Curto', 'C', 2, 2), fonte: 'AS03', nota: 'Ágil e arremessável. A manobra adicional depende da ação do usuário.' },
+  { ...A('Lança-nitrogênio', 'pesadas', 'fogo', 3, '6d6', 'x2', 'Curto', 'Fr', 2, 2), fonte: 'AS06', municao: 'Combustível', nota: 'Ataque em linha; Fortitude pode reduzir a condição, conforme AS06 p. 73.' },
+  { ...A('Designated Marksman Rifle', 'taticas', 'fogo', 3, '2d10', '19/x3', 'Médio', 'B', 3, 2), fonte: 'AS09', municao: 'Balas longas', nota: 'Bônus de mira para Pontaria veterana segundo AS09 p. 43.' },
+  { ...A('Pistola Taser', 'taticas', 'disparo', 2, '2d6', 'x3', 'Curto', 'E', 1), fonte: 'AS09', nota: 'Em acerto, confira o teste de resistência e efeito de atordoamento no AS09 p. 48.' },
+  { ...A('Espingarda Serrada', 'taticas', 'fogo', 1, '3d6', 'x3', 'Curto', 'B', 1), fonte: 'AS09', nota: 'Metade do dano em alcance superior ao indicado no AS09 p. 46.' },
+  { ...A('Machado Tático', 'taticas', 'corpo', 2, '1d8', 'x3', 'Curto', 'C', 1), fonte: 'AS09', nota: 'Ágil. Contra-ataque e bloqueio têm opções extras no AS09 p. 47.' },
+  ASaH('Pregador pneumático', 'simples', 'disparo', 0, '1d4', 'x4', 'Curto', 'P', 1),
+  ASaH('Estilingue', 'simples', 'disparo', 0, '1d4', 'x2', 'Curto', 'I', 1, 2),
+  ASaH('Revólver compacto', 'simples', 'fogo', 1, '2d4', '19/x3', 'Curto', 'P', 1),
+  ASaH('Baioneta', 'taticas', 'corpo', 0, '1d4', '19', '—', 'P', 1),
+  ASaH('Faca tática', 'taticas', 'corpo', 1, '1d6', '19', 'Curto', 'C', 1),
+  ASaH('Gancho de carne', 'taticas', 'corpo', 0, '1d4', 'x4', '—', 'P', 1),
+  ASaH('Bastão policial', 'taticas', 'corpo', 1, '1d6', 'x2', 'Curto', 'I', 1),
+  ASaH('Picareta', 'taticas', 'corpo', 0, '1d6', 'x4', '—', 'P', 1),
+  ASaH('Shuriken', 'taticas', 'arremesso', 1, '1d4', 'x2', 'Curto', 'P', 0.5),
+  ASaH('Pistola pesada', 'taticas', 'fogo', 1, '2d8', '18', 'Curto', 'B', 1),
+  ASaH('Espingarda de cano duplo', 'taticas', 'fogo', 2, '4d6', 'x3', 'Curto', 'B', 2, 2),
+  { ...ASaH('Fuzil alheio', 'taticas', 'fogo', 4, '2d10', '17/x3', 'Extremo', 'E', 2, 2), nota: 'Inclui mira laser e telescópica. Sem munição.' },
 ];
 export const PROTECOES = [
   { nome: 'Proteção leve', defesa: 5, categoria: 1, espacos: 2, peso: 'leve' },
   { nome: 'Proteção pesada', defesa: 10, categoria: 2, espacos: 5, peso: 'pesada', rd: 2, penalidade: 5 },
   { nome: 'Escudo', defesa: 2, categoria: 1, espacos: 2, peso: 'escudo' },
+  { nome: 'Armadura dos Couraças', defesa: 10, categoria: 3, espacos: 0, peso: 'pesada', nota: 'RD B/I/P 5, Sangue 10. Vulnerável a Morte. +1 Defesa por semana, até +20. AS03 p. 115.' },
+  { nome: 'Capacete Tático', defesa: 0, categoria: 2, espacos: 1, peso: 'pesada', nota: '25% de chance de ignorar dano extra de crítico ou furtivo. AS09 p. 43.' },
+  { nome: 'Escudo Balístico LED', defesa: 2, categoria: 2, espacos: 2, peso: 'escudo', nota: 'RD balístico 10 e efeitos de cobertura e luz. AS09 p. 46.' },
 ];
 export const ITENS_GERAIS = [
   { nome: 'Balas curtas', categoria: 0, espacos: 1 }, { nome: 'Balas longas', categoria: 1, espacos: 1 },
@@ -655,8 +688,10 @@ export const ITENS_LR = [
   { nome: 'Scanner de manifestação paranormal (elemento)', categoria: 2, espacos: 1, fonte: 'LR', grupo: 'Itens paranormais (Livro de Regras)', resumo: 'Ação padrão e 1 PE por rodada: indica a direção de manifestações do elemento em alcance longo.' },
 ];
 // Itens do Sobrevivendo ao Horror (cap. 1, "Equipamento"). Resumos com outras palavras; página = página do PDF digitalizado.
-// categoria/espacos null = a tabela do livro não saiu legível no OCR: o site usa cat. 0 e 1 espaço e avisa para conferir.
-const IS = (nome, grupo, pagina, resumo, extra = {}) => ({ nome, categoria: null, espacos: null, fonte: 'SaH', grupo, pagina, resumo, ...extra });
+const IS = (nome, grupo, pagina, resumo, extra = {}) => {
+  const [categoria, espacos] = MATERIAL_SAH[nome] || [null, null];
+  return { nome, categoria, espacos, fonte: 'SaH', grupo, pagina, resumo, ...extra };
+};
 export const ITENS_SAH = [
   // Acessórios (p. 40)
   IS('Amuleto sagrado', 'Acessórios', 40, 'Objeto de fé (rosário, contas, shimenawa…). Conta como item vestido: +2 em Religião e Vontade.'),
@@ -665,7 +700,7 @@ export const ITENS_SAH = [
   IS('Documentos falsos', 'Acessórios', 40, 'Identidade falsa completa: +2 em Diplomacia, Enganação e Intimidação para se passar por essa pessoa.'),
   IS('Manual operacional', 'Acessórios', 40, 'Um por perícia. Uma ação de interlúdio lendo: usa a perícia como treinado até o próximo interlúdio (o aprimorado dá também +5). Só um manual por vez.'),
   IS('Notebook', 'Acessórios', 40, 'Com internet, +2 em testes para obter informações. Ao relaxar no interlúdio, recupera +1 de Sanidade. A tela ilumina um cone de 4,5m. Inclui tablets.'),
-  IS('Bateria potente (modificação)', 'Acessórios', 40, 'Modificação para objetos elétricos: dobra a bateria e o alcance da luz; num taser, dobra os usos, dano 1d8 e +5 na DT.'),
+  // Modificação de acessório cadastrada no editor de itens.
   // Explosivos (p. 42)
   IS('Dinamite', 'Explosivos', 42, 'Ação padrão para acender e arremessar (alcance médio). Raio de 6m: 4d6 de impacto + 4d6 de fogo e fica em chamas (Reflexos DT Agi: metade e sem chamas).'),
   IS('Explosivo plástico', 'Explosivos', 42, 'Duas rodadas para preparar; detona por controle (alcance longo) ou com fogo/eletricidade. Raio de 3m: 16d6 de impacto (Reflexos DT Int: metade). Nas mãos de especialista, dano dobrado em estruturas e ignora RD.'),
@@ -707,7 +742,7 @@ export const ITENS_SAH = [
   IS('Pé de morto', 'Itens paranormais', 46, 'Botas de pele amaldiçoada: +5 em Furtividade; em cenas de furtividade, se mover de forma chamativa aumenta a visibilidade em só +1.'),
   IS('Pen drive selado', 'Itens paranormais', 46, 'Protegido por sigilos de Conhecimento: não pode ser invadido nem afetado por Energia; serve para invadir outros aparelhos sem contaminação.'),
   IS('Valete da salvação', 'Itens paranormais', 46, 'Ação padrão para jogar a carta: ela aponta a melhor rota de fuga em alcance médio e some. Numa perseguição, você consegue cortar caminho automaticamente.'),
-  IS('Lente de revelação (modificação)', 'Itens paranormais', 46, 'Para câmera de aura: vê seres invisíveis e incorpóreos. Ação padrão e 1 PE para fotografar uma criatura em alcance curto: até o fim da cena ela perde camuflagem e invisibilidade e fica corpórea (Vontade DT Pre evita).'),
+  // Modificação de acessório cadastrada no editor de itens.
   // Itens amaldiçoados por elemento (p. 58–62)
   IS('Conector de membros', 'Itens amaldiçoados', 58, 'Ação padrão para religar braço, perna ou cabeça decepados (até 3 rodadas). Quem estava morrendo ou morto fica inconsciente com 1 PV. 25% de a parte ganhar “vida própria” (lento, penalidade com o braço ou chance de ficar confuso).', { elemento: 'sangue' }),
   IS("Dose d'A Praga", 'Itens amaldiçoados', 58, 'Ação padrão: você ou alguém adjacente recebe Arma de Sangue, Sangue de Ferro e Sangue Vivo até o fim da cena. Depois, Fortitude (DT 20 +5 por dose anterior desde o interlúdio): se falhar, 2d4 de dano mental, mantém os poderes mais uma cena e fica sob Ódio Incontrolável.', { elemento: 'sangue' }),
@@ -716,12 +751,13 @@ export const ITENS_SAH = [
   IS('Ampulheta do tempo sofrido', 'Itens amaldiçoados', 59, 'Empunhada: 5 PE para receber na hora os benefícios de uma ação de interlúdio. Só pode usar de novo depois de gastar uma ação de interlúdio para “devolver o tempo”.', { elemento: 'morte' }),
   IS('Injeção de Lodo', 'Itens amaldiçoados', 60, 'Ação padrão, em você ou alguém adjacente que aceite: até o fim da cena, vulnerabilidade a balístico e Energia, mas na próxima vez que cairia a 0 PV fica com 1 PV.', { elemento: 'morte' }),
   IS('Instantâneo mortal', 'Itens amaldiçoados', 60, 'Foto dos últimos momentos de alguém. Ao procurar pistas com uma perícia ligada àquela morte, 1 PE: a imagem aponta uma direção útil (bônus no teste; valor ilegível no OCR).', { elemento: 'morte' }),
-  IS('Projétil de Lodo', 'Itens amaldiçoados', 60, 'Munição (curta ou longa) forjada com Lodo: todo o dano da arma vira Morte. No fim da cena a arma se degrada até se desfazer. Poderosa contra criaturas de Sangue.', { elemento: 'morte' }),
+  IS('Projétil de Lodo, curto', 'Itens amaldiçoados', 60, 'Munição (curta ou longa) forjada com Lodo: todo o dano da arma vira Morte. No fim da cena a arma se degrada até se desfazer. Poderosa contra criaturas de Sangue.', { elemento: 'morte' }),
+  IS('Projétil de Lodo, longo', 'Itens amaldiçoados', 60, 'Munição (curta ou longa) forjada com Lodo: todo o dano da arma vira Morte. No fim da cena a arma se degrada até se desfazer. Poderosa contra criaturas de Sangue.', { elemento: 'morte' }),
   IS('Rádio chiador', 'Itens amaldiçoados', 60, 'Ligado, chia se houver criatura paranormal em alcance extremo, mais alto quanto mais perto (dá direção e distância aproximadas). Atrai as criaturas que o ouvem. Pilhas duram 12 horas.', { elemento: 'morte' }),
   IS('Câmera obscura', 'Itens amaldiçoados', 60, 'Câmera de aura que já vem com a lente de revelação, com +10 na DT; se a criatura falhar, também sofre 6d6 de dano de frio (só criaturas com invisibilidade, incorporeidade ou camuflagem).', { elemento: 'conhecimento' }),
   IS('Enxame fantasmagórico', 'Itens amaldiçoados', 61, 'Manto de traças: vestido, deixa você invisível, mas sofre 1 de dano mental (ignora resistência) no início de cada turno.'),
   IS('Repositório do fracasso', 'Itens amaldiçoados', 61, 'Cada 1 tirado no d20 por uma criatura paranormal em alcance médio vira uma carga (máx. 6). Uma vez por rodada, gaste uma carga para recuperar 1d4 PE, com –1 cumulativo em Vontade até o próximo interlúdio.'),
-  IS('Tábula do saber custoso', 'Itens amaldiçoados', 61, 'Empunhada: age como treinado numa perícia por um teste, perdendo Sanidade igual ao atributo-chave dessa perícia.', { elemento: 'conhecimento' }),
+  IS('Tablet do saber custoso', 'Itens amaldiçoados', 61, 'Empunhada: age como treinado numa perícia por um teste, perdendo Sanidade igual ao atributo-chave dessa perícia.', { elemento: 'conhecimento' }),
   IS('Arreio neural', 'Itens amaldiçoados', 61, 'Usando o arreio, ao sofrer 5 ou mais de dano de eletricidade ou Energia, recupera 1 PE (máximo por dia: o dobro do seu Vigor).', { elemento: 'energia' }),
   IS('Centrifugador existencial', 'Itens amaldiçoados', 61, 'Ação padrão e 3 PE: você se divide e ganha um turno extra no fim da rodada; sorteie qual versão some. Ocultismo DT 15 (+5 por uso no dia): se falhar, perde metade dos atributos (recupera 1 de cada por interlúdio).', { elemento: 'energia' }),
   IS('Espelho refletor', 'Itens amaldiçoados', 62, 'Ação de movimento para ver um ponto fora do seu ângulo em alcance médio, com bônus em Percepção (valor ilegível no OCR), até atrás de cobertura total. Pode ser sacrificado para refletir de volta um dano de Energia.', { elemento: 'energia' }),
@@ -744,11 +780,11 @@ export const ACESSORIOS_AMALDICOADOS = [
   { nome: 'Acessório amaldiçoado: Vitalidade', categoria: null, espacos: null, fonte: 'LR', grupo: 'Acessórios amaldiçoados (Livro de Regras)', resumo: '+15 PV (depois de um dia de uso). Preço: perde 2 SAN ao falhar em testes do atributo do elemento.', elemento: 'sangue', notaCategoria: 'Categoria: a do acessório base +1 por maldição (Livro de Regras p. 147).' },
   { nome: 'Acessório amaldiçoado: Proteção Elemental', categoria: null, espacos: null, fonte: 'LR', grupo: 'Acessórios amaldiçoados (Livro de Regras)', resumo: 'Resistência 10 contra um elemento (conta como item desse elemento). Preço: perde 2 SAN ao falhar em testes do atributo do elemento.', elemento: 'variavel', notaCategoria: 'Categoria: a do acessório base +1 por maldição (Livro de Regras p. 147).' },
 ];
-export const ITENS_CATALOGO = [...ITENS_GERAIS, ...ITENS_LR, ...ITENS_SAH, ...ACESSORIOS_AMALDICOADOS];
+export const ITENS_CATALOGO = [...ITENS_GERAIS, ...ITENS_LR, ...ITENS_SAH, ...ITENS_ESPECIAIS, ...ITENS_ARQUIVOS, ...ACESSORIOS_AMALDICOADOS];
 export const ITEM_SAH = Object.fromEntries([...ITENS_SAH, ...ACESSORIOS_AMALDICOADOS].map(i => [i.nome, i]));
-export const ITEM_INFO = Object.fromEntries([...ITENS_LR, ...ITENS_SAH, ...ACESSORIOS_AMALDICOADOS].map(i => [i.nome, i])); // itens com descrição (botão ? na mochila)
+export const ITEM_INFO = Object.fromEntries([...ITENS_LR, ...ITENS_SAH, ...ITENS_ESPECIAIS, ...ITENS_ARQUIVOS, ...ACESSORIOS_AMALDICOADOS].map(i => [i.nome, i])); // itens com descrição (botão ? na mochila)
 export const DESLOCAMENTO_BASE = 9; // metros
-export const TIPOS_DANO = { B: 'balístico', C: 'corte', I: 'impacto', P: 'perfuração', F: 'fogo' };
+export const TIPOS_DANO = { B: 'balístico', C: 'corte', I: 'impacto', P: 'perfuração', F: 'fogo', E: 'Energia', Fr: 'frio' };
 
 // ---------- Condições (resumos curtos) ----------
 // "–1D" = um dado a menos no teste.
@@ -758,7 +794,7 @@ export const CONDICOES = [
   ['asfixiado', 'Asfixiado', 'Não respira; aguenta algumas rodadas e depois faz Fortitude.'], ['atordoado', 'Atordoado', 'Desprevenido e não age.'],
   ['caido', 'Caído', 'No chão: pior contra corpo a corpo, melhor contra distância, desloca pouco.'], ['cego', 'Cego', 'Desprevenido e lento; –2D em perícias de AGI e FOR.'],
   ['confuso', 'Confuso', 'Age de forma aleatória.'], ['debilitado', 'Debilitado', '–2D em AGI, FOR e VIG.'],
-  ['desprevenido', 'Desprevenido', '–5 na Defesa e –1D em Reflexos.'], ['em-chamas', 'Em chamas', 'Sofre dano de fogo por rodada até apagar.'],
+  ['doente', 'Doente', 'Sob efeito de uma doença.'], ['desprevenido', 'Desprevenido', '–5 na Defesa e –1D em Reflexos.'], ['em-chamas', 'Em chamas', 'Sofre dano de fogo por rodada até apagar.'],
   ['enjoado', 'Enjoado', 'Só uma ação padrão OU de movimento por rodada.'], ['enlouquecendo', 'Enlouquecendo', 'Sanidade 0. Três turnos assim na cena e o personagem fica insano.'],
   ['enredado', 'Enredado', 'Lento, vulnerável e –1D em ataques.'], ['envenenado', 'Envenenado', 'Depende do veneno.'],
   ['esmorecido', 'Esmorecido', '–2D em INT e PRE.'], ['exausto', 'Exausto', 'Debilitado, lento e vulnerável.'],
@@ -769,7 +805,7 @@ export const CONDICOES = [
   ['machucado', 'Machucado', 'Metade dos PV ou menos.'], ['morrendo', 'Morrendo', '0 PV. Três turnos assim na cena e o personagem morre.'],
   ['ofuscado', 'Ofuscado', '–1D em ataques e Percepção.'], ['paralisado', 'Paralisado', 'Imóvel e indefeso; só ações mentais.'],
   ['pasmo', 'Pasmo', 'Não age.'], ['perturbado', 'Perturbado', 'Metade da Sanidade ou menos: sofre um efeito de insanidade.'],
-  ['petrificado', 'Petrificado', 'Inconsciente, com RD 10.'], ['sangrando', 'Sangrando', 'Fortitude a cada turno; se falhar perde 1d6 PV.'],
+  ['petrificado', 'Petrificado', 'Inconsciente, com RD 10.'], ['sangrando', 'Sangrando', 'Teste de Vigor DT 20 no início do turno. Se falhar, perde 1d6 PV.'],
   ['surdo', 'Surdo', 'Não ouve; –2D em Iniciativa.'], ['surpreendido', 'Surpreendido', 'Desprevenido e não age na rodada.'],
   ['vulneravel', 'Vulnerável', '–2 na Defesa.'],
 ].map(([id, nome, resumo]) => ({ id, nome, resumo }));
@@ -778,7 +814,7 @@ export const EFEITO_CONDICAO = {
   abalado: { todos: -1 }, apavorado: { pericias: -2 }, cego: { agi: -2, for: -2 }, debilitado: { agi: -2, for: -2, vig: -2 },
   fraco: { agi: -1, for: -1, vig: -1 }, esmorecido: { int: -2, pre: -2 }, frustrado: { int: -1, pre: -1 },
   exausto: { agi: -2, for: -2, vig: -2, defesa: -2 }, fatigado: { agi: -1, for: -1, vig: -1, defesa: -2 },
-  desprevenido: { defesa: -5 }, vulneravel: { defesa: -2 }, enredado: { defesa: -2 }, indefeso: { defesa: -15 },
+  desprevenido: { defesa: -5 }, vulneravel: { defesa: -2 }, enredado: { defesa: -2 }, indefeso: { defesa: -10 },
 };
 
 // Ferimentos debilitantes (SaH): 1d6
@@ -882,8 +918,8 @@ export const RITUAIS = [
   R('Backup', 'energia', 2, '', 'AS04'),
   R('Hesitação Forçada', 'conhecimento', 1, '', 'AS06'),
   R('Vampirismo', 'sangue', 2, '', 'AS07'),
-  // Passagem de Conhecimento e versão Expandida (AS01) são bi-elementais;
-  // permanecem no Acervo, pois o motor atual representa um só elemento por ritual.
+  { ...R('Passagem de Conhecimento', 'conhecimento', 2, 'Permite trocar de corpo ou compartilhar o corpo do alvo.', 'AS01'), elementos: ['sangue', 'conhecimento'], execucao: 'completa', alcance: 'toque', alvo: '1 pessoa', duracao: 'cena', resistencia: 'Vontade evita' },
+  { ...R('Passagem de Conhecimento Expandido', 'conhecimento', 4, 'Troca consciências entre dois grupos de pessoas.', 'AS01'), elementos: ['sangue', 'conhecimento'], execucao: '1 dia', alcance: 'curto', alvo: 'até 10 pessoas', duracao: 'permanente', ritualExigido: 'Passagem de Conhecimento' },
   // Sobrevivendo ao Horror
   R('Esfolar', 'sangue', 1, 'Lâminas de sangue cortam o alvo, que sangra.', 'SaH'),
   R('Sede de Adrenalina', 'sangue', 2, 'Reação: refaz um teste físico ou reduz dano de impacto.', 'SaH'),
@@ -986,6 +1022,8 @@ export const PODER_PARANORMAL = Object.fromEntries(PODERES_PARANORMAIS.map(p => 
 //     ataque, ataqueDados, dano, margemTodas, dtRitual. Valores 'int'/'pre'/'vig'/'agi'/'for' = o atributo.
 // ganhaPeTemp: PE temporários ganhos. rolar: fórmula rolada ao usar. nivelMin: só a partir desse nível da trilha/NEX.
 export const USAVEIS = {
+  'Determinação Inquestionável': { custo: 5, dura: 'instante' },
+  'Achado Conveniente': { custo: 5, dura: 'instante' },
   // Combatente (trilhas)
   'Inspirar Confiança': { custo: 2, dura: 'instante', nota: 'reação: um aliado rola de novo' },
   'Estrategista': { custo: 'aliados', dura: 'instante', nota: 'aliados ganham ação de movimento' },
@@ -1002,7 +1040,7 @@ export const USAVEIS = {
   'Disparo Impactante': { custo: 2, dura: 'instante' },
   'Assassinar': { custo: 3, dura: 'instante' },
   'Sombra Fugaz': { custo: 3, dura: 'instante' },
-  'Paramédico': { custo: 2, dura: 'instante', rolarCura: true },
+  'Paramédico': { custo: 2, dura: 'instante' },
   'Equipe de Trauma': { custo: 2, dura: 'instante' },
   'Reanimação': { custo: 10, dura: 'instante' },
   'Eloquência': { custo: 'aliados', dura: 'instante', nota: '1 PE por alvo' },
@@ -1121,13 +1159,13 @@ export const MODIFICACOES = [
   { id: 'mal-consumidora', maldicao: 'morte', nome: 'Consumidora', para: ['corpo', 'disparo', 'arremesso', 'fogo'], resumo: 'Alvos atingidos ficam lentos até o fim da cena; 2 PE ao atacar: se acertar, o alvo fica imóvel por 1 rodada.' },
   { id: 'mal-erosiva', maldicao: 'morte', nome: 'Erosiva', para: ['corpo', 'disparo', 'arremesso', 'fogo'], resumo: '+1d8 de dano de Morte; 2 PE ao atacar: se acertar, 2d4 de Morte no início dos turnos do alvo por 2 rodadas.', ef: { danoDados: '1d8' } },
   { id: 'mal-repulsora', maldicao: 'morte', nome: 'Repulsora', para: ['corpo', 'disparo', 'arremesso', 'fogo'], resumo: '+2 na Defesa enquanto empunhada; ao bloquear, 2 PE para +5 na Defesa.' },
-  { id: 'mal-lancinante', maldicao: 'sangue', nome: 'Lancinante', para: ['corpo', 'disparo', 'arremesso', 'fogo'], resumo: '+1d8 de dano de Sangue, multiplicado no crítico (o site soma o +1d8; no crítico, multiplique também este dado).', ef: { danoDados: '1d8' } },
+  { id: 'mal-lancinante', maldicao: 'sangue', nome: 'Lancinante', para: ['corpo', 'disparo', 'arremesso', 'fogo'], resumo: '+1d8 de dano de Sangue, multiplicado no crítico (o site soma o +1d8; no crítico, multiplique também este dado).', ef: { danoDados: '1d8', criticoDados: true } },
   { id: 'mal-predadora', maldicao: 'sangue', nome: 'Predadora', para: ['corpo', 'disparo', 'arremesso', 'fogo'], resumo: 'Ignora camuflagem e cobertura leves; à distância, +1 categoria de alcance; a margem de ameaça dobra (antes de outros aumentos).', ef: { margemDobro: true } },
   { id: 'mal-sanguinaria', maldicao: 'sangue', nome: 'Sanguinária', para: ['corpo', 'disparo', 'arremesso', 'fogo'], resumo: 'Quem é atingido fica sangrando (cumulativo); no crítico, o alvo fica fraco e você ganha 2d10 PV temporários.' },
   { id: 'mal-abascanta', maldicao: 'conhecimento', nome: 'Abascanta', para: ['leve', 'pesada', 'escudo'], resumo: '+5 em resistências contra rituais; uma vez por cena, reação e PE igual ao custo para refletir um ritual no conjurador.' },
   { id: 'mal-profetica', maldicao: 'conhecimento', nome: 'Profética', para: ['leve', 'pesada', 'escudo'], resumo: 'Resistência a Conhecimento 10; 2 PE para rolar de novo um teste de resistência.' },
   { id: 'mal-sombria', maldicao: 'conhecimento', nome: 'Sombria', para: ['leve', 'pesada', 'escudo'], resumo: '+5 em Furtividade e ignora a penalidade de carga nela; movimento e 1 PE para parecer roupa comum.' },
-  { id: 'mal-cinetica', maldicao: 'energia', nome: 'Cinética', para: ['leve', 'pesada', 'escudo'], resumo: '+2 na Defesa e RD 2 (leve ou escudo) ou 5 (pesada). O site soma a Defesa; anote a RD.', ef: { defesa: 2 } },
+  { id: 'mal-cinetica', maldicao: 'energia', nome: 'Cinética', para: ['leve', 'pesada', 'escudo'], resumo: '+2 na Defesa e RD 2 (leve ou escudo) ou 5 (pesada). O site soma a Defesa; anote a RD.', ef: { defesa: 2 }, rdCinetica: true },
   { id: 'mal-lepida', maldicao: 'energia', nome: 'Lépida', para: ['leve', 'pesada', 'escudo'], resumo: '+10 em Atletismo e +3m de deslocamento; 2 PE: ignora terreno difícil, escala e cai até 9m sem dano até o fim do turno.' },
   { id: 'mal-voltaica', maldicao: 'energia', nome: 'Voltaica', para: ['leve', 'pesada', 'escudo'], resumo: 'Resistência a Energia 10; movimento e 2 PE: até o fim da cena, 2d6 de Energia nos seres adjacentes no fim dos seus turnos.' },
   { id: 'mal-letargica', maldicao: 'morte', nome: 'Letárgica', para: ['leve', 'pesada', 'escudo'], resumo: '+2 na Defesa; 25% (leve/escudo) ou 50% (pesada) de ignorar o dano extra de críticos e ataques furtivos.', ef: { defesa: 2 } },
@@ -1149,3 +1187,6 @@ for (const r of RITUAIS) {
   if (r.discente && !r.discente.circulo) r.discente.circulo = Math.max(2, r.circulo + 1 > 4 ? 4 : 2);
   if (r.verdadeiro && !r.verdadeiro.circulo) r.verdadeiro.circulo = Math.min(4, Math.max(3, r.circulo + 1));
 }
+
+// Livro de Regras v1.3, p. 126: a forma verdadeira exige 4º círculo e afinidade.
+Object.assign(RITUAIS.find(r => r.id === 'cicatrizacao').verdadeiro, { circulo: 4, afinidade: true });
