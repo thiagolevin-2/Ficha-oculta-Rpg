@@ -1,10 +1,10 @@
-import { ORIGEM, PERICIA } from './catalogo.js?v=0.23';
-import { abrirModal } from './rolagem.js?v=0.23';
-import { esc } from './util.js?v=0.23';
+import { ORIGEM, PERICIA } from './catalogo.js?v=0.23.3';
+import { abrirModal } from './rolagem.js?v=0.23.3';
+import { esc } from './util.js?v=0.23.3';
 
 let consulta;
 function carregarOrigens() {
-  consulta ||= fetch(new URL('../dados/origens-texto.json?v=0.23', import.meta.url))
+  consulta ||= fetch(new URL('../dados/origens-texto.json?v=0.23.3', import.meta.url))
     .then(resposta => {
       if (!resposta.ok) throw new Error('Descrições indisponíveis.');
       return resposta.json();

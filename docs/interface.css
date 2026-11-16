@@ -263,9 +263,13 @@
 @media(max-width:560px) {
   :root[data-tema] .topo {padding:16px 16px 8px;gap:14px}.troca-tema svg {width:16px}.troca-tema {padding:8px;gap:7px}
   :root[data-tema] .pagina {padding:22px 16px 70px}.barra-contexto {padding:14px 16px;font-size:8px}
-  .hero-arquivo {grid-template-columns:1fr;padding:12px 0 30px;gap:10px}.hero-texto {position:relative;z-index:2}
-  :root[data-tema] .hero-texto h1 {font-size:56px;margin:22px 0}.hero-texto > p {font-size:18px}.hero-arte {min-height:340px;max-width:365px;width:100%;margin:0 auto}
-  .documento-hero {width:270px;margin-top:12px}.doc-corpo strong {font-size:25px}.orbita-ritual {inset:-10px 0}.arte-legenda {bottom:0}
+  .hero-arquivo {grid-template-columns:minmax(0,1fr);padding:12px 0 30px;gap:10px}
+  .hero-texto {position:relative;z-index:2;min-width:0}
+  :root[data-tema] .hero-texto h1 {font-size:clamp(29px,9.3vw,48px);margin:22px 0;overflow-wrap:anywhere}.hero-texto > p {font-size:18px}.hero-arte {min-height:340px;max-width:365px;width:100%;margin:0 auto;overflow:clip;overflow-clip-margin:12px}
+  .documento-hero {width:min(270px,86%);margin-top:12px}
+  .doc-corpo strong {font-size:clamp(16px,5.5vw,25px);overflow-wrap:anywhere}
+  .orbita-ritual {inset:-10px 0}
+  .arte-legenda {bottom:0;max-width:100%;white-space:normal;text-align:center}
   .hero-acoes .btn {flex:1 1 auto}.hero-nota {gap:9px;font-size:7px;margin-top:18px}.sobretitulo {font-size:8px;letter-spacing:.1em}
   .separador-arquivo {font-size:8px}.separador-arquivo span:last-child {display:none}
   :root[data-tema] .painel,:root[data-tema] .ameaca-bloco {padding:18px}:root[data-tema] .grade {gap:16px}
@@ -304,6 +308,10 @@
 @media(max-width:560px) {
  :root[data-tema] .tabela {min-width:520px}
  :root[data-tema] .modal .tabela {min-width:420px}
+ :root[data-tema] .tabela-limites {min-width:0;table-layout:fixed}
+ :root[data-tema] .tabela-limites th:first-child {width:32%}
+ :root[data-tema] .tabela-limites th:not(:first-child),
+ :root[data-tema] .tabela-limites td:not(:first-child) {padding-inline:3px}
  :root[data-tema] .painel-vitais {margin-bottom:18px}
 }
 :root[data-tema] .marca span {display:block}
@@ -319,3 +327,10 @@
 .etiqueta-origem { cursor: pointer; text-decoration: underline; text-underline-offset: 0.18em; }
 .origem-facsimile { display: flex; flex-wrap: wrap; gap: 12px; }
 .origem-facsimile img { display: block; max-width: 100%; width: auto; height: auto; object-fit: contain; align-self: flex-start; border-radius: 6px; }
+
+.tabela-limites input {
+  width: min(64px, 100%);
+  min-width: 0;
+  min-height: 30px;
+  padding: 2px 4px;
+}

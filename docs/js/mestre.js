@@ -1,15 +1,15 @@
-import { sofrerDano, resolverCondicoesDoTurno } from './dano.js?v=0.23';
-import { AMEACAS_BASE } from './bestiario.js?v=0.23';
+import { sofrerDano, resolverCondicoesDoTurno } from './dano.js?v=0.23.3';
+import { AMEACAS_BASE } from './bestiario.js?v=0.23.3';
 // mestre.js — Área do Mestre (primeira versão): Ameaças, Combate (iniciativa), Anotações e Backup.
 // Ideia do dm-manager do Arcana, com o "bloco de ameaça" do Ordem Paranormal.
-import { ELEMENTOS, ATRIBUTOS, CONDICOES, EVENTOS_INVESTIGACAO } from './catalogo.js?v=0.23';
-import { iniciarTurno, encerrarTurno, fimDeCena } from './turnos.js?v=0.23';
-import { temPeso } from './idade.js?v=0.23';
-import { derivar } from './regras.js?v=0.23';
-import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.23';
-import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal } from './util.js?v=0.23';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.23';
-import { d as dado, rolarTeste } from './dados.js?v=0.23';
+import { ELEMENTOS, ATRIBUTOS, CONDICOES, EVENTOS_INVESTIGACAO } from './catalogo.js?v=0.23.3';
+import { iniciarTurno, encerrarTurno, fimDeCena } from './turnos.js?v=0.23.3';
+import { temPeso } from './idade.js?v=0.23.3';
+import { derivar } from './regras.js?v=0.23.3';
+import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.23.3';
+import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal } from './util.js?v=0.23.3';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.23.3';
+import { d as dado, rolarTeste } from './dados.js?v=0.23.3';
 
 const txt = (v, m = 200) => (typeof v === 'string' ? v : v == null ? '' : String(v)).slice(0, m);
 const FORMULA = /^[0-9d+\-\s]{0,40}$/i;

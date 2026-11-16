@@ -1,16 +1,16 @@
-import { condicoesEfetivas } from './dano.js?v=0.23';
-import { circuloDeAprender, RITUAIS_DE_TRILHA } from './aprendizado.js?v=0.23';
+import { condicoesEfetivas } from './dano.js?v=0.23.3';
+import { circuloDeAprender, RITUAIS_DE_TRILHA } from './aprendizado.js?v=0.23.3';
 // regras.js — o MOTOR do sistema. A ficha guarda só as ESCOLHAS; derivar(ficha) calcula o resto.
 // (mesma ideia do derive() do core.js do Arcana)
 import {
   ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS,
   PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES,
   ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS,
-} from './catalogo.js?v=0.23';
+} from './catalogo.js?v=0.23.3';
 
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS } from './equipamentos.js?v=0.23';
-import { faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, tetoEtario } from './idade.js?v=0.23';
-import { passivosDeItens } from './amaldicoados.js?v=0.23';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS } from './equipamentos.js?v=0.23.3';
+import { faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, tetoEtario } from './idade.js?v=0.23.3';
+import { passivosDeItens } from './amaldicoados.js?v=0.23.3';
 
 export const VERSAO_FICHA = 1;
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));

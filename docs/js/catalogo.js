@@ -1,10 +1,10 @@
-import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.23';
+import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.23.3';
 // catalogo.js — as regras do sistema escritas como DADOS.
 // Tudo aqui são números e nomes das regras + resumos curtos, escritos com outras palavras.
 // O texto oficial está nos livros (Livro de Regras = "LR"; Sobrevivendo ao Horror = "SaH").
 // Para mudar uma regra, mude aqui: as telas e o motor (regras.js) leem deste arquivo.
 
-import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.23';
+import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.23.3';
 
 export const NOME_DO_SITE = 'Ficha Oculta RPG';
 

@@ -1,15 +1,15 @@
-import { abrirOrigem } from './origens-ui.js?v=0.23';
-import { fecharModal } from './rolagem.js?v=0.23';
-import { simboloDaRoda } from './simbolos.js?v=0.23';
+import { abrirOrigem } from './origens-ui.js?v=0.23.3';
+import { fecharModal } from './rolagem.js?v=0.23.3';
+import { simboloDaRoda } from './simbolos.js?v=0.23.3';
 // criador.js — criação de agente em passos.
 // PASSO 0 (pedido do projeto): escolher as regras ANTES de criar a ficha — Regras Padrão ou Sobrevivendo ao Horror.
-import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.23';
-import { novaFicha, normalizar, derivar } from './regras.js?v=0.23';
-import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.23';
+import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.23.3';
+import { novaFicha, normalizar, derivar } from './regras.js?v=0.23.3';
+import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.23.3';
 
-import { faixaEtaria, PESOS_IDADE, tetoEtario } from './idade.js?v=0.23';
+import { faixaEtaria, PESOS_IDADE, tetoEtario } from './idade.js?v=0.23.3';
 
-const comOpcoes = r => ({ ...r.ficha, opcionais: r.opcionais });
+const comOpcoes = r => ({ ...r.ficha, modo: r.modo === 'sah' ? 'sah' : 'padrao', opcionais: r.opcionais }); // o modo escolhido no passo 1 (antes ficava sempre "padrão")
 const baseAtributo = (r, id) => faixaEtaria(comOpcoes(r))?.base?.[id] ?? 1;
 const pontosCriacao = r => ['mundano', 'sobrevivente'].includes(r.ficha.classe) ? 3 : CRIACAO_ATRIBUTOS.pontos;
 const pontosUsados = r => ATRIBUTOS.reduce((s, a) => s + r.ficha.atributos[a.id] - baseAtributo(r, a.id), 0);

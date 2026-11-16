@@ -1,29 +1,29 @@
-import { abrirOrigem } from './origens-ui.js?v=0.23';
-import { parametrosFabricacao } from './fabricacao.js?v=0.23';
-import { perfilRitual, podeResolverRitual } from './efeitos-rituais.js?v=0.23';
-import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao } from './dano.js?v=0.23';
-import { problemaAoAprender, viaPoder, circuloDeAprender } from './aprendizado.js?v=0.23';
+import { abrirOrigem } from './origens-ui.js?v=0.23.3';
+import { parametrosFabricacao } from './fabricacao.js?v=0.23.3';
+import { perfilRitual, podeResolverRitual } from './efeitos-rituais.js?v=0.23.3';
+import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao } from './dano.js?v=0.23.3';
+import { problemaAoAprender, viaPoder, circuloDeAprender } from './aprendizado.js?v=0.23.3';
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 import {
   MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS,
   ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO,
-} from './catalogo.js?v=0.23';
-import { faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario } from './idade.js?v=0.23';
-import { MOD_ACESSORIOS, moverPacoteParaReserva } from './equipamentos.js?v=0.23';
-import { iniciarTurno, encerrarTurno, fimDeCena } from './turnos.js?v=0.23';
-import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses } from './regras.js?v=0.23';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.23';
-import { pentagramaAtributos } from './criador.js?v=0.23';
-import { AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.23';
-import { textoTeste, d, rolar } from './dados.js?v=0.23';
-import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.23';
+} from './catalogo.js?v=0.23.3';
+import { faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario } from './idade.js?v=0.23.3';
+import { MOD_ACESSORIOS, moverPacoteParaReserva } from './equipamentos.js?v=0.23.3';
+import { iniciarTurno, encerrarTurno, fimDeCena } from './turnos.js?v=0.23.3';
+import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses } from './regras.js?v=0.23.3';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.23.3';
+import { pentagramaAtributos } from './criador.js?v=0.23.3';
+import { AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.23.3';
+import { textoTeste, d, rolar } from './dados.js?v=0.23.3';
+import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.23.3';
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.23', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.23-sah', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.23.3', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.23.3', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
   // Os textos do Sobrevivendo ao Horror foram conferidos com o PDF e estão em dados/textos.json (v0.23).
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
@@ -195,7 +195,7 @@ function abaAmaldicoados(f, d) {
     const usos = (def.usos || []).map((u, k) => {
       const c = custoDoUso(u, it), dtExtra = u.teste?.porUso ? u.teste.porUso * it.usosDia : 0;
       const det = [u.acao, c, u.teste ? `${PERICIA[u.teste.pericia]?.nome} DT ${u.teste.dt + dtExtra}` : '', u.rolar ? u.rolar.f : ''].filter(Boolean).join(' · ');
-      return `<button class="btn pequeno usar" data-acao="usar-amaldicoado" data-uid="${esc(it.uid)}" data-u="${k}" title="${esc(u.nota || '')}">${esc(u.nome)}${det ? ` <small>(${esc(det)})</small>` : ''}</button>`;
+      return `<button class="btn pequeno usar" data-acao="usar-amaldicoado" data-uid="${esc(it.uid)}" data-u="${k}" ${!it.qtd ? 'disabled' : ''} title="${esc(u.nota || '')}">${esc(u.nome)}${det ? ` <small>(${esc(det)})</small>` : ''}</button>`;
     }).join(' ');
     return `<div class="hab el-${el}" style="border-left-color:var(--el)">
       <span class="meta">${sigilo(el === 'medo' ? 'medo' : el, 'var(--el)')}<span class="etiqueta">${NOME_EL[def.el] || 'Variável'}</span>${it.qtd > 1 ? `<span class="etiqueta">×${it.qtd}</span>` : ''}${it.carga ? `<span class="etiqueta">carga ${it.carga}</span>` : ''}${it.usosDia ? `<span class="etiqueta">${it.usosDia} uso(s) hoje</span>` : ''}</span>
@@ -630,9 +630,9 @@ function abaInventario(f, d) {
         <label class="campo"><span>Patente</span><select data-campo="patenteManual" data-tipo="int"><option value="0" ${!f.patenteManual ? 'selected' : ''}>Automática pelos PP (${esc(PATENTES.find(p => p.n === (PATENTES.filter(x => f.pp >= x.pp).at(-1) || PATENTES[0]).n).nome)})</option>${PATENTES.map(p => `<option value="${p.n}" ${f.patenteManual === p.n ? 'selected' : ''}>${esc(p.nome)}</option>`).join('')}</select></label>
         <label class="campo"><span>Pontos de prestígio</span><input type="number" min="0" data-campo="pp" data-tipo="int" id="inv-pp" value="${f.pp}"></label>
         <label class="campo"><span>Limite de crédito</span><select data-campo="creditoManual"><option value="" ${!f.creditoManual ? 'selected' : ''}>Da patente (${esc(PATENTES[d.patente.n - 1].credito)})</option>${['Baixo', 'Médio', 'Alto', 'Ilimitado'].map(c => `<option ${f.creditoManual === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label></div>
-      <table class="tabela" style="margin-top:10px"><thead><tr><th>Categoria</th><th>I</th><th>II</th><th>III</th><th>IV</th></tr></thead><tbody>
+      <div class="tabela-rolagem" style="margin-top:10px"><table class="tabela tabela-limites"><thead><tr><th>Categoria</th><th>I</th><th>II</th><th>III</th><th>IV</th></tr></thead><tbody>
         <tr><td>Em uso</td>${[1, 2, 3, 4].map(c => `<td class="num" style="${d.usoCategoria[c] > lim[c - 1] ? 'color:var(--perigo);font-weight:700' : ''}">${d.usoCategoria[c]}</td>`).join('')}</tr>
-        <tr><td>Pode levar</td>${[1, 2, 3, 4].map(c => `<td><input type="number" min="0" max="20" style="width:64px;min-height:30px;padding:2px 6px" data-limite-item="${c - 1}" id="lim-${c}" value="${lim[c - 1]}" aria-label="Limite de itens de categoria ${romano(c)}"></td>`).join('')}</tr></tbody></table>
+        <tr><td>Pode levar</td>${[1, 2, 3, 4].map(c => `<td><input type="number" min="0" max="20" data-limite-item="${c - 1}" id="lim-${c}" value="${lim[c - 1]}" aria-label="Limite de itens de categoria ${romano(c)}"></td>`).join('')}</tr></tbody></table></div>
       <div class="linha" style="margin-top:8px"><small class="apagado">${d.patente.itensEditados ? 'Limites editados à mão.' : 'Limites da patente.'} Itens de categoria 0 não têm limite.</small>${d.patente.itensEditados ? '<button class="btn pequeno" data-acao="limites-padrao">Voltar ao padrão da patente</button>' : ''}</div>
       ${!f.patenteManual && PATENTES[d.patente.n] ? `<p class="apagado" style="margin-top:6px">Próxima: ${esc(PATENTES[d.patente.n].nome)} com ${PATENTES[d.patente.n].pp} PP.</p>` : ''}`
       : '<p>Um item de categoria I e itens de categoria 0 compatíveis com a origem. Não usa patente.</p>'}
@@ -1132,6 +1132,7 @@ export function acoesFicha(ctx) {
       const ficha = f(); let d = derivar(ficha);
       const it = ficha.itens.find(x => x.uid === el.dataset.uid), def = it && AMALDICOADOS[it.nome], u = def?.usos?.[Number(el.dataset.u)];
       if (!u) return;
+      if (!it.qtd) return ctx.avisar('Esse item está sem unidades.', true);
       const titulo = `${it.nome}: ${u.nome}`, k = d.pd ? 'PD' : 'PE', msgs = [];
       if (d.semAcoes && !['reação', 'automática', 'livre', 'interlúdio'].includes(u.acao)) return ctx.avisar('As condições atuais impedem a ação.', true);
       const pedir = (pergunta, padrao = '1', max = 999) => { const r = prompt(pergunta, padrao); return r == null ? null : inteiro(r, 0, max, 0); };
