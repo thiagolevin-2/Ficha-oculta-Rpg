@@ -1,4 +1,4 @@
-/* v0.16 — cinco atmosferas, uma única estrutura. */
+/* v0.17 — cinco atmosferas, uma única estrutura. */
 :root[data-elemento="sangue"] {
  --fundo:#120b0e;--fundo-2:#1b1014;--painel:#1e1418;--painel-2:#291b21;--campo:#160e12;--nav:#160d12;
  --tinta:#f6e9e9;--osso:#e2c8ce;--apagado:#c0a5af;--linha:#49303b;--linha-forte:#78515f;
@@ -59,37 +59,42 @@
 :root[data-elemento] .roda-nome {font-size:8px;letter-spacing:.02em;color:var(--apagado)}
 :root[data-elemento] .roda-nome b {font-size:12px;letter-spacing:.08em;color:var(--tinta)}
 :root[data-elemento] .roda-valor {font-size:28px;line-height:1.05;margin:2px 0 0;color:var(--tinta)}
-/* Le conteneur ne tourne pas: seul le sigil central reçoit son animation. */
-.roda-elemento {position:absolute;left:50%;top:51%;width:31%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;z-index:0;color:var(--elemento-cor)}
-.roda-elemento i {position:absolute;display:block;inset:0;pointer-events:none}
-.simbolo-elemento {background:var(--elemento-cor);mask:var(--sigilo-elemento) center/contain no-repeat;transform-origin:50% 50%}
-.aura-elemento {inset:-18%!important;border-radius:50%;background:radial-gradient(circle,var(--elemento-suave),transparent 72%)}
-.eco-elemento {inset:-14%!important;border:1px solid var(--linha-forte);border-radius:50%;opacity:.5}
-/* Sangue: batimento duplo e onda concêntrica. */
-[data-elemento="sangue"] .simbolo-elemento {animation:elemento-pulsar 2.6s ease-in-out infinite}
-[data-elemento="sangue"] .eco-elemento {border-color:var(--elemento-cor);animation:elemento-onda 2.6s ease-out infinite}
-@keyframes elemento-pulsar {0%,38%,100% {transform:scale(.92)} 9%,24% {transform:scale(1.08)} 16%,32% {transform:scale(.98)}}
-@keyframes elemento-onda {0% {transform:scale(.78);opacity:.6} 70%,100% {transform:scale(1.35);opacity:0}}
-/* Morte: rotação lenta, inversa, e espiral concêntrica. */
-[data-elemento="morte"] .simbolo-elemento {animation:elemento-espiral 30s linear infinite}
-[data-elemento="morte"] .eco-elemento {border-style:dashed;border-radius:42% 58% 43% 57%;animation:elemento-espiral 18s linear infinite reverse}
-@keyframes elemento-espiral {from {transform:rotate(0)} to {transform:rotate(-360deg)}}
-/* Conhecimento: inscrições orbitam o símbolo, que se revela suavemente. */
-[data-elemento="conhecimento"] .simbolo-elemento {animation:elemento-revelar 6s ease-in-out infinite}
-[data-elemento="conhecimento"] .eco-elemento {border-style:dotted;border-width:2px;animation:elemento-inscrever 24s linear infinite}
-@keyframes elemento-revelar {0%,100% {opacity:.6;transform:translateY(2px)} 50% {opacity:1;transform:translateY(-2px)}}
-@keyframes elemento-inscrever {to {transform:rotate(360deg)}}
-/* Energia: pequenos deslocamentos irregulares, sem flashes de tela. */
-[data-elemento="energia"] .simbolo-elemento {animation:elemento-instavel 4.7s steps(1,end) infinite}
-[data-elemento="energia"] .eco-elemento {border-radius:28% 72% 56% 44%;border-style:dashed;animation:elemento-campo 7s ease-in-out infinite}
-@keyframes elemento-instavel {0%,18%,26%,62%,74%,100% {transform:translate(0,0) skew(0)} 20% {transform:translate(2px,-1px) skew(-3deg)} 23% {transform:translate(-2px,1px) skew(2deg)} 65% {transform:translate(1px,2px) skew(3deg)} 70% {transform:translate(-1px,-1px)}}
-@keyframes elemento-campo {0%,100% {transform:rotate(0) scale(.95)} 50% {transform:rotate(45deg) scale(1.08)}}
-/* Medo: respiração lenta, névoa e contorno que parece desaparecer. */
-[data-elemento="medo"] .simbolo-elemento {animation:elemento-ocultar 8s ease-in-out infinite}
-[data-elemento="medo"] .aura-elemento {animation:elemento-nevoa 8s ease-in-out infinite}
-[data-elemento="medo"] .eco-elemento {border-color:var(--elemento-cor);opacity:.17}
-@keyframes elemento-ocultar {0%,100% {opacity:.85;filter:blur(0);transform:scale(.96)} 50% {opacity:.35;filter:blur(1px);transform:scale(1.04)}}
-@keyframes elemento-nevoa {0%,100% {transform:scale(.8);opacity:.35} 50% {transform:scale(1.35);opacity:.85}}
+/* Traços das referências em SVG inline: cada parte recebe seu movimento. */
+:root[data-elemento] .roda-elemento {width:34%}
+.simbolo-elemento-svg {position:absolute;inset:0;pointer-events:none}
+.sigilo-roda {display:block;width:100%;height:100%;overflow:visible;fill:currentColor;color:var(--elemento-cor);filter:drop-shadow(0 0 3px var(--elemento-suave))}
+.sigilo-roda g,.sigilo-roda path,.sigilo-roda circle {transform-box:view-box;transform-origin:100px 100px}
+/* Sangue: a marca mantém a orientação; batimentos empurram gotas para baixo. */
+.sangue-marca {animation:sangue-batimento 3.4s ease-in-out infinite}
+.sangue-gota {opacity:0;animation:sangue-escorrer 3.4s ease-in infinite}
+.gota-b {animation-delay:1.7s}
+@keyframes sangue-batimento {0%,38%,100%{transform:scale(1)} 10%{transform:scale(1.045)} 18%{transform:scale(1)} 27%{transform:scale(1.025)}}
+@keyframes sangue-escorrer {0%,34%,100%{opacity:0;transform:translateY(-3px) scaleY(.5)} 42%{opacity:.65;transform:translateY(0) scaleY(1)} 76%{opacity:0;transform:translateY(12px) scaleY(1.25)}}
+/* Morte: só o núcleo espiralado gira; a haste e as pontas ficam fixas. */
+.sigilo-roda .morte-espiral {transform-origin:100px 107px;animation:morte-espiral-nucleo 38s linear infinite}
+.sigilo-roda .morte-fluxo {transform-origin:100px 107px;opacity:.45;animation:morte-fluxo-anel 24s linear infinite}
+@keyframes morte-espiral-nucleo {to{transform:rotate(-360deg)}}
+@keyframes morte-fluxo-anel {to{stroke-dashoffset:232}}
+/* Conhecimento: três anéis de inscrições giram em ritmos próprios. */
+.conhecimento-externo {animation:conhecimento-orbita 72s linear infinite}
+.conhecimento-medio {animation:conhecimento-orbita 58s linear infinite reverse}
+.conhecimento-interno {animation:conhecimento-orbita 46s linear infinite}
+.conhecimento-centro {animation:conhecimento-revelacao 7s ease-in-out infinite}
+@keyframes conhecimento-orbita {to{transform:rotate(360deg)}}
+@keyframes conhecimento-revelacao {0%,100%{opacity:.65} 50%{opacity:1;filter:drop-shadow(0 0 2px currentColor)}}
+/* Energia: correntes percorrem as três ramificações, não uma rotação genérica. */
+.energia-descarga {stroke:color-mix(in srgb,var(--elemento-cor) 35%,white);stroke-dasharray:13 87;stroke-dashoffset:100;opacity:0;animation:energia-percurso 4.8s ease-in-out infinite;filter:drop-shadow(0 0 2px currentColor)}
+.descarga-b {animation-delay:1.6s}.descarga-c {animation-delay:3.2s}
+.energia-marca {animation:energia-tensao 9s ease-in-out infinite}
+@keyframes energia-percurso {0%,12%{opacity:0;stroke-dashoffset:100} 24%,58%{opacity:.8} 72%,100%{opacity:0;stroke-dashoffset:-20}}
+@keyframes energia-tensao {0%,100%{opacity:.72} 35%,65%{opacity:1}}
+/* Medo: a marca se revela em silêncio; os dois nós respondem um ao outro. */
+.medo-marca {animation:medo-presenca 9s ease-in-out infinite}
+.medo-nodo {stroke:color-mix(in srgb,var(--elemento-cor) 65%,white);opacity:0;animation:medo-ressonancia 9s ease-in-out infinite}
+.nodo-b {animation-delay:4.5s}
+@keyframes medo-presenca {0%,100%{opacity:.9;filter:blur(0)} 50%{opacity:.48;filter:blur(.4px)}}
+@keyframes medo-ressonancia {0%,100%{opacity:0;stroke-width:.5} 45%{opacity:.75;stroke-width:2} 70%{opacity:.1;stroke-width:.8}}
+
 /* Roda e status primeiro, vitais em seguida, depois pendências e perícias. */
 :root[data-elemento] .visao-agente {grid-template-columns:minmax(275px,.8fr) minmax(0,1.2fr);gap:16px;align-items:start;margin:0 0 16px}
 :root[data-elemento] .visao-agente > .painel {margin:0;padding:18px}
@@ -148,4 +153,15 @@
  :root[data-elemento] {--fundo:#fff;--painel:#fff;--painel-2:#f3f3f3;--campo:#fff;--tinta:#222;--osso:#333;--apagado:#555;--linha:#bbb;--linha-forte:#666;--elemento-cor:#333}
  .roda-elemento i {animation:none!important;filter:none!important}
  :root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:1fr 1fr}
+}
+
+@media(prefers-reduced-motion:reduce) {
+ .sigilo-roda,.sigilo-roda * {animation:none!important;transform:none!important;filter:none!important}
+ .sigilo-roda {opacity:1!important}
+ .sigilo-roda > g:not(.sangue-gotas),.sigilo-roda .conhecimento-centro {opacity:1!important}
+ .sangue-gotas,.energia-descarga,.medo-nodo,.morte-fluxo {display:none!important}
+}
+@media print {
+ .sigilo-roda,.sigilo-roda * {animation:none!important;transform:none!important;filter:none!important;opacity:1!important}
+ .sangue-gotas,.energia-descarga,.medo-nodo,.morte-fluxo {display:none!important}
 }

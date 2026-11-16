@@ -2,20 +2,20 @@
 import {
   MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS,
   ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS,
-} from './catalogo.js?v=0.16';
-import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.16';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.16';
-import { pentagramaAtributos } from './criador.js?v=0.16';
-import { textoTeste, d, rolar } from './dados.js?v=0.16';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.16';
+} from './catalogo.js?v=0.17';
+import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.17';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.17';
+import { pentagramaAtributos } from './criador.js?v=0.17';
+import { textoTeste, d, rolar } from './dados.js?v=0.17';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.17';
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.16', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.16-sah', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
-  try { const r = await fetch('dados/textos_sah_ocr.json?v=0.16-ocr', {cache:'no-cache'}); if (r.ok) OCR_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.17', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.17-sah', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos_sah_ocr.json?v=0.17-ocr', {cache:'no-cache'}); if (r.ok) OCR_SAH = await r.json(); } catch {}
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
 let OCR_SAH = { rituais: {}, habilidades: {} };

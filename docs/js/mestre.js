@@ -1,11 +1,11 @@
 // mestre.js — Área do Mestre (primeira versão): Ameaças, Combate (iniciativa), Anotações e Backup.
 // Ideia do dm-manager do Arcana, com o "bloco de ameaça" do Ordem Paranormal.
-import { ELEMENTOS, ATRIBUTOS } from './catalogo.js?v=0.16';
-import { derivar } from './regras.js?v=0.16';
-import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.16';
-import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal } from './util.js?v=0.16';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.16';
-import { rolarTeste } from './dados.js?v=0.16';
+import { ELEMENTOS, ATRIBUTOS } from './catalogo.js?v=0.17';
+import { derivar } from './regras.js?v=0.17';
+import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.17';
+import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal } from './util.js?v=0.17';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.17';
+import { rolarTeste } from './dados.js?v=0.17';
 
 const txt = (v, m = 200) => (typeof v === 'string' ? v : v == null ? '' : String(v)).slice(0, m);
 const FORMULA = /^[0-9d+\-\s]{0,40}$/i;

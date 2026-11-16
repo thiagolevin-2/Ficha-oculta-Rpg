@@ -1,9 +1,9 @@
 // rolagem.js — rolar testes, ataques e dano; mostrar o resultado; guardar o histórico.
 // Os dados 3D (do Arcana) só MOSTRAM um resultado já sorteado: a animação não decide nada.
-import { rolarTeste, rolar, comSinal } from './dados.js?v=0.16';
-import { animateDice, diceAnimationsEnabled, setDiceAnimations } from './dice3d.js?v=0.16';
-import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.16';
-import { esc, avisar } from './util.js?v=0.16';
+import { rolarTeste, rolar, comSinal } from './dados.js?v=0.17';
+import { animateDice, diceAnimationsEnabled, setDiceAnimations } from './dice3d.js?v=0.17';
+import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.17';
+import { esc, avisar } from './util.js?v=0.17';
 
 let historico = carregarRolagens();
 // modificadores da PRÓXIMA rolagem (bandeja): dados a mais/menos e bônus fixo
