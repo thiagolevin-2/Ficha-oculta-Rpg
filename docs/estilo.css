@@ -781,3 +781,11 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 .previa-ritual .texto-completo{margin-top:0}
 /* botões "Aprender ritual" / "Cancelar" sempre visíveis, mesmo com descrição longa */
 .modal:has(.previa-ritual) footer{position:sticky;bottom:-18px;margin:16px -18px -18px;padding:12px 18px;background:var(--painel);border-top:1px solid var(--linha);z-index:1}
+/* v0.11 · busca nas janelas: o [hidden] precisa vencer o display do cartão */
+.modal [data-busca][hidden]{display:none !important}
+.modal .grupo-itens:not(:has(.cartao:not([hidden]))){display:none}
+.cartao .etiqueta{justify-self:start;align-self:start;width:max-content}
+.acoes-item{white-space:nowrap}
+/* v0.14 · botões de rolar dados citados nas habilidades/poderes */
+.rolar-efeito{font-variant-numeric:tabular-nums;white-space:nowrap}
+.hab .meta .rolar-efeito{margin-left:4px}

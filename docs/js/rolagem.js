@@ -1,9 +1,9 @@
 // rolagem.js — rolar testes, ataques e dano; mostrar o resultado; guardar o histórico.
 // Os dados 3D (do Arcana) só MOSTRAM um resultado já sorteado: a animação não decide nada.
-import { rolarTeste, rolar, comSinal } from './dados.js?v=0.11';
-import { animateDice, diceAnimationsEnabled, setDiceAnimations } from './dice3d.js?v=0.11';
-import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.11';
-import { esc, avisar } from './util.js?v=0.11';
+import { rolarTeste, rolar, comSinal } from './dados.js?v=0.14';
+import { animateDice, diceAnimationsEnabled, setDiceAnimations } from './dice3d.js?v=0.14';
+import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.14';
+import { esc, avisar } from './util.js?v=0.14';
 
 let historico = carregarRolagens();
 // modificadores da PRÓXIMA rolagem (bandeja): dados a mais/menos e bônus fixo
@@ -25,7 +25,7 @@ function registrar(item) {
 const dadosAnim = (valores, indice, lados = 20) => valores.slice(0, 12).map((v, i) => ({ sides: lados, value: v, selected: indice == null || i === indice }));
 
 // Teste de perícia/atributo/ataque. dados: { qtd, pior } (já com condições). bonus: soma fixa.
-export async function rolarTesteUI({ titulo, quem = '', dados, bonus = 0, margem = 21, mult = 2, tipo = 'teste', formulaDano = '', subtitulo = '' }) {
+export async function rolarTesteUI({ titulo, quem = '', dados, bonus = 0, margem = 21, mult = 2, tipo = 'teste', formulaDano = '', subtitulo = '', tituloDano = '', rotuloDano = '' }) {
   let qtd = dados.qtd, pior = dados.pior;
   // aplica os dados extras da bandeja (no Ordem, +1D = um d20 a mais; com atributo 0 a conta inverte)
   if (proxima.dados) {
@@ -35,7 +35,7 @@ export async function rolarTesteUI({ titulo, quem = '', dados, bonus = 0, margem
   const bonusTotal = bonus + proxima.bonus;
   const dt = Number(proxima.dt) || null;
   const r = rolarTeste({ qtd, pior, bonus: bonusTotal, margem });
-  const item = { tipo, titulo, quem, valores: r.valores, indice: r.indice, pior: r.pior, bonus: bonusTotal, total: r.total, critico: tipo === 'ataque' && r.critico, dt, formulaDano, mult, margem };
+  const item = { tipo, titulo, quem, valores: r.valores, indice: r.indice, pior: r.pior, bonus: bonusTotal, total: r.total, critico: tipo === 'ataque' && r.critico, dt, formulaDano, mult, margem, tituloDano, rotuloDano };
   proxima.dados = 0; proxima.bonus = 0;
   await animar(item);
   registrar(item);
@@ -43,10 +43,10 @@ export async function rolarTesteUI({ titulo, quem = '', dados, bonus = 0, margem
   return item;
 }
 
-export async function rolarDanoUI({ titulo, quem = '', formula, multiplicador = 1, tipo = 'dano' }) {
+export async function rolarDanoUI({ titulo, quem = '', formula, multiplicador = 1, tipo = 'dano', rotulo = '' }) {
   let r;
   try { r = rolar(formula, { multiplicador }); } catch (e) { avisar(e.message, true); return null; }
-  const item = { tipo, titulo, quem, formula, multiplicador, total: r.total, detalhe: r.detalhe, grupos: r.dados };
+  const item = { tipo, titulo, quem, formula, multiplicador, total: r.total, detalhe: r.detalhe, grupos: r.dados, rotulo };
   await animar(item);
   registrar(item);
   mostrarResultado(item);
@@ -60,7 +60,7 @@ async function animar(item) {
       await animateDice(dadosAnim(item.valores, item.indice), { label: item.titulo, total: item.total, subtitle: item.pior ? 'ATRIBUTO ZERO: VALE O PIOR' : `${item.valores.length}d20 · VALE O MELHOR`, dc: item.dt, natural: item.valores[item.indice], kind: item.tipo === 'ataque' ? 'attack' : 'check', criticalThreshold: item.margem || 21, quem: item.quem });
     } else {
       const dice = item.grupos.flatMap(g => g.valores.map(v => ({ sides: g.lados, value: v })));
-      await animateDice(dice.filter(x => [2, 4, 6, 8, 10, 12, 20].includes(x.sides)), { label: item.titulo, total: item.total, subtitle: item.multiplicador > 1 ? `CRÍTICO ×${item.multiplicador}` : 'DANO', quem: item.quem });
+      await animateDice(dice.filter(x => [2, 4, 6, 8, 10, 12, 20].includes(x.sides)), { label: item.titulo, total: item.total, subtitle: item.multiplicador > 1 ? `CRÍTICO ×${item.multiplicador}` : (item.rotulo || 'DANO'), quem: item.quem });
     }
   } catch (e) { console.warn(e); }
 }
@@ -103,7 +103,9 @@ function mostrarResultado(item) {
   }
   const rodape = item.tipo === 'ataque' && item.formulaDano
     ? `<button class="btn" data-acao="rolar-dano-ultimo" data-crit="0">Rolar dano</button>${item.critico ? `<button class="btn sangue" data-acao="rolar-dano-ultimo" data-crit="1">Dano crítico ×${item.mult}</button>` : ''}`
-    : `<button class="btn sangue" data-acao="fechar-modal">Fechar</button>`;
+    : item.tipo === 'ritual' && item.formulaDano
+      ? `<button class="btn fantasma" data-acao="fechar-modal">Fechar</button><button class="btn sangue" data-acao="rolar-dano-ultimo" data-crit="0">Rolar ${item.rotuloDano === 'CURA' ? 'cura' : 'dano'} (${esc(item.formulaDano)})</button>`
+      : `<button class="btn sangue" data-acao="fechar-modal">Fechar</button>`;
   abrirModal(item.titulo, corpo, rodape);
 }
 

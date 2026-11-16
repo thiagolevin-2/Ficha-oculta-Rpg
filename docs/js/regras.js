@@ -3,8 +3,8 @@
 import {
   ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS,
   PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES,
-  ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO,
-} from './catalogo.js?v=0.11';
+  ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS,
+} from './catalogo.js?v=0.14';
 
 export const VERSAO_FICHA = 1;
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
@@ -23,6 +23,8 @@ function limparEf(ef) {
   return o;
 }
 const semAcento = v => String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+const RITUAL_POR_NOME = new Map(RITUAIS.map(r => [semAcento(r.nome), r]));
+const ritualDoCatalogo = nome => RITUAL_POR_NOME.get(semAcento(nome));
 
 // ---------- Ficha nova ----------
 export function novaFicha(modo = 'padrao', opcionais = {}) {
@@ -36,7 +38,8 @@ export function normalizar(f) {
   const o = f.opcionais || {};
   const opcionais = modo === 'sah' ? {
     determinacao: !!o.determinacao || !!o.patentes, nivelExp: !!o.nivelExp && !o.patentes, patentes: !!o.patentes, ferimentos: !!o.ferimentos, progressaoNex: !!o.progressaoNex,
-  } : { determinacao: false, nivelExp: false, patentes: false, ferimentos: false, progressaoNex: false };
+    transcenderSan: !!o.transcenderSan,
+  } : { determinacao: false, nivelExp: false, patentes: false, ferimentos: false, progressaoNex: false, transcenderSan: false };
   let classe = CLASSES[f.classe] ? f.classe : 'combatente';
   if (CLASSES[classe].soSah && modo !== 'sah') classe = 'combatente';
   const atributos = {};
@@ -67,11 +70,12 @@ export function normalizar(f) {
       .filter(p => p.id !== 'proprio' || p.nome),
     habilidadesProprias: lista(f.habilidadesProprias, 60).map(h => ({ nome: txt(h?.nome, 80), resumo: txt(h?.resumo, 1500), custo: txt(h?.custo, 30), uid: txt(h?.uid, 60) || uid() })).filter(h => h.nome),
     notasHabilidade: Object.fromEntries(Object.entries(f.notasHabilidade || {}).slice(0, 120).map(([k, v]) => [txt(k, 80), txt(v, 1500)])),
-    rituais: lista(f.rituais, 80).map(x => ({
+    // Campos vazios (ritual aprendido em versão antiga, por exemplo) são completados com os dados do catálogo.
+    rituais: lista(f.rituais, 80).map(x => { const c = ritualDoCatalogo(x?.nome) || {}; const vazio = (v, max, alt) => txt(v, max) || txt(alt, max); return ({
       uid: txt(x?.uid, 60) || uid(), nome: txt(x?.nome, 80) || 'Ritual', elemento: txt(x?.elemento, 20) || 'conhecimento', circulo: int(x?.circulo, 1, 4, 1),
-      execucao: txt(x?.execucao, 40), alcance: txt(x?.alcance, 40), alvo: txt(x?.alvo, 80), duracao: txt(x?.duracao, 40), resistencia: txt(x?.resistencia, 60),
-      efeito: txt(x?.efeito, 3000), formula: FORMULA.test(txt(x?.formula, 40)) ? txt(x?.formula, 40) : '', discente: txt(x?.discente, 400), verdadeiro: txt(x?.verdadeiro, 400),
-    })),
+      execucao: vazio(x?.execucao, 40, c.execucao), alcance: vazio(x?.alcance, 40, c.alcance), alvo: vazio(x?.alvo, 80, c.alvo || c.area || c.efeitoArea), duracao: vazio(x?.duracao, 40, c.duracao), resistencia: vazio(x?.resistencia, 60, c.resistencia),
+      efeito: vazio(x?.efeito, 3000, c.resumo), formula: FORMULA.test(txt(x?.formula, 40)) && txt(x?.formula, 40) ? txt(x?.formula, 40) : (FORMULA.test(txt(c.dados, 40)) ? txt(c.dados, 40) : ''), discente: txt(x?.discente, 400), verdadeiro: txt(x?.verdadeiro, 400),
+    }); }),
     armas: lista(f.armas, 40).map(a => ({
       uid: txt(a?.uid, 60) || uid(), nome: txt(a?.nome, 60) || 'Arma', prof: ['simples', 'taticas', 'pesadas'].includes(a?.prof) ? a.prof : 'simples',
       uso: ['corpo', 'disparo', 'fogo', 'arremesso'].includes(a?.uso) ? a.uso : 'corpo', categoria: int(a?.categoria, 0, 4, 0),
@@ -95,6 +99,9 @@ export function normalizar(f) {
     grausAplicados: int(f.grausAplicados, 0, 10, 0),
     bonus: Object.fromEntries(['defesa', 'pv', 'pe', 'san', 'pd', 'desl', 'carga', 'rd', 'resistencia', 'iniciativaDados', 'paranormais', 'rituais'].map(k => [k, int(f.bonus?.[k], -99, 999, 0)])),
     elementoAfinidade: txt(f.elementoAfinidade, 20),
+    // Livro de Regras p. 124: em NEX 50% o personagem se CONECTA a um elemento; a AFINIDADE só se desenvolve no próximo Transcender.
+    // Fichas antigas (sem o campo) que já tinham elemento continuam com afinidade.
+    afinidadeAtiva: typeof f.afinidadeAtiva === 'boolean' ? f.afinidadeAtiva && !!txt(f.elementoAfinidade, 20) : !!txt(f.elementoAfinidade, 20),
     nexAlt: { pen25: ['diplomacia', 'enganacao', 'intimidacao'].includes(f.nexAlt?.pen25) ? f.nexAlt.pen25 : '', pen35: ['atletismo', 'fortitude', 'reflexos'].includes(f.nexAlt?.pen35) ? f.nexAlt.pen35 : '', atr35: ['agi', 'for', 'int', 'vig'].includes(f.nexAlt?.atr35) ? f.nexAlt.atr35 : '' },
     criadoEm: txt(f.criadoEm, 40) || new Date().toISOString(), atualizadoEm: txt(f.atualizadoEm, 40) || new Date().toISOString(),
   };
@@ -200,11 +207,12 @@ export function derivar(f) {
     else pdMax = cls.pd[0] + atrPE + (n - 1) * (cls.pd[1] + atrPE);
     pdMax += pePorEfeitos + f.bonus.pd + f.bonus.pe;
   } else {
-    if (ehSobrevivente(f)) { pe = cls.pe[0] + atrPE + (f.estagio - 1) * cls.pe[1]; san = cls.san[0] + (f.estagio - 1) * cls.san[1]; }
+    if (ehSobrevivente(f)) { pe = cls.pe[0] + atrPE + (f.estagio - 1) * cls.pe[1]; san = cls.san[0] + (f.estagio - 1) * cls.san[1] - (f.opcionais?.transcenderSan ? f.poderes.filter(p => p.id === 'transcender').length * cls.san[1] : 0); }
     else {
       pe = cls.pe[0] + atrPE + (n - 1) * (cls.pe[1] + atrPE);
       const transcender = f.poderes.filter(p => p.id === 'transcender').length;
-      san = cls.san[0] + (n - 1) * cls.san[1] - transcender * cls.san[1];
+      const custaSan = !nexSeparado(f) || !!f.opcionais?.transcenderSan;
+      san = cls.san[0] + (n - 1) * cls.san[1] - (custaSan ? transcender * cls.san[1] : 0);
     }
     if (tem('sanMetade')) san = Math.floor(san / 2);
     san += soma('sanPorNivel') * neq + f.bonus.san;
@@ -338,7 +346,9 @@ export function derivar(f) {
     if (a.uso === 'corpo') { danoExtra += soma('danoCorpo'); dadosExtras += soma('dadoCorpo'); }
     if (a.uso === 'fogo') danoExtra += soma('danoFogo');
     if (temPoder('ninja-urbano') && (a.uso === 'corpo' || a.uso === 'disparo')) { danoExtra += 2; notas.push('Ninja Urbano +2'); }
-    let margem = a.margem - (a.uso === 'corpo' ? soma('margemCorpo') : 0) - soma('margemTodas') - ativo.margemTodas;
+    // Maldição Predadora (Livro de Regras p. 146): a margem de ameaça dobra antes de qualquer aumento (19 vira 17).
+    const margemBase = (a.mods || []).some(m => MODIFICACAO[m]?.ef?.margemDobro) ? 21 - (21 - a.margem) * 2 : a.margem;
+    let margem = margemBase - (a.uso === 'corpo' ? soma('margemCorpo') : 0) - soma('margemTodas') - ativo.margemTodas;
     const mult = a.mult + soma('multTodas') + (a.mods || []).filter(m => MODIFICACAO[m]?.ef?.mult).length;
     if (a.ferramenta && tem('ferramenta')) { bonusAtaque += 1; danoExtra += 1; margem -= 1; notas.push('Ferramenta de Trabalho'); }
     if (a.balasLongas && f.trilha === 'atirador' && trilhaNv(2)) { danoExtra += at.int; notas.push('Mira de Elite +Int'); }
@@ -372,7 +382,7 @@ export function derivar(f) {
   // Transcender x poderes paranormais (contados separados)
   const transcenderes = f.poderes.filter(p => p.id === 'transcender').length;
   const limiarNex = [25, 35, 50, 60, 75, 90];
-  const transcenderSeparado = nexSeparado(f) && f.classe !== 'sobrevivente';
+  const transcenderSeparado = nexSeparado(f); // SaH p. 98: com NEX separado, Transcender deixa de ser poder de classe (vale também para o sobrevivente)
   const limiteTranscender = transcenderSeparado ? limiarNex.filter(x => nexAtual >= x).length : slotsPoder + (versatilidade ? 1 : 0);
   const paranormalDaOrigem = ORIGEM[f.origem]?.id === 'cultista' ? 1 : 0;
   const limiteParanormais = transcenderes + paranormalDaOrigem + (f.bonus.paranormais || 0);
@@ -450,15 +460,16 @@ export function derivar(f) {
   const grausFaltando = Math.max(0, slotsGrau - f.grausAplicados);
   if (grausFaltando) pend.push({ id: 'grau', texto: `${grausFaltando} grau(s) de treinamento: ${porGrau} perícias para virar ${neq >= 14 ? 'veterano ou expert' : 'veterano'}`, acao: 'grau-treinamento' });
   const poderesLivres = Math.max(0, slotsPoder + (versatilidade ? 1 : 0) - poderesEscolhidos - (versatilidade && f.escolhas.versatilidade ? 1 : 0));
-  if (poderesLivres) pend.push({ id: 'poder', texto: `${poderesLivres} poder(es) de classe para escolher (Transcender conta como um)`, acao: 'escolher-poder' });
-  if (transcenderSeparado && transcenderLivres) pend.push({ id: 'transcender', texto: `${transcenderLivres} Transcender disponível(is) pelas faixas de NEX`, acao: 'transcender' });
+  if (poderesLivres) pend.push({ id: 'poder', texto: `${poderesLivres} poder(es) de classe para escolher${transcenderSeparado ? '' : ' (Transcender conta como um)'}`, acao: 'escolher-poder' });
+  if (transcenderSeparado && transcenderLivres) pend.push({ id: 'transcender', texto: `${transcenderLivres} Transcender disponível(is): seu NEX chegou a uma faixa de alteração (25/35/50/60/75/90%). É opcional.`, acao: 'transcender' });
+  if (nexAtual >= 50 && !f.elementoAfinidade) pend.push({ id: 'conexao', texto: 'NEX 50%: escolher o elemento de conexão (vira afinidade no próximo Transcender)', acao: 'escolher-conexao' });
   if (f.paranormais.length < limiteParanormais) pend.push({ id: 'paranormal', texto: `${limiteParanormais - f.paranormais.length} poder(es) paranormal(is) para escolher`, acao: 'janela-paranormal' });
   if (limiteRituais && f.rituais.length < limiteRituais) pend.push({ id: 'rituais', texto: `${limiteRituais - f.rituais.length} ritual(is) para aprender (até o ${circuloMax}º círculo)`, aba: 'rituais' });
   if (!f.trilha && trilhaLiberada(f, 2)) pend.push({ id: 'trilha', texto: 'Escolher a trilha', aba: 'habilidades' });
   if (versatilidade && !f.escolhas.versatilidade && poderesEscolhidos <= slotsPoder) pend.push({ id: 'versatilidade', texto: 'Escolher a Versatilidade (NEX 50%)', acao: 'versatilidade' });
 
   return {
-    pendencias: pend, transcenderLivres, limiteRituais, porGrau, nomesAtivos: f.efeitos.map(e => e.nome),
+    pendencias: pend, afinidade: f.afinidadeAtiva ? f.elementoAfinidade : '', transcenderLivres, limiteRituais, porGrau, nomesAtivos: f.efeitos.map(e => e.nome),
     nivel: n, nivelEq: neq, textoNivel: textoNivel(f), nexAtual, alteracoesNex, nexSeparado: nexSeparado(f), progressaoNex: usaProgressaoNex(f), pd, pv, pe, san, pdMax, atual, machucado, limitePE, limiteRitual,
     defesa, rd, desl, cargaMax, cargaUsada, sobrecarregado, penalCarga, prof, pericias, PER, ataques, habilidades, trilha, trilhaHabs,
     poderesEscolhidos, expansao, forcaSaber, slotsPoder, slotsAtributo, slotsGrau, versatilidade, trilhaEm, transcenderes, limiteTranscender, transcenderSeparado, limiteParanormais, paranormaisUsados, paranormalDaOrigem, porElemento, ativo, sangueFervente,
