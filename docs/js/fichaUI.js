@@ -2,20 +2,20 @@
 import {
   MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS,
   ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS,
-} from './catalogo.js?v=0.17';
-import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.17';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.17';
-import { pentagramaAtributos } from './criador.js?v=0.17';
-import { textoTeste, d, rolar } from './dados.js?v=0.17';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.17';
+} from './catalogo.js?v=0.18';
+import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.18';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.18';
+import { pentagramaAtributos } from './criador.js?v=0.18';
+import { textoTeste, d, rolar } from './dados.js?v=0.18';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.18';
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.17', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.17-sah', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
-  try { const r = await fetch('dados/textos_sah_ocr.json?v=0.17-ocr', {cache:'no-cache'}); if (r.ok) OCR_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.18', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.18-sah', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos_sah_ocr.json?v=0.18-ocr', {cache:'no-cache'}); if (r.ok) OCR_SAH = await r.json(); } catch {}
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
 let OCR_SAH = { rituais: {}, habilidades: {} };
@@ -46,10 +46,14 @@ export function telaFicha(f, ui) {
   return `<div class="pagina pagina-ficha">
   <div class="ficha-identificador"><span>DOSSIÊ DE AGENTE / REGISTRO INDIVIDUAL</span><span class="selo">CONFIDENCIAL</span></div>
   ${cabecalho(f, d)}
-  ${d.avisos.length ? `<details class="avisos-ficha" style="margin-top:12px"><summary class="ui" style="cursor:pointer">⚠ ${d.avisos.length} aviso(s) de regra</summary><ul>${d.avisos.map(a => `<li>${esc(a)}</li>`).join('')}</ul></details>` : ''}
+  ${aba !== 'agente' ? avisosDeRegra(d) : ''}
   <nav class="abas" role="tablist" data-guardar-rolagem="abas">${ABAS.map(([id, nome]) => `<button role="tab" data-acao="aba" data-aba="${id}" aria-selected="${aba === id}">${nome}</button>`).join('')}</nav>
   <div class="secao-aba"><span>${String(ABAS.findIndex(([id]) => id === aba) + 1).padStart(2, '0')} / ${esc(ABAS.find(([id]) => id === aba)?.[1] || 'Agente')}</span><small>ARQUIVO PESSOAL · ALTERAÇÕES SALVAS AUTOMATICAMENTE</small></div>
   <div class="conteudo-aba">${corpo}</div></div>`;
+}
+
+function avisosDeRegra(d) {
+  return d.avisos.length ? `<details class="avisos-ficha" open><summary class="ui">⚠ ${d.avisos.length} aviso(s) de regra</summary><ul>${d.avisos.map(a => `<li>${esc(a)}</li>`).join('')}</ul></details>` : '';
 }
 
 function cabecalho(f, d) {
@@ -100,12 +104,15 @@ function abaAgente(f, d) {
       : temOpcional(f, 'nivelExp') ? `<label class="campo"><span>Nível</span><select data-campo="nivel" data-tipo="int">${Array.from({ length: 20 }, (_, i) => `<option value="${i + 1}" ${f.nivel === i + 1 ? 'selected' : ''}>${i + 1}</option>`).join('')}</select></label>${campoNexExposicao}`
         : `<label class="campo"><span>NEX</span><select data-campo="nex" data-tipo="int">${NEX.map(n => `<option value="${n}" ${f.nex === n ? 'selected' : ''}>${n}%</option>`).join('')}</select></label>`;
   const botoesExposicao = nexSeparado(f) ? `<div class="linha" style="margin-top:8px"><span class="rotulo">Exposição ao paranormal:</span>${EXPOSICOES.map(e => `<button class="btn pequeno" data-acao="exposicao" data-nex="${e.nex}" title="${esc(e.resumo)}">${esc(e.nome)} +${e.nex}%</button>`).join('')}</div><p class="apagado" style="font-size:.85rem;margin-top:4px">O NEX aqui mede só a exposição (máximo 99%). Aprender um ritual soma o círculo dele no NEX. ${f.opcionais.progressaoNex ? 'A Progressão de NEX está na aba Habilidades.' : 'A Progressão de NEX (regra opcional) está desligada: ligue na aba Notas se quiser.'}</p>` : '';
-  return `<div class="grade c2 visao-agente">
+  return `<div class="ficha-alertas">${avisosDeRegra(d)}${painelPendencias(d)}</div>
+  <div class="grade c2 visao-agente">
   <section class="painel painel-roda"><div class="titulo-secao"><h2 class="faixa sangue">Atributos</h2><button class="btn pequeno fantasma" data-acao="editar-atributos">Editar</button></div>
     ${pentagramaAtributos(f.atributos, false, true)}
     <p class="apagado" style="text-align:center;font-size:.9rem">Toque num atributo para rolar. ${d.slotsAtributo ? `Aumentos de atributo liberados: ${d.slotsAtributo}.` : ''}</p>
   </section>
-  <section class="painel"><h2 class="faixa">Status operacional</h2>
+  <section class="painel painel-vitais"><div class="titulo-secao"><h2 class="faixa">Sinais vitais</h2><small class="apagado dossie-txt">CONTROLE DE RECURSOS</small></div><div class="recursos">${recursos.join('')}</div></section>
+  </div>
+  <section class="painel painel-status"><h2 class="faixa">Status operacional</h2>
     <div class="numeros-chave" style="margin-top:12px">
       <div class="chave"><b>${d.defesa}</b><span>Defesa</span></div>
       <div class="chave"><b>${d.desl}m</b><span>Desloc.</span></div>
@@ -121,9 +128,8 @@ function abaAgente(f, d) {
       ${d.atual.pv <= 0 ? `<span class="etiqueta alerta">Morrendo ${f.recursos.morrendo}/3</span><button class="btn pequeno" data-acao="contador" data-c="morrendo">+1 turno morrendo</button>` : ''}
       ${!d.pd && d.atual.san <= 0 ? `<span class="etiqueta alerta">Enlouquecendo ${f.recursos.enlouquecendo}/3</span><button class="btn pequeno" data-acao="contador" data-c="enlouquecendo">+1 turno</button>` : ''}
     </div>
-  </section></div>
-  <section class="painel painel-vitais"><div class="titulo-secao"><h2 class="faixa">Sinais vitais</h2><small class="apagado dossie-txt">CONTROLE DE RECURSOS</small></div><div class="recursos">${recursos.join('')}</div></section>
-  <div class="ficha-acompanhamento">${painelPendencias(d) ? `<div style="margin-bottom:14px">${painelPendencias(d)}</div>` : ''}${efeitos ? `<div style="margin-bottom:14px">${efeitos}</div>` : ''}</div>
+  </section>
+  ${efeitos ? `<div class="ficha-acompanhamento">${efeitos}</div>` : ''}
   <section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa">Perícias</h2><span class="apagado dossie-txt">Toque no dado para rolar</span></div>
     <div class="tabela-rolagem"><table class="tabela"><thead><tr><th>Perícia</th><th>Atr.</th><th>Grau</th><th class="esconde-celular">Outros</th><th>Rolar</th></tr></thead><tbody>
     ${d.pericias.map(p => `<tr class="${p.bloqueada ? 'pericia-bloq' : ''}"><td>${esc(p.nome)}${p.id === 'profissao' && f.profissao ? ` <small>(${esc(f.profissao)})</small>` : ''}${p.treinada ? ' <small title="Só treinada">*</small>' : ''}${p.carga ? ' <small title="Penalidade de carga">+</small>' : ''}</td>

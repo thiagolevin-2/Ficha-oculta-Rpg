@@ -1,16 +1,17 @@
+import { aplicarContaminacao, htmlContaminacao } from './contaminacao.js?v=0.18';
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
-import { ELEMENTOS_VISUAIS, aplicarElemento } from './temas.js?v=0.17';
-import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.17';
-import { normalizar, derivar } from './regras.js?v=0.17';
-import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, espacoUsado } from './armazenamento.js?v=0.17';
-import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.17';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.17';
-import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.17-sah';
-import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.17';
-import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.17';
+import { ELEMENTOS_VISUAIS, aplicarElemento } from './temas.js?v=0.18';
+import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.18';
+import { normalizar, derivar } from './regras.js?v=0.18';
+import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, espacoUsado } from './armazenamento.js?v=0.18';
+import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.18';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.18';
+import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.18-sah';
+import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.18';
+import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.18';
 
-export const VERSAO = '0.17';
+export const VERSAO = '0.18';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -29,7 +30,7 @@ let buscaLivroDigital = '';
 async function abrirLivroDigital(id, pagina=1) {
   if (!LIVROS_DIGITALIZADOS.some(v=>v.id===id)) return;
   try {
-    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.17-sah', {cache:'no-cache'});
+    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.18-sah', {cache:'no-cache'});
     if (!resp.ok) throw new Error('Não foi possível carregar esta transcrição.');
     livroDigital = await resp.json(); paginaDigital = Math.min(Math.max(1, Number(pagina)||1),livroDigital.paginas.length); buscaLivroDigital = '';
     render();
@@ -40,11 +41,11 @@ async function abrirLivroDigital(id, pagina=1) {
 }
 
 async function carregarSuplementos(){
-  try { const r=await fetch('dados/suplementos.json?v=0.17'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
+  try { const r=await fetch('dados/suplementos.json?v=0.18'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
 }
 async function carregarReferenciasSAH(){
   try {
-    const r = await fetch('dados/sah_referencias.json?v=0.17', {cache:'no-cache'});
+    const r = await fetch('dados/sah_referencias.json?v=0.18', {cache:'no-cache'});
     if(r.ok) SAH_REF = await r.json();
   } catch(e){ console.warn('Índice do Sobrevivendo ao Horror não disponível', e); }
 }
@@ -206,7 +207,9 @@ function render() {
   else if (r.tela === 'acervo') corpo = acervo();
   else if (r.tela === 'sobre') corpo = sobre();
   else corpo = inicio();
-  htmlMantendoFoco(app, `${topo()}<div class="area-trabalho">${barraContexto()}<main id="conteudo" tabindex="-1">${corpo}</main><footer class="rodape">${NOME_DO_SITE} v${VERSAO} · projeto pessoal de Thiago Silva · ferramenta de fãs para Ordem Paranormal RPG · salvo só neste navegador</footer>${bandeja()}</div>`);
+  const fichaVisual = r.tela === 'ficha' ? ctx.fichaAtual() : null;
+  aplicarContaminacao(fichaVisual);
+  htmlMantendoFoco(app, `${topo()}<div class="area-trabalho">${htmlContaminacao(fichaVisual, estado.elemento)}${barraContexto()}<main id="conteudo" tabindex="-1">${corpo}</main><footer class="rodape">${NOME_DO_SITE} v${VERSAO} · projeto pessoal de Thiago Silva · ferramenta de fãs para Ordem Paranormal RPG · salvo só neste navegador</footer>${bandeja()}</div>`);
 }
 quandoMudar(() => { if (estado.historicoAberto) render(); });
 

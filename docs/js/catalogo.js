@@ -3,7 +3,7 @@
 // O texto oficial está nos livros (Livro de Regras = "LR"; Sobrevivendo ao Horror = "SaH").
 // Para mudar uma regra, mude aqui: as telas e o motor (regras.js) leem deste arquivo.
 
-import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.17';
+import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.18';
 
 export const NOME_DO_SITE = 'Ficha Oculta RPG';
 

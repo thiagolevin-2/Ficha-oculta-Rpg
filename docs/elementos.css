@@ -165,3 +165,35 @@
  .sigilo-roda,.sigilo-roda * {animation:none!important;transform:none!important;filter:none!important;opacity:1!important}
  .sangue-gotas,.energia-descarga,.medo-nodo,.morte-fluxo {display:none!important}
 }
+/* v0.18 — avisos acima, roda e recursos lado a lado, status na linha seguinte. */
+:root[data-elemento] .ficha-alertas {display:grid;gap:10px;margin:0 0 14px}
+:root[data-elemento] .ficha-alertas:empty {display:none}
+:root[data-elemento] .ficha-alertas .avisos-ficha {margin:0;padding:12px 16px;border:1px solid var(--linha-forte);border-left:3px solid var(--vela);background:var(--painel);border-radius:var(--raio)}
+:root[data-elemento] .ficha-alertas .avisos-ficha summary {cursor:pointer;color:var(--vela);font-size:11px}
+:root[data-elemento] .ficha-alertas .avisos-ficha ul {margin:8px 0 0;padding-left:18px;font-size:13px}
+:root[data-elemento] .ficha-alertas .pendencias {margin:0}
+:root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:minmax(260px,.9fr) minmax(0,1.1fr);gap:16px;align-items:start}
+:root[data-elemento] .visao-agente > .painel-vitais {margin:0}
+:root[data-elemento] .visao-agente .painel-vitais .recursos {grid-template-columns:1fr;gap:8px}
+:root[data-elemento] .visao-agente .painel-vitais .titulo-secao {margin-bottom:12px}
+:root[data-elemento] .visao-agente .recurso {padding:10px 12px}
+:root[data-elemento] .visao-agente .recurso .numeros {font-size:22px}
+:root[data-elemento] .visao-agente .recurso .sigla {font-size:10px}
+:root[data-elemento] .visao-agente .recurso .barra {margin:7px 0}
+:root[data-elemento] .visao-agente .recurso .acoes-rec input {min-height:30px;font-size:12px}
+:root[data-elemento] .visao-agente .recurso .acoes-rec .btn {min-height:30px;padding:5px 9px}
+:root[data-elemento] .visao-agente .recurso .acoes-rec .icone-btn {height:30px}
+:root[data-elemento] .visao-agente .recurso > .linha {gap:6px}
+:root[data-elemento] .visao-agente .recurso > .linha small {font-size:10px;line-height:1.4}
+:root[data-elemento] .painel-status {margin:0 0 16px;padding:18px}
+:root[data-elemento] .painel-status .numeros-chave {grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px}
+:root[data-elemento] .painel-status > .grade.c2 {grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+:root[data-elemento] .painel-status > .linha {justify-content:flex-end}
+@media(max-width:680px) {
+ :root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:1fr}
+ :root[data-elemento] .painel-status .numeros-chave {grid-template-columns:repeat(3,minmax(0,1fr))}
+ :root[data-elemento] .painel-status > .grade.c2 {grid-template-columns:1fr}
+}
+@media print {
+ :root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:1fr 1fr}
+}

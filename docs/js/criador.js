@@ -1,9 +1,9 @@
-import { simboloDaRoda } from './simbolos.js?v=0.17';
+import { simboloDaRoda } from './simbolos.js?v=0.18';
 // criador.js — criação de agente em passos.
 // PASSO 0 (pedido do projeto): escolher as regras ANTES de criar a ficha — Regras Padrão ou Sobrevivendo ao Horror.
-import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.17';
-import { novaFicha, normalizar, derivar } from './regras.js?v=0.17';
-import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.17';
+import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.18';
+import { novaFicha, normalizar, derivar } from './regras.js?v=0.18';
+import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.18';
 
 export const PASSOS = [
   ['modo', 'Regras'], ['conceito', 'Conceito'], ['classe', 'Classe'], ['atributos', 'Atributos'], ['origem', 'Origem'], ['pericias', 'Perícias'], ['revisao', 'Revisão'],

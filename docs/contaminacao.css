@@ -1,0 +1,30 @@
+/* A contaminação cresce em dez faixas (0–9), sem alterar mecânicas. */
+:root {--nivel-infeccao:0;--infeccao:0}
+.contaminacao-site {position:fixed;top:0;bottom:0;left:238px;right:0;z-index:17;pointer-events:none;overflow:hidden;color:var(--elemento-cor);isolation:isolate;contain:layout paint}
+.contaminacao-site * {pointer-events:none!important}
+.marca-infeccao {position:absolute;left:var(--x);top:var(--y);width:calc(16px + var(--nivel-infeccao)*4px);aspect-ratio:1;background:currentColor;mask:var(--sigilo-elemento) center/contain no-repeat;translate:-50% 0;transform:rotate(var(--rot));opacity:calc(.06 + var(--infeccao)*.14);animation-delay:var(--atraso)!important;transform-origin:center}
+.trama-infeccao {position:absolute;inset:0;width:100%;height:100%;opacity:calc(.08 + var(--infeccao)*.17);stroke-linecap:round;stroke-linejoin:round}
+:root[data-contaminacao]:not([data-contaminacao="0"]) .pagina-ficha .painel {box-shadow:inset 0 0 calc(var(--nivel-infeccao)*1.5px) var(--elemento-suave),var(--sombra)}
+[data-elemento="sangue"] .marca-infeccao {animation:infeccao-sangue 8s ease-in-out infinite}
+[data-elemento="sangue"] .trama-infeccao {stroke-width:1.7;stroke-dasharray:90 7;animation:infeccao-escorrer 25s linear infinite}
+[data-elemento="morte"] .marca-infeccao {animation:infeccao-morte 55s linear infinite}
+[data-elemento="morte"] .trama-infeccao {stroke-dasharray:45 4 3 9}
+[data-elemento="conhecimento"] .marca-infeccao {transform:rotate(0);animation:infeccao-inscrever 13s ease-in-out infinite}
+[data-elemento="conhecimento"] .trama-infeccao {stroke-dasharray:14 7}
+[data-elemento="energia"] .marca-infeccao {animation:infeccao-carga 11s ease-in-out infinite}
+[data-elemento="energia"] .trama-infeccao {stroke-dasharray:12 65;animation:infeccao-circuito 12s linear infinite}
+[data-elemento="medo"] .marca-infeccao {animation:infeccao-presenca 16s ease-in-out infinite}
+[data-elemento="medo"] .trama-infeccao {filter:blur(1px);stroke-width:3;opacity:calc(.04 + var(--infeccao)*.1)}
+[data-elemento="medo"] .contaminacao-site::before {content:'';position:absolute;inset:0;background:radial-gradient(ellipse at -10% 50%,var(--elemento-suave),transparent 38%),radial-gradient(ellipse at 110% 50%,var(--elemento-suave),transparent 38%);opacity:var(--infeccao);animation:infeccao-nevoa 16s ease-in-out infinite}
+@keyframes infeccao-sangue {0%,100%{scale:1} 17%{scale:1.06} 25%{scale:1} 32%{scale:1.03}}
+@keyframes infeccao-escorrer {to{stroke-dashoffset:-194}}
+@keyframes infeccao-morte {to{rotate:-360deg}}
+@keyframes infeccao-inscrever {0%,100%{opacity:calc(.05 + var(--infeccao)*.09)} 50%{opacity:calc(.08 + var(--infeccao)*.15)}}
+@keyframes infeccao-carga {0%,100%{filter:drop-shadow(0 0 0 transparent)} 50%{filter:drop-shadow(0 0 3px var(--elemento-cor))}}
+@keyframes infeccao-circuito {to{stroke-dashoffset:-154}}
+@keyframes infeccao-presenca {0%,100%{opacity:calc(.03 + var(--infeccao)*.07);filter:blur(.8px)} 50%{opacity:calc(.07 + var(--infeccao)*.13);filter:blur(0)}}
+@keyframes infeccao-nevoa {0%,100%{scale:1} 50%{scale:1.08}}
+@media(max-width:1180px) {.contaminacao-site {left:205px}}
+@media(max-width:820px) {.contaminacao-site {left:0}}
+@media(prefers-reduced-motion:reduce) {.contaminacao-site,.contaminacao-site *,.contaminacao-site::before {animation:none!important;filter:none!important}}
+@media print {.contaminacao-site {display:none!important}}
