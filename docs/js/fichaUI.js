@@ -2,20 +2,20 @@
 import {
   MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS,
   ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS,
-} from './catalogo.js?v=0.14';
-import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.14';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.14';
-import { pentagramaAtributos } from './criador.js?v=0.14';
-import { textoTeste, d, rolar } from './dados.js?v=0.14';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.14';
+} from './catalogo.js?v=0.15';
+import { derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, poderesDeOutrasClasses } from './regras.js?v=0.15';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.15';
+import { pentagramaAtributos } from './criador.js?v=0.15';
+import { textoTeste, d, rolar } from './dados.js?v=0.15';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.15';
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.14', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.14-sah', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
-  try { const r = await fetch('dados/textos_sah_ocr.json?v=0.14-ocr', {cache:'no-cache'}); if (r.ok) OCR_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.15', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.15-sah', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos_sah_ocr.json?v=0.15-ocr', {cache:'no-cache'}); if (r.ok) OCR_SAH = await r.json(); } catch {}
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
 let OCR_SAH = { rituais: {}, habilidades: {} };
@@ -43,11 +43,13 @@ export function telaFicha(f, ui) {
   dAtual = d;
   const aba = ui.aba || 'agente';
   const corpo = ({ agente: abaAgente, combate: abaCombate, habilidades: abaHabilidades, poderes: abaPoderes, rituais: abaRituais, inventario: abaInventario, notas: abaNotas }[aba] || abaAgente)(f, d, ui);
-  return `<div class="pagina">
+  return `<div class="pagina pagina-ficha">
+  <div class="ficha-identificador"><span>DOSSIÊ DE AGENTE / REGISTRO INDIVIDUAL</span><span class="selo">CONFIDENCIAL</span></div>
   ${cabecalho(f, d)}
   ${d.avisos.length ? `<details class="avisos-ficha" style="margin-top:12px"><summary class="ui" style="cursor:pointer">⚠ ${d.avisos.length} aviso(s) de regra</summary><ul>${d.avisos.map(a => `<li>${esc(a)}</li>`).join('')}</ul></details>` : ''}
   <nav class="abas" role="tablist" data-guardar-rolagem="abas">${ABAS.map(([id, nome]) => `<button role="tab" data-acao="aba" data-aba="${id}" aria-selected="${aba === id}">${nome}</button>`).join('')}</nav>
-  ${corpo}</div>`;
+  <div class="secao-aba"><span>${String(ABAS.findIndex(([id]) => id === aba) + 1).padStart(2, '0')} / ${esc(ABAS.find(([id]) => id === aba)?.[1] || 'Agente')}</span><small>ARQUIVO PESSOAL · ALTERAÇÕES SALVAS AUTOMATICAMENTE</small></div>
+  <div class="conteudo-aba">${corpo}</div></div>`;
 }
 
 function cabecalho(f, d) {
@@ -98,13 +100,12 @@ function abaAgente(f, d) {
       : temOpcional(f, 'nivelExp') ? `<label class="campo"><span>Nível</span><select data-campo="nivel" data-tipo="int">${Array.from({ length: 20 }, (_, i) => `<option value="${i + 1}" ${f.nivel === i + 1 ? 'selected' : ''}>${i + 1}</option>`).join('')}</select></label>${campoNexExposicao}`
         : `<label class="campo"><span>NEX</span><select data-campo="nex" data-tipo="int">${NEX.map(n => `<option value="${n}" ${f.nex === n ? 'selected' : ''}>${n}%</option>`).join('')}</select></label>`;
   const botoesExposicao = nexSeparado(f) ? `<div class="linha" style="margin-top:8px"><span class="rotulo">Exposição ao paranormal:</span>${EXPOSICOES.map(e => `<button class="btn pequeno" data-acao="exposicao" data-nex="${e.nex}" title="${esc(e.resumo)}">${esc(e.nome)} +${e.nex}%</button>`).join('')}</div><p class="apagado" style="font-size:.85rem;margin-top:4px">O NEX aqui mede só a exposição (máximo 99%). Aprender um ritual soma o círculo dele no NEX. ${f.opcionais.progressaoNex ? 'A Progressão de NEX está na aba Habilidades.' : 'A Progressão de NEX (regra opcional) está desligada: ligue na aba Notas se quiser.'}</p>` : '';
-  return `${painelPendencias(d) ? `<div style="margin-bottom:14px">${painelPendencias(d)}</div>` : ''}${efeitos ? `<div style="margin-bottom:14px">${efeitos}</div>` : ''}<div class="grade c2">
+  return `${painelPendencias(d) ? `<div style="margin-bottom:14px">${painelPendencias(d)}</div>` : ''}${efeitos ? `<div style="margin-bottom:14px">${efeitos}</div>` : ''}<section class="painel painel-vitais"><div class="titulo-secao"><h2 class="faixa">Sinais vitais</h2><small class="apagado dossie-txt">CONTROLE DE RECURSOS</small></div><div class="recursos">${recursos.join('')}</div></section><div class="grade c2 visao-agente">
   <section class="painel"><div class="titulo-secao"><h2 class="faixa sangue">Atributos</h2><button class="btn pequeno fantasma" data-acao="editar-atributos">Editar</button></div>
     ${pentagramaAtributos(f.atributos, false, true)}
     <p class="apagado" style="text-align:center;font-size:.9rem">Toque num atributo para rolar. ${d.slotsAtributo ? `Aumentos de atributo liberados: ${d.slotsAtributo}.` : ''}</p>
   </section>
-  <section class="painel"><h2 class="faixa">Estado</h2>
-    <div class="recursos">${recursos.join('')}</div>
+  <section class="painel"><h2 class="faixa">Status operacional</h2>
     <div class="numeros-chave" style="margin-top:12px">
       <div class="chave"><b>${d.defesa}</b><span>Defesa</span></div>
       <div class="chave"><b>${d.desl}m</b><span>Desloc.</span></div>
