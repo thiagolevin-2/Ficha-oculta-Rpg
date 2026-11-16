@@ -1,0 +1,151 @@
+/* v0.16 — cinco atmosferas, uma única estrutura. */
+:root[data-elemento="sangue"] {
+ --fundo:#120b0e;--fundo-2:#1b1014;--painel:#1e1418;--painel-2:#291b21;--campo:#160e12;--nav:#160d12;
+ --tinta:#f6e9e9;--osso:#e2c8ce;--apagado:#c0a5af;--linha:#49303b;--linha-forte:#78515f;
+ --sangue:#a9324c;--sangue-escuro:#80213b;--sangue-texto:#ff9cad;--vela:#dfa5a0;--roxo:#c58ca9;
+ --accent-soft:#ab345419;--elemento-cor:#f2708d;--elemento-suave:#f2708d25;--sigilo-elemento:url(assets/sigilo-sangue.svg);
+ --pv:#d5637c;--pe:#dca57f;--san:#b8a1d7;--pd:#d699bd;--ok:#9fc5ac;--perigo:#ff9cad;
+}
+:root[data-elemento="morte"] {
+ --fundo:#101113;--fundo-2:#18191d;--painel:#1c1e22;--painel-2:#26282e;--campo:#141519;--nav:#131417;
+ --tinta:#eeeef2;--osso:#d5d4de;--apagado:#b0afbd;--linha:#3d3d48;--linha-forte:#656471;
+ --sangue:#585768;--sangue-escuro:#444350;--sangue-texto:#cbc5e3;--vela:#c1b7d9;--roxo:#a39ab8;
+ --accent-soft:#b4a6ce12;--elemento-cor:#c3b5df;--elemento-suave:#b4a6ce25;--sigilo-elemento:url(assets/sigilo-morte.svg);
+ --pv:#c18e9c;--pe:#c0b18c;--san:#a19fc5;--pd:#b29dc8;--ok:#a8bbad;--perigo:#e5a8b7;
+}
+:root[data-elemento="conhecimento"] {
+ --fundo:#14120b;--fundo-2:#1f1b10;--painel:#242015;--painel-2:#302a1b;--campo:#19160d;--nav:#19160e;
+ --tinta:#f5efda;--osso:#e1d8b6;--apagado:#bdb28c;--linha:#4c442c;--linha-forte:#786b42;
+ --sangue:#78601e;--sangue-escuro:#5b4717;--sangue-texto:#e9c96b;--vela:#efd584;--roxo:#c8ac67;
+ --accent-soft:#d0a94018;--elemento-cor:#e9c96b;--elemento-suave:#e9c96b25;--sigilo-elemento:url(assets/sigilo-conhecimento.svg);
+ --pv:#cc9380;--pe:#e0c063;--san:#a4bba3;--pd:#c7a7c0;--ok:#b4c899;--perigo:#edab8b;
+}
+:root[data-elemento="energia"] {
+ --fundo:#100c19;--fundo-2:#191125;--painel:#20172e;--painel-2:#2c203e;--campo:#160e21;--nav:#150f20;
+ --tinta:#f2eafa;--osso:#dbcaed;--apagado:#bda7d0;--linha:#483455;--linha-forte:#745686;
+ --sangue:#7742a3;--sangue-escuro:#582d7e;--sangue-texto:#d8a8ff;--vela:#d9b9ff;--roxo:#bd93e0;
+ --accent-soft:#b66bf01c;--elemento-cor:#c28afa;--elemento-suave:#c28afa25;--sigilo-elemento:url(assets/sigilo-energia.svg);
+ --pv:#e08bb6;--pe:#d4bd7a;--san:#94b9df;--pd:#ca97ef;--ok:#a6d3bd;--perigo:#f2a0cf;
+}
+:root[data-elemento="medo"] {
+ --fundo:#10141a;--fundo-2:#191e27;--painel:#1e2530;--painel-2:#283241;--campo:#151b24;--nav:#141a23;
+ --tinta:#f4f7fa;--osso:#d6e0ec;--apagado:#afbdcd;--linha:#3b4b5f;--linha-forte:#63758c;
+ --sangue:#4c627d;--sangue-escuro:#394c63;--sangue-texto:#d1e5fa;--vela:#d1dfea;--roxo:#a9bed5;
+ --accent-soft:#c5def315;--elemento-cor:#e4f1fc;--elemento-suave:#e4f1fc25;--sigilo-elemento:url(assets/sigilo-medo.svg);
+ --pv:#d59eab;--pe:#cfbd90;--san:#abc9e7;--pd:#b8b2d9;--ok:#b4d7cd;--perigo:#eeb8c0;
+}
+:root[data-elemento] {--pergaminho:var(--tinta);--sombra:0 7px 22px #00000018;--faixa:var(--tinta);--faixa-texto:var(--fundo);color-scheme:dark}
+:root[data-elemento] body::before {background:radial-gradient(ellipse at 85% 5%,var(--elemento-suave),transparent 60%),url(assets/manchas.svg) center/1300px;opacity:.45}
+:root[data-elemento] .painel {border-top-color:var(--linha-forte)}
+:root[data-elemento] .ponto-sinal,:root[data-elemento] .contexto-status i {background:var(--elemento-cor);box-shadow:0 0 10px var(--elemento-suave)}
+:root[data-elemento] .nav-sigilo {background:var(--elemento-cor);mask-image:var(--sigilo-elemento)}
+.escolha-elemento {display:grid;gap:7px}
+.escolha-elemento > span {font:9px var(--fonte-dossie);letter-spacing:.08em;color:var(--apagado)}
+:root[data-elemento] .escolha-elemento select {font-size:14px;min-height:42px;background:var(--campo);border-color:var(--linha-forte);color:var(--tinta);cursor:pointer}
+.escolha-elemento > small {font:7px/1.5 var(--fonte-dossie);letter-spacing:.03em;color:var(--apagado)}
+:root[data-elemento] .orbita-ritual {background:var(--elemento-cor)}
+:root[data-elemento] .membrana {background:radial-gradient(ellipse,var(--elemento-suave),transparent 65%);box-shadow:inset 0 0 42px var(--elemento-suave),0 0 70px var(--accent-soft);border-color:var(--linha-forte)}
+:root[data-elemento] .olho-vazio {border-color:var(--linha-forte);box-shadow:inset 0 0 55px var(--elemento-suave)}
+:root[data-elemento] .olho-vazio i {background:var(--fundo);border-color:var(--linha-forte);box-shadow:0 0 45px var(--elemento-suave)}
+:root[data-elemento] .documento-hero {background:var(--painel);color:var(--tinta);border-color:var(--linha-forte)}
+:root[data-elemento] .doc-linha,:root[data-elemento] .doc-campos span {border-color:var(--linha-forte)}
+:root[data-elemento] .doc-corpo span {color:var(--apagado)}
+:root[data-elemento] .doc-base .selo {color:var(--sangue-texto)}
+:root[data-elemento] .roda-atr {width:min(282px,100%);aspect-ratio:1;margin:0 auto;position:relative;isolation:isolate}
+:root[data-elemento] .roda-item {width:30%;z-index:2}
+:root[data-elemento] .roda-circulo {background:var(--campo);border-color:var(--linha-forte)}
+:root[data-elemento] .roda-circulo::before {background:var(--elemento-cor);opacity:.55}
+:root[data-elemento] button.roda-circulo:hover::before {background:var(--elemento-cor);opacity:1}
+:root[data-elemento] .roda-nome {font-size:8px;letter-spacing:.02em;color:var(--apagado)}
+:root[data-elemento] .roda-nome b {font-size:12px;letter-spacing:.08em;color:var(--tinta)}
+:root[data-elemento] .roda-valor {font-size:28px;line-height:1.05;margin:2px 0 0;color:var(--tinta)}
+/* Le conteneur ne tourne pas: seul le sigil central reçoit son animation. */
+.roda-elemento {position:absolute;left:50%;top:51%;width:31%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;z-index:0;color:var(--elemento-cor)}
+.roda-elemento i {position:absolute;display:block;inset:0;pointer-events:none}
+.simbolo-elemento {background:var(--elemento-cor);mask:var(--sigilo-elemento) center/contain no-repeat;transform-origin:50% 50%}
+.aura-elemento {inset:-18%!important;border-radius:50%;background:radial-gradient(circle,var(--elemento-suave),transparent 72%)}
+.eco-elemento {inset:-14%!important;border:1px solid var(--linha-forte);border-radius:50%;opacity:.5}
+/* Sangue: batimento duplo e onda concêntrica. */
+[data-elemento="sangue"] .simbolo-elemento {animation:elemento-pulsar 2.6s ease-in-out infinite}
+[data-elemento="sangue"] .eco-elemento {border-color:var(--elemento-cor);animation:elemento-onda 2.6s ease-out infinite}
+@keyframes elemento-pulsar {0%,38%,100% {transform:scale(.92)} 9%,24% {transform:scale(1.08)} 16%,32% {transform:scale(.98)}}
+@keyframes elemento-onda {0% {transform:scale(.78);opacity:.6} 70%,100% {transform:scale(1.35);opacity:0}}
+/* Morte: rotação lenta, inversa, e espiral concêntrica. */
+[data-elemento="morte"] .simbolo-elemento {animation:elemento-espiral 30s linear infinite}
+[data-elemento="morte"] .eco-elemento {border-style:dashed;border-radius:42% 58% 43% 57%;animation:elemento-espiral 18s linear infinite reverse}
+@keyframes elemento-espiral {from {transform:rotate(0)} to {transform:rotate(-360deg)}}
+/* Conhecimento: inscrições orbitam o símbolo, que se revela suavemente. */
+[data-elemento="conhecimento"] .simbolo-elemento {animation:elemento-revelar 6s ease-in-out infinite}
+[data-elemento="conhecimento"] .eco-elemento {border-style:dotted;border-width:2px;animation:elemento-inscrever 24s linear infinite}
+@keyframes elemento-revelar {0%,100% {opacity:.6;transform:translateY(2px)} 50% {opacity:1;transform:translateY(-2px)}}
+@keyframes elemento-inscrever {to {transform:rotate(360deg)}}
+/* Energia: pequenos deslocamentos irregulares, sem flashes de tela. */
+[data-elemento="energia"] .simbolo-elemento {animation:elemento-instavel 4.7s steps(1,end) infinite}
+[data-elemento="energia"] .eco-elemento {border-radius:28% 72% 56% 44%;border-style:dashed;animation:elemento-campo 7s ease-in-out infinite}
+@keyframes elemento-instavel {0%,18%,26%,62%,74%,100% {transform:translate(0,0) skew(0)} 20% {transform:translate(2px,-1px) skew(-3deg)} 23% {transform:translate(-2px,1px) skew(2deg)} 65% {transform:translate(1px,2px) skew(3deg)} 70% {transform:translate(-1px,-1px)}}
+@keyframes elemento-campo {0%,100% {transform:rotate(0) scale(.95)} 50% {transform:rotate(45deg) scale(1.08)}}
+/* Medo: respiração lenta, névoa e contorno que parece desaparecer. */
+[data-elemento="medo"] .simbolo-elemento {animation:elemento-ocultar 8s ease-in-out infinite}
+[data-elemento="medo"] .aura-elemento {animation:elemento-nevoa 8s ease-in-out infinite}
+[data-elemento="medo"] .eco-elemento {border-color:var(--elemento-cor);opacity:.17}
+@keyframes elemento-ocultar {0%,100% {opacity:.85;filter:blur(0);transform:scale(.96)} 50% {opacity:.35;filter:blur(1px);transform:scale(1.04)}}
+@keyframes elemento-nevoa {0%,100% {transform:scale(.8);opacity:.35} 50% {transform:scale(1.35);opacity:.85}}
+/* Roda e status primeiro, vitais em seguida, depois pendências e perícias. */
+:root[data-elemento] .visao-agente {grid-template-columns:minmax(275px,.8fr) minmax(0,1.2fr);gap:16px;align-items:start;margin:0 0 16px}
+:root[data-elemento] .visao-agente > .painel {margin:0;padding:18px}
+:root[data-elemento] .painel-roda .titulo-secao {margin-bottom:8px}
+:root[data-elemento] .painel-roda > p {margin:4px 0 0!important;font-size:11px!important;line-height:1.45}
+:root[data-elemento] .visao-agente .numeros-chave {grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+:root[data-elemento] .visao-agente .chave {padding:10px 5px}
+:root[data-elemento] .visao-agente .chave b {font-size:26px}
+:root[data-elemento] .visao-agente .grade.c2 {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+:root[data-elemento] .painel-vitais {padding:18px;margin:0 0 16px}
+:root[data-elemento] .painel-vitais .titulo-secao {margin-bottom:12px}
+:root[data-elemento] .painel-vitais .recursos {gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(225px,100%),1fr))}
+:root[data-elemento] .recurso {padding:12px}
+:root[data-elemento] .recurso .numeros {font-size:24px}
+:root[data-elemento] .recurso .barra {margin:10px 0}
+:root[data-elemento] .recurso .acoes-rec {gap:4px}
+:root[data-elemento] .recurso .acoes-rec .btn {padding:6px 8px}
+:root[data-elemento] .ficha-acompanhamento {display:grid;grid-template-columns:1fr;gap:12px;margin:0 0 16px}
+:root[data-elemento] .ficha-acompanhamento:empty {display:none}
+:root[data-elemento] .ficha-acompanhamento > div {margin:0!important}
+:root[data-elemento] .ficha-acompanhamento .painel {padding:16px}
+:root[data-elemento] .ficha-acompanhamento .titulo-secao {margin-bottom:10px}
+:root[data-elemento] .ficha-identificador {margin-bottom:12px}
+:root[data-elemento] .ficha-cabeca {padding:18px;gap:14px;grid-template-columns:72px minmax(0,1fr) auto}
+:root[data-elemento] .retrato {width:72px;height:90px}
+:root[data-elemento] .acoes-cabeca {grid-column:auto;align-self:center;border:0;padding:0;max-width:180px;gap:6px}
+:root[data-elemento] .ficha-cabeca h1,:root[data-elemento] .ficha-cabeca h1 input {font-size:30px;padding-bottom:5px;margin-bottom:8px}
+:root[data-elemento] .abas {margin-top:16px}
+:root[data-elemento] .secao-aba {padding:14px 0}
+:root[data-elemento] .pagina-ficha {padding-top:24px}
+@media(max-width:1180px) {
+ :root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:minmax(255px,.85fr) minmax(0,1.15fr)}
+ :root[data-elemento] .ficha-cabeca {grid-template-columns:64px minmax(0,1fr)}
+ :root[data-elemento] .acoes-cabeca {grid-column:1/-1;justify-content:flex-end;max-width:none;padding-top:10px;border-top:1px solid var(--linha)}
+ :root[data-elemento] .roda-atr {width:min(260px,100%)}
+}
+@media(max-width:820px) {
+ .escolha-elemento {gap:3px;min-width:116px}.escolha-elemento > span {font-size:7px}.escolha-elemento > small {display:none}
+ :root[data-elemento] .escolha-elemento select {font-size:12px;min-height:36px;padding:7px 9px}
+}
+@media(max-width:660px) {
+ :root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:1fr}
+ :root[data-elemento] .roda-atr {width:min(270px,100%)}
+ :root[data-elemento] .visao-agente .grade.c2 {grid-template-columns:repeat(2,minmax(0,1fr))}
+ :root[data-elemento] .ficha-cabeca h1,:root[data-elemento] .ficha-cabeca h1 input {font-size:25px}
+ :root[data-elemento] .ficha-cabeca {padding:14px}
+ :root[data-elemento] .ficha-cabeca .retrato {width:64px;height:82px}
+ :root[data-elemento] .painel-vitais .recursos {grid-template-columns:1fr}
+ :root[data-elemento] .painel-vitais .titulo-secao > small {font-size:8px}
+}
+@media(prefers-reduced-motion:reduce) {
+ :root[data-elemento] .roda-elemento i {animation:none!important;transform:none!important;filter:none!important}
+ :root[data-elemento] .simbolo-elemento {opacity:1!important}
+}
+@media print {
+ :root[data-elemento] {--fundo:#fff;--painel:#fff;--painel-2:#f3f3f3;--campo:#fff;--tinta:#222;--osso:#333;--apagado:#555;--linha:#bbb;--linha-forte:#666;--elemento-cor:#333}
+ .roda-elemento i {animation:none!important;filter:none!important}
+ :root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:1fr 1fr}
+}

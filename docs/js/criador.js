@@ -1,8 +1,8 @@
 // criador.js — criação de agente em passos.
 // PASSO 0 (pedido do projeto): escolher as regras ANTES de criar a ficha — Regras Padrão ou Sobrevivendo ao Horror.
-import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.15';
-import { novaFicha, normalizar, derivar } from './regras.js?v=0.15';
-import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.15';
+import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.16';
+import { novaFicha, normalizar, derivar } from './regras.js?v=0.16';
+import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.16';
 
 export const PASSOS = [
   ['modo', 'Regras'], ['conceito', 'Conceito'], ['classe', 'Classe'], ['atributos', 'Atributos'], ['origem', 'Origem'], ['pericias', 'Perícias'], ['revisao', 'Revisão'],
@@ -125,10 +125,10 @@ function passoAtributos(r) {
 }
 
 export function pentagramaAtributos(at, editavel, rolavel = false) {
-  // Roda dos atributos: 5 círculos de borda irregular em volta de uma engrenagem ornamentada (desenhos originais).
+  // Roda dos atributos com sigilo central determinado pelo elemento visual da interface.
   // AGI em cima, INT à direita, VIG e PRE embaixo, FOR à esquerda. O nome fica DENTRO do círculo, com o valor grande.
   const pos = { agi: [50, 17], int: [83, 41], vig: [69.5, 80], pre: [30.5, 80], for: [17, 41] };
-  return `<div class="roda-atr"><div class="roda-engrenagem" aria-hidden="true"></div>
+  return `<div class="roda-atr"><div class="roda-elemento" aria-hidden="true"><i class="aura-elemento"></i><i class="simbolo-elemento"></i><i class="eco-elemento"></i></div>
   ${ATRIBUTOS.map(a => {
     const miolo = `<span class="roda-nome">${a.nome}<b>${a.sigla}</b></span><span class="roda-valor">${at[a.id]}</span>`;
     return `<div class="roda-item" style="left:${pos[a.id][0]}%;top:${pos[a.id][1]}%">

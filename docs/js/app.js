@@ -1,22 +1,23 @@
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
-import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.15';
-import { normalizar, derivar } from './regras.js?v=0.15';
-import { carregarFichas, salvarFichas, carregarTema, salvarTema, espacoUsado } from './armazenamento.js?v=0.15';
-import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.15';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.15';
-import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.15-sah';
-import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.15';
-import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.15';
+import { ELEMENTOS_VISUAIS, aplicarElemento } from './temas.js?v=0.16';
+import { NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.16';
+import { normalizar, derivar } from './regras.js?v=0.16';
+import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, espacoUsado } from './armazenamento.js?v=0.16';
+import { $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.16';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.16';
+import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.16-sah';
+import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.16';
+import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.16';
 
-export const VERSAO = '0.15';
+export const VERSAO = '0.16';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
   ui: { aba: 'agente', ritFiltro: { busca: '', elemento: '', circulo: '' } },
   criador: null,
   historicoAberto: false,
-  tema: carregarTema(),
+  elemento: carregarElemento(),
 };
 const app = $('#app');
 let SUPLEMENTOS = null;
@@ -28,7 +29,7 @@ let buscaLivroDigital = '';
 async function abrirLivroDigital(id, pagina=1) {
   if (!LIVROS_DIGITALIZADOS.some(v=>v.id===id)) return;
   try {
-    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.15-sah', {cache:'no-cache'});
+    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.16-sah', {cache:'no-cache'});
     if (!resp.ok) throw new Error('Não foi possível carregar esta transcrição.');
     livroDigital = await resp.json(); paginaDigital = Math.min(Math.max(1, Number(pagina)||1),livroDigital.paginas.length); buscaLivroDigital = '';
     render();
@@ -39,16 +40,16 @@ async function abrirLivroDigital(id, pagina=1) {
 }
 
 async function carregarSuplementos(){
-  try { const r=await fetch('dados/suplementos.json?v=0.15'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
+  try { const r=await fetch('dados/suplementos.json?v=0.16'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
 }
 async function carregarReferenciasSAH(){
   try {
-    const r = await fetch('dados/sah_referencias.json?v=0.15', {cache:'no-cache'});
+    const r = await fetch('dados/sah_referencias.json?v=0.16', {cache:'no-cache'});
     if(r.ok) SAH_REF = await r.json();
   } catch(e){ console.warn('Índice do Sobrevivendo ao Horror não disponível', e); }
 }
 definirRaizModal($('#modal-raiz'));
-document.documentElement.dataset.tema = estado.tema;
+aplicarElemento(estado.elemento);
 
 const ctx = {
   estado, avisar,
@@ -93,7 +94,7 @@ function topo() {
   <header class="topo"><a class="marca" href="#/"><img src="assets/favicon.svg" alt=""><span>Ficha <b>Oculta</b><small>ORDEM PARANORMAL · RPG</small></span></a>
   <div class="nav-legenda">CENTRAL DE INVESTIGAÇÃO</div>
   <nav aria-label="Navegação principal">${link('#/', 'Início', 'inicio', r === 'inicio','00')}${link('#/agentes', 'Agentes', 'agentes', ['agentes', 'ficha', 'novo'].includes(r),'01')}${link('#/mestre', 'Mestre', 'mestre', r === 'mestre','02')}${link('#/acervo', 'Suplementos', 'acervo', r === 'acervo','03')}${link('#/sobre', 'Sobre', 'sobre', r === 'sobre','04')}</nav>
-  <div class="nav-base"><div class="nav-sigilo" aria-hidden="true"></div><p>O paranormal não vem<br>para a nossa realidade<br><em>por vontade própria.</em></p><button class="troca-tema" data-acao="tema" aria-label="Trocar tema claro/escuro" title="Alternar Realidade e Outro Lado">${icone('tema')}<span>${estado.tema === 'papel' ? 'Realidade' : 'Outro Lado'}<small>ALTERAR ATMOSFERA</small></span><b>⇄</b></button><span class="nav-local">● ARQUIVO LOCAL · v${VERSAO}</span></div></header>`;
+  <div class="nav-base"><div class="nav-sigilo" aria-hidden="true"></div><p>O paranormal não vem<br>para a nossa realidade<br><em>por vontade própria.</em></p><label class="escolha-elemento"><span>ELEMENTO DA INTERFACE</span><select data-elemento-visual aria-label="Elemento da interface">${ELEMENTOS_VISUAIS.map(e => `<option value="${e.id}" ${estado.elemento === e.id ? 'selected' : ''}>${e.nome}</option>`).join('')}</select><small>ESTILO VISUAL · SEM ALTERAR REGRAS</small></label><span class="nav-local">● ARQUIVO LOCAL · v${VERSAO}</span></div></header>`;
 }
 function inicio() {
   return `<div class="pagina pagina-inicio"><section class="hero-arquivo" aria-labelledby="hero-titulo">
@@ -115,7 +116,7 @@ function inicio() {
 function barraContexto() {
   const r = estado.rota.tela;
   const nomes = {inicio:'Visão geral',agentes:'Dossiês de agentes',novo:'Recrutamento',ficha:'Arquivo de agente',mestre:'Controle de operações',acervo:'Acervo de suplementos',sobre:'Sobre o projeto'};
-  return `<div class="barra-contexto"><span>ARQUIVO OCULTO <b>/</b> ${nomes[r] || 'Visão geral'}</span><span class="contexto-status"><i></i>${estado.tema === 'papel' ? 'REALIDADE · DOSSIÊ DE AGENTE' : 'OUTRO LADO · MEMBRANA INSTÁVEL'}</span></div>`;
+  return `<div class="barra-contexto"><span>ARQUIVO OCULTO <b>/</b> ${nomes[r] || 'Visão geral'}</span><span class="contexto-status"><i></i>${ELEMENTOS_VISUAIS.find(e => e.id === estado.elemento).nome.toUpperCase()} · MEMBRANA INSTÁVEL</span></div>`;
 }
 function listaAgentes() {
   const fs = estado.fichas;
@@ -214,7 +215,6 @@ const acoes = {
   ...acoesCriador(ctx), ...acoesFicha(ctx), ...acoesMestre(ctx),
   'fechar-modal': () => fecharModal(),
   'fechar-modal-fundo': (el, ev) => { if (ev.target === el) fecharModal(); },
-  'tema': () => { estado.tema = estado.tema === 'papel' ? 'noite' : 'papel'; document.documentElement.dataset.tema = estado.tema; salvarTema(estado.tema); render(); },
   'novo-agente': (el, ev) => { ev.preventDefault(); estado.criador = novoRascunho(); if (location.hash === '#/novo') render(); else location.hash = '#/novo'; },
   'abrir-livro-digital': el => abrirLivroDigital(el.dataset.livro),
   'pagina-livro': el => { paginaDigital = Number(el.dataset.pagina)||1; render(); document.getElementById('leitor-privado')?.scrollIntoView({block:'start'}); },
@@ -250,6 +250,12 @@ document.addEventListener('click', ev => {
 // Campos: digitar salva sem redesenhar (o teclado não fecha); mudar número/seleção redesenha.
 function aoEditar(ev, final) {
   const el = ev.target;
+  if ('elementoVisual' in el.dataset) {
+    if (final && ELEMENTOS_VISUAIS.some(e => e.id === el.value)) {
+      estado.elemento = el.value; salvarElemento(el.value); aplicarElemento(el.value); render();
+    }
+    return;
+  }
   if (el.dataset.acaoCheck) { if (final) checks[el.dataset.acaoCheck]?.(el, ev); return; }
   if (el.dataset.limiteItem != null) { // limites de itens por categoria (editados à mão)
     if (!final) return; const f = ctx.fichaAtual(); if (!f) return; const d = derivar(f);
