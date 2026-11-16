@@ -1,15 +1,15 @@
-import { sofrerDano, resolverCondicoesDoTurno } from './dano.js?v=0.20.2';
-import { AMEACAS_BASE } from './bestiario.js?v=0.20.2';
+import { sofrerDano, resolverCondicoesDoTurno } from './dano.js?v=0.23';
+import { AMEACAS_BASE } from './bestiario.js?v=0.23';
 // mestre.js — Área do Mestre (primeira versão): Ameaças, Combate (iniciativa), Anotações e Backup.
 // Ideia do dm-manager do Arcana, com o "bloco de ameaça" do Ordem Paranormal.
-import { ELEMENTOS, ATRIBUTOS, CONDICOES } from './catalogo.js?v=0.20.2';
-import { iniciarTurno, encerrarTurno, fimDeCena } from './turnos.js?v=0.20.2';
-import { temPeso } from './idade.js?v=0.20.2';
-import { derivar } from './regras.js?v=0.20.2';
-import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.20.2';
-import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal } from './util.js?v=0.20.2';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.20.2';
-import { d as dado, rolarTeste } from './dados.js?v=0.20.2';
+import { ELEMENTOS, ATRIBUTOS, CONDICOES, EVENTOS_INVESTIGACAO } from './catalogo.js?v=0.23';
+import { iniciarTurno, encerrarTurno, fimDeCena } from './turnos.js?v=0.23';
+import { temPeso } from './idade.js?v=0.23';
+import { derivar } from './regras.js?v=0.23';
+import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.23';
+import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal } from './util.js?v=0.23';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.23';
+import { d as dado, rolarTeste } from './dados.js?v=0.23';
 
 const txt = (v, m = 200) => (typeof v === 'string' ? v : v == null ? '' : String(v)).slice(0, m);
 const FORMULA = /^[0-9d+\-\s]{0,40}$/i;
@@ -46,6 +46,7 @@ function normalizarMestre(m) {
     cenas: {
       tipo: ['investigacao', 'perseguicao', 'furtividade', 'fabricacao', 'interpretacao'].includes(m.cenas?.tipo) ? m.cenas.tipo : 'investigacao',
       nome: txt(m.cenas?.nome, 100), objetivo: txt(m.cenas?.objetivo, 200),
+      eventos: (Array.isArray(m.cenas?.eventos) ? m.cenas.eventos : []).map(Number).filter(n => n >= 2 && n <= 12).slice(0, 20),
       rodada: inteiro(m.cenas?.rodada, 1, 999, 1), sucessos: inteiro(m.cenas?.sucessos, 0, 999), falhas: inteiro(m.cenas?.falhas, 0, 999),
       agentes: Object.fromEntries(Object.entries(m.cenas?.agentes || {}).slice(0, 40).map(([id, p]) => [id, {
         sucessos: inteiro(p?.sucessos, 0, 99), falhas: inteiro(p?.falhas, 0, 99), visibilidade: inteiro(p?.visibilidade, 0, 99),
@@ -153,6 +154,7 @@ function abaCenas(fichas) {
     }).join('')}</div>` : ''}
     ${cena.tipo === 'furtividade' ? `<p>Visibilidade total: ${fichas.reduce((total, f) => total + (cena.agentes[f.id]?.visibilidade || 0), 0)}. Na regra de grupo, com 5 ou mais ao fim da rodada, personagens com visibilidade positiva são vistos.</p>` : ''}
     ${cena.tipo === 'fabricacao' ? `<ul>${fichas.flatMap(f => f.projetosFabricacao.map(p => `<li>${esc(f.nome)} · ${esc(p.nome)} · DT ${p.dt} · ${p.feitas}/${p.exigidas} ações</li>`)).join('')}</ul>` : ''}
+    ${cena.tipo === 'investigacao' ? `<div class="linha" style="margin:10px 0"><button class="btn" data-acao="m-evento-investigacao">Rolar evento de investigação (2d6)</button><small class="apagado">SaH p. 82: no início da rodada. Cada evento só acontece uma vez por cena; repetido vira "sem evento".</small></div>` : ''}
     <div class="linha"><input id="cena-registro" aria-label="Evento, pista ou ação" placeholder="Evento, pista ou ação"><button class="btn sangue" data-acao="m-cena-registrar">Registrar</button></div>
     <ul>${cena.registro.slice().reverse().map(l => `<li>${esc(l)}</li>`).join('')}</ul>
     <button class="btn perigo" data-acao="m-cena-reiniciar">Nova cena</button>
@@ -239,6 +241,17 @@ export function acoesMestre(ctx) {
       const p = progressoCena(mestre.cenas, ficha.id);
       p.visibilidade = Math.min(99, Math.max(0, p.visibilidade + (Number(el.dataset.d) < 0 ? -1 : 1)));
       att();
+    },
+    'm-evento-investigacao': async () => {
+      const cena = mestre.cenas;
+      const r = await rolarDanoUI({ titulo: 'Evento de investigação', formula: '2d6', rotulo: 'EVENTO' }); if (!r) return;
+      let n = r.total; const repetido = cena.eventos.includes(n) && ![6, 7, 8].includes(n);
+      const [nome, texto] = repetido ? ['Sem evento', `Resultado ${n} repetido nesta cena.`] : EVENTOS_INVESTIGACAO[n];
+      if (!repetido) cena.eventos.push(n);
+      let extra = '';
+      if (!repetido && n === 10) { const a = await rolarDanoUI({ titulo: 'Ferimento: atributo (1d10)', formula: '1d10', rotulo: 'ATRIBUTO' }); if (a) extra = ` Atributo: ${['Agilidade', 'Força', 'Intelecto', 'Presença', 'Vigor'][Math.ceil(a.total / 2) - 1]}.`; }
+      cena.registro.push(`Rodada ${cena.rodada} · evento ${n} — ${nome}: ${texto}${extra}`.slice(0, 300));
+      att(); ctx.avisar(`${nome}.${extra}`);
     },
     'm-cena-registrar': () => {
       const cena = mestre.cenas, entrada = document.getElementById('cena-registro').value.trim();

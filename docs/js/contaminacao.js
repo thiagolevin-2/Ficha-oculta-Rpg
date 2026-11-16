@@ -1,5 +1,5 @@
 // Decoração por NEX: não altera regras, atributos, recursos ou afinidade.
-import { nexDaFicha } from './regras.js?v=0.20.2';
+import { nexDaFicha } from './regras.js?v=0.23';
 export function exposicaoVisual(ficha) {
   const valor = ficha ? Number(nexDaFicha(ficha)) : 0;
   const nex = Number.isFinite(valor) ? Math.max(0, Math.min(99, valor)) : 0;

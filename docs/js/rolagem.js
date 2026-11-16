@@ -1,9 +1,10 @@
 // rolagem.js — rolar testes, ataques e dano; mostrar o resultado; guardar o histórico.
 // Os dados 3D (do Arcana) só MOSTRAM um resultado já sorteado: a animação não decide nada.
-import { rolarTeste, rolar, comSinal } from './dados.js?v=0.20.2';
-import { animateDice, diceAnimationsEnabled, setDiceAnimations } from './dice3d.js?v=0.20.2';
-import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.20.2';
-import { esc, avisar } from './util.js?v=0.20.2';
+import { rolarTeste, rolar, comSinal } from './dados.js?v=0.23';
+import { animateDice, diceAnimationsEnabled, setDiceAnimations } from './dice3d.js?v=0.23';
+import { diceFromValues } from './dice-geometry.js?v=0.23';
+import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.23';
+import { esc, avisar } from './util.js?v=0.23';
 
 let historico = carregarRolagens();
 // modificadores da PRÓXIMA rolagem (bandeja): dados a mais/menos e bônus fixo
@@ -59,8 +60,10 @@ async function animar(item) {
     if (item.valores) {
       await animateDice(dadosAnim(item.valores, item.indice), { label: item.titulo, total: item.total, subtitle: item.pior ? 'ATRIBUTO ZERO: VALE O PIOR' : `${item.valores.length}d20 · VALE O MELHOR`, dc: item.dt, natural: item.valores[item.indice], kind: item.tipo === 'ataque' ? 'attack' : 'check', criticalThreshold: item.margem || 21, quem: item.quem });
     } else {
-      const dice = item.grupos.flatMap(g => g.valores.map(v => ({ sides: g.lados, value: v })));
-      await animateDice(dice.filter(x => [2, 4, 6, 8, 10, 12, 20].includes(x.sides)), { label: item.titulo, total: item.total, subtitle: item.multiplicador > 1 ? `CRÍTICO ×${item.multiplicador}` : (item.rotulo || 'DANO'), kind: item.rotulo === 'CURA' ? 'heal' : item.rotulo === 'EFEITO' ? 'effect' : 'damage', quem: item.quem });
+      // d2 vira moeda e d100 vira dois d10 (dezenas e unidades); outros tamanhos não têm modelo 3D
+      const dice = item.grupos.filter(g => [2, 4, 6, 8, 10, 12, 20, 100].includes(g.lados)).flatMap(g => diceFromValues(g.lados, g.valores)).slice(0, 24);
+      if (!dice.length) return;
+      await animateDice(dice, { label: item.titulo, total: item.total, subtitle: item.multiplicador > 1 ? `CRÍTICO ×${item.multiplicador}` : (item.rotulo || 'DANO'), kind: item.rotulo === 'CURA' ? 'heal' : item.rotulo === 'EFEITO' ? 'effect' : 'damage', quem: item.quem });
     }
   } catch (e) { console.warn(e); }
 }

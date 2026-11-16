@@ -1,13 +1,13 @@
-import { abrirOrigem } from './origens-ui.js?v=0.20.2';
-import { fecharModal } from './rolagem.js?v=0.20.2';
-import { simboloDaRoda } from './simbolos.js?v=0.20.2';
+import { abrirOrigem } from './origens-ui.js?v=0.23';
+import { fecharModal } from './rolagem.js?v=0.23';
+import { simboloDaRoda } from './simbolos.js?v=0.23';
 // criador.js — criação de agente em passos.
 // PASSO 0 (pedido do projeto): escolher as regras ANTES de criar a ficha — Regras Padrão ou Sobrevivendo ao Horror.
-import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.20.2';
-import { novaFicha, normalizar, derivar } from './regras.js?v=0.20.2';
-import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.20.2';
+import { MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, ORIGEM, PERICIAS, PERICIA, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.23';
+import { novaFicha, normalizar, derivar } from './regras.js?v=0.23';
+import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.23';
 
-import { faixaEtaria, PESOS_IDADE, tetoEtario } from './idade.js?v=0.20.2';
+import { faixaEtaria, PESOS_IDADE, tetoEtario } from './idade.js?v=0.23';
 
 const comOpcoes = r => ({ ...r.ficha, opcionais: r.opcionais });
 const baseAtributo = (r, id) => faixaEtaria(comOpcoes(r))?.base?.[id] ?? 1;
@@ -118,12 +118,12 @@ function passoModo(r) {
     <button class="modo" data-acao="cri-modo" data-modo="padrao" aria-pressed="${r.modo === 'padrao'}">
       <span class="sigilo sigilo-grande" style="--img:url(assets/sigilo-conhecimento.svg);--cor:var(--vela)"></span>
       <span class="selo">Livro de Regras</span><h2>Regras Padrão</h2>
-      <ul><li>Agente da Ordem desde o início (NEX 5%).</li><li>Combatente, Especialista ou Ocultista.</li><li>26 origens, 15 trilhas, PV, PE e Sanidade.</li><li>Evolução por NEX até 99%.</li></ul>
+      <ul><li>Agente da Ordem desde o início (NEX 5%).</li><li>Combatente, Especialista, Ocultista ou Sobrevivente.</li><li>26 origens, 15 trilhas, PV, PE e Sanidade.</li><li>Evolução por NEX até 99%.</li></ul>
     </button>
     <button class="modo sah" data-acao="cri-modo" data-modo="sah" aria-pressed="${r.modo === 'sah'}">
       <span class="sigilo sigilo-grande" style="--img:url(assets/sigilo-medo.svg);--cor:#c9a6f0"></span>
       <span class="selo" style="color:#c9a6f0">Sobrevivendo ao Horror</span><h2>Sobrevivendo ao Horror</h2>
-      <ul><li>Tudo das regras padrão, mais:</li><li>Classe <b>Sobrevivente</b>: gente comum, por estágios.</li><li>20 novas origens e 9 novas trilhas.</li><li>Poderes gerais e regras opcionais de horror.</li></ul>
+      <ul><li>Tudo das regras padrão, mais:</li><li>Classe <b>Sobrevivente</b> (também disponível nas Regras Padrão).</li><li>20 novas origens e 9 novas trilhas.</li><li>Poderes gerais e regras opcionais de horror.</li></ul>
     </button>
   </div>
   ${r.modo ? `<section class="painel" style="margin-top:16px"><h3 class="titulo-vermelho">Regras opcionais</h3><p class="apagado">Combine com o mestre. Todas podem ficar desligadas.</p><div class="opcionais">${op}</div></section>` : ''}`;

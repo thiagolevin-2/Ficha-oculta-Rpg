@@ -1,4 +1,4 @@
-import { d as dado, rolarTeste } from './dados.js?v=0.20.2';
+import { d as dado, rolarTeste } from './dados.js?v=0.23';
 
 export function sofrerDano(ficha, d, quantidade, { tipo = 'pv', rd = 0, metade = 0, ignorarTemp = false } = {}) {
   const recurso = tipo === 'mental' ? d.pd ? 'pd' : 'san' : 'pv';
