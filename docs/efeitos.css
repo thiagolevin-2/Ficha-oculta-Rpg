@@ -1,0 +1,401 @@
+/* v0.17 — cinco atmosferas, uma única estrutura. */
+:root[data-elemento="sangue"] {
+ --fundo:#120b0e;--fundo-2:#1b1014;--painel:#1e1418;--painel-2:#291b21;--campo:#160e12;--nav:#160d12;
+ --tinta:#f6e9e9;--osso:#e2c8ce;--apagado:#c0a5af;--linha:#49303b;--linha-forte:#78515f;
+ --sangue:#a9324c;--sangue-escuro:#80213b;--sangue-texto:#ff9cad;--vela:#dfa5a0;--roxo:#c58ca9;
+ --accent-soft:#ab345419;--elemento-cor:#f2708d;--elemento-suave:#f2708d25;--sigilo-elemento:url(assets/sigilo-sangue.svg);
+ --pv:#d5637c;--pe:#dca57f;--san:#b8a1d7;--pd:#d699bd;--ok:#9fc5ac;--perigo:#ff9cad;
+}
+:root[data-elemento="morte"] {
+ --fundo:#101113;--fundo-2:#18191d;--painel:#1c1e22;--painel-2:#26282e;--campo:#141519;--nav:#131417;
+ --tinta:#eeeef2;--osso:#d5d4de;--apagado:#b0afbd;--linha:#3d3d48;--linha-forte:#656471;
+ --sangue:#585768;--sangue-escuro:#444350;--sangue-texto:#cbc5e3;--vela:#c1b7d9;--roxo:#a39ab8;
+ --accent-soft:#b4a6ce12;--elemento-cor:#c3b5df;--elemento-suave:#b4a6ce25;--sigilo-elemento:url(assets/sigilo-morte.svg);
+ --pv:#c18e9c;--pe:#c0b18c;--san:#a19fc5;--pd:#b29dc8;--ok:#a8bbad;--perigo:#e5a8b7;
+}
+:root[data-elemento="conhecimento"] {
+ --fundo:#14120b;--fundo-2:#1f1b10;--painel:#242015;--painel-2:#302a1b;--campo:#19160d;--nav:#19160e;
+ --tinta:#f5efda;--osso:#e1d8b6;--apagado:#bdb28c;--linha:#4c442c;--linha-forte:#786b42;
+ --sangue:#78601e;--sangue-escuro:#5b4717;--sangue-texto:#e9c96b;--vela:#efd584;--roxo:#c8ac67;
+ --accent-soft:#d0a94018;--elemento-cor:#e9c96b;--elemento-suave:#e9c96b25;--sigilo-elemento:url(assets/sigilo-conhecimento.svg);
+ --pv:#cc9380;--pe:#e0c063;--san:#a4bba3;--pd:#c7a7c0;--ok:#b4c899;--perigo:#edab8b;
+}
+:root[data-elemento="energia"] {
+ --fundo:#100c19;--fundo-2:#191125;--painel:#20172e;--painel-2:#2c203e;--campo:#160e21;--nav:#150f20;
+ --tinta:#f2eafa;--osso:#dbcaed;--apagado:#bda7d0;--linha:#483455;--linha-forte:#745686;
+ --sangue:#7742a3;--sangue-escuro:#582d7e;--sangue-texto:#d8a8ff;--vela:#d9b9ff;--roxo:#bd93e0;
+ --accent-soft:#b66bf01c;--elemento-cor:#c28afa;--elemento-suave:#c28afa25;--sigilo-elemento:url(assets/sigilo-energia.svg);
+ --pv:#e08bb6;--pe:#d4bd7a;--san:#94b9df;--pd:#ca97ef;--ok:#a6d3bd;--perigo:#f2a0cf;
+}
+:root[data-elemento="medo"] {
+ --fundo:#10141a;--fundo-2:#191e27;--painel:#1e2530;--painel-2:#283241;--campo:#151b24;--nav:#141a23;
+ --tinta:#f4f7fa;--osso:#d6e0ec;--apagado:#afbdcd;--linha:#3b4b5f;--linha-forte:#63758c;
+ --sangue:#4c627d;--sangue-escuro:#394c63;--sangue-texto:#d1e5fa;--vela:#d1dfea;--roxo:#a9bed5;
+ --accent-soft:#c5def315;--elemento-cor:#e4f1fc;--elemento-suave:#e4f1fc25;--sigilo-elemento:url(assets/sigilo-medo.svg);
+ --pv:#d59eab;--pe:#cfbd90;--san:#abc9e7;--pd:#b8b2d9;--ok:#b4d7cd;--perigo:#eeb8c0;
+}
+:root[data-elemento] {--pergaminho:var(--tinta);--sombra:0 7px 22px #00000018;--faixa:var(--tinta);--faixa-texto:var(--fundo);color-scheme:dark}
+:root[data-elemento] body::before {background:radial-gradient(ellipse at 85% 5%,var(--elemento-suave),transparent 60%),url(assets/manchas.svg) center/1300px;opacity:.45}
+:root[data-elemento] .painel {border-top-color:var(--linha-forte)}
+:root[data-elemento] .ponto-sinal,:root[data-elemento] .contexto-status i {background:var(--elemento-cor);box-shadow:0 0 10px var(--elemento-suave)}
+:root[data-elemento] .nav-sigilo {background:var(--elemento-cor);mask-image:var(--sigilo-elemento)}
+.escolha-elemento {display:grid;gap:7px}
+.escolha-elemento > span {font:9px var(--fonte-dossie);letter-spacing:.08em;color:var(--apagado)}
+:root[data-elemento] .escolha-elemento select {font-size:14px;min-height:42px;background:var(--campo);border-color:var(--linha-forte);color:var(--tinta);cursor:pointer}
+.escolha-elemento > small {font:7px/1.5 var(--fonte-dossie);letter-spacing:.03em;color:var(--apagado)}
+:root[data-elemento] .orbita-ritual {background:var(--elemento-cor)}
+:root[data-elemento] .membrana {background:radial-gradient(ellipse,var(--elemento-suave),transparent 65%);box-shadow:inset 0 0 42px var(--elemento-suave),0 0 70px var(--accent-soft);border-color:var(--linha-forte)}
+:root[data-elemento] .olho-vazio {border-color:var(--linha-forte);box-shadow:inset 0 0 55px var(--elemento-suave)}
+:root[data-elemento] .olho-vazio i {background:var(--fundo);border-color:var(--linha-forte);box-shadow:0 0 45px var(--elemento-suave)}
+:root[data-elemento] .documento-hero {background:var(--painel);color:var(--tinta);border-color:var(--linha-forte)}
+:root[data-elemento] .doc-linha,:root[data-elemento] .doc-campos span {border-color:var(--linha-forte)}
+:root[data-elemento] .doc-corpo span {color:var(--apagado)}
+:root[data-elemento] .doc-base .selo {color:var(--sangue-texto)}
+:root[data-elemento] .roda-atr {width:min(282px,100%);aspect-ratio:1;margin:0 auto;position:relative;isolation:isolate}
+:root[data-elemento] .roda-item {width:30%;z-index:2}
+:root[data-elemento] .roda-circulo {background:var(--campo);border-color:var(--linha-forte)}
+:root[data-elemento] .roda-circulo::before {background:var(--elemento-cor);opacity:.55}
+:root[data-elemento] button.roda-circulo:hover::before {background:var(--elemento-cor);opacity:1}
+:root[data-elemento] .roda-nome {font-size:8px;letter-spacing:.02em;color:var(--apagado)}
+:root[data-elemento] .roda-nome b {font-size:12px;letter-spacing:.08em;color:var(--tinta)}
+:root[data-elemento] .roda-valor {font-size:28px;line-height:1.05;margin:2px 0 0;color:var(--tinta)}
+/* Traços das referências em SVG inline: cada parte recebe seu movimento. */
+:root[data-elemento] .roda-elemento {width:34%}
+.simbolo-elemento-svg {position:absolute;inset:0;pointer-events:none}
+.sigilo-roda {display:block;width:100%;height:100%;overflow:visible;fill:currentColor;color:var(--elemento-cor);filter:drop-shadow(0 0 3px var(--elemento-suave))}
+.sigilo-roda g,.sigilo-roda path,.sigilo-roda circle {transform-box:view-box;transform-origin:100px 100px}
+/* Sangue: a marca mantém a orientação; batimentos empurram gotas para baixo. */
+.sangue-marca {animation:sangue-batimento 3.4s ease-in-out infinite}
+.sangue-gota {opacity:0;animation:sangue-escorrer 3.4s ease-in infinite}
+.gota-b {animation-delay:1.7s}
+@keyframes sangue-batimento {0%,38%,100%{transform:scale(1)} 10%{transform:scale(1.045)} 18%{transform:scale(1)} 27%{transform:scale(1.025)}}
+@keyframes sangue-escorrer {0%,34%,100%{opacity:0;transform:translateY(-3px) scaleY(.5)} 42%{opacity:.65;transform:translateY(0) scaleY(1)} 76%{opacity:0;transform:translateY(12px) scaleY(1.25)}}
+/* Morte: só o núcleo espiralado gira; a haste e as pontas ficam fixas. */
+.sigilo-roda .morte-espiral {transform-origin:100px 107px;animation:morte-espiral-nucleo 38s linear infinite}
+.sigilo-roda .morte-fluxo {transform-origin:100px 107px;opacity:.45;animation:morte-fluxo-anel 24s linear infinite}
+@keyframes morte-espiral-nucleo {to{transform:rotate(-360deg)}}
+@keyframes morte-fluxo-anel {to{stroke-dashoffset:232}}
+/* Conhecimento: três anéis de inscrições giram em ritmos próprios. */
+.conhecimento-externo {animation:conhecimento-orbita 72s linear infinite}
+.conhecimento-medio {animation:conhecimento-orbita 58s linear infinite reverse}
+.conhecimento-interno {animation:conhecimento-orbita 46s linear infinite}
+.conhecimento-centro {animation:conhecimento-revelacao 7s ease-in-out infinite}
+@keyframes conhecimento-orbita {to{transform:rotate(360deg)}}
+@keyframes conhecimento-revelacao {0%,100%{opacity:.65} 50%{opacity:1;filter:drop-shadow(0 0 2px currentColor)}}
+/* Energia: correntes percorrem as três ramificações, não uma rotação genérica. */
+.energia-descarga {stroke:color-mix(in srgb,var(--elemento-cor) 35%,white);stroke-dasharray:13 87;stroke-dashoffset:100;opacity:0;animation:energia-percurso 4.8s ease-in-out infinite;filter:drop-shadow(0 0 2px currentColor)}
+.descarga-b {animation-delay:1.6s}.descarga-c {animation-delay:3.2s}
+.energia-marca {animation:energia-tensao 9s ease-in-out infinite}
+@keyframes energia-percurso {0%,12%{opacity:0;stroke-dashoffset:100} 24%,58%{opacity:.8} 72%,100%{opacity:0;stroke-dashoffset:-20}}
+@keyframes energia-tensao {0%,100%{opacity:.72} 35%,65%{opacity:1}}
+/* Medo: a marca se revela em silêncio; os dois nós respondem um ao outro. */
+.medo-marca {animation:medo-presenca 9s ease-in-out infinite}
+.medo-nodo {stroke:color-mix(in srgb,var(--elemento-cor) 65%,white);opacity:0;animation:medo-ressonancia 9s ease-in-out infinite}
+.nodo-b {animation-delay:4.5s}
+@keyframes medo-presenca {0%,100%{opacity:.9;filter:blur(0)} 50%{opacity:.48;filter:blur(.4px)}}
+@keyframes medo-ressonancia {0%,100%{opacity:0;stroke-width:.5} 45%{opacity:.75;stroke-width:2} 70%{opacity:.1;stroke-width:.8}}
+
+/* Roda e status primeiro, vitais em seguida, depois pendências e perícias. */
+:root[data-elemento] .visao-agente {grid-template-columns:minmax(275px,.8fr) minmax(0,1.2fr);gap:16px;align-items:start;margin:0 0 16px}
+:root[data-elemento] .visao-agente > .painel {margin:0;padding:18px}
+:root[data-elemento] .painel-roda .titulo-secao {margin-bottom:8px}
+:root[data-elemento] .painel-roda > p {margin:4px 0 0!important;font-size:11px!important;line-height:1.45}
+:root[data-elemento] .visao-agente .numeros-chave {grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+:root[data-elemento] .visao-agente .chave {padding:10px 5px}
+:root[data-elemento] .visao-agente .chave b {font-size:26px}
+:root[data-elemento] .visao-agente .grade.c2 {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+:root[data-elemento] .painel-vitais {padding:18px;margin:0 0 16px}
+:root[data-elemento] .painel-vitais .titulo-secao {margin-bottom:12px}
+:root[data-elemento] .painel-vitais .recursos {gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(225px,100%),1fr))}
+:root[data-elemento] .recurso {padding:12px}
+:root[data-elemento] .recurso .numeros {font-size:24px}
+:root[data-elemento] .recurso .barra {margin:10px 0}
+:root[data-elemento] .recurso .acoes-rec {gap:4px}
+:root[data-elemento] .recurso .acoes-rec .btn {padding:6px 8px}
+:root[data-elemento] .ficha-acompanhamento {display:grid;grid-template-columns:1fr;gap:12px;margin:0 0 16px}
+:root[data-elemento] .ficha-acompanhamento:empty {display:none}
+:root[data-elemento] .ficha-acompanhamento > div {margin:0!important}
+:root[data-elemento] .ficha-acompanhamento .painel {padding:16px}
+:root[data-elemento] .ficha-acompanhamento .titulo-secao {margin-bottom:10px}
+:root[data-elemento] .ficha-identificador {margin-bottom:12px}
+:root[data-elemento] .ficha-cabeca {padding:18px;gap:14px;grid-template-columns:72px minmax(0,1fr) auto}
+:root[data-elemento] .retrato {width:72px;height:90px}
+:root[data-elemento] .acoes-cabeca {grid-column:auto;align-self:center;border:0;padding:0;max-width:180px;gap:6px}
+:root[data-elemento] .ficha-cabeca h1,:root[data-elemento] .ficha-cabeca h1 input {font-size:30px;padding-bottom:5px;margin-bottom:8px}
+:root[data-elemento] .abas {margin-top:16px}
+:root[data-elemento] .secao-aba {padding:14px 0}
+:root[data-elemento] .pagina-ficha {padding-top:24px}
+@media(max-width:1180px) {
+ :root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:minmax(255px,.85fr) minmax(0,1.15fr)}
+ :root[data-elemento] .ficha-cabeca {grid-template-columns:64px minmax(0,1fr)}
+ :root[data-elemento] .acoes-cabeca {grid-column:1/-1;justify-content:flex-end;max-width:none;padding-top:10px;border-top:1px solid var(--linha)}
+ :root[data-elemento] .roda-atr {width:min(260px,100%)}
+}
+@media(max-width:820px) {
+ .escolha-elemento {gap:3px;min-width:116px}.escolha-elemento > span {font-size:7px}.escolha-elemento > small {display:none}
+ :root[data-elemento] .escolha-elemento select {font-size:12px;min-height:36px;padding:7px 9px}
+}
+@media(max-width:660px) {
+ :root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:1fr}
+ :root[data-elemento] .roda-atr {width:min(270px,100%)}
+ :root[data-elemento] .visao-agente .grade.c2 {grid-template-columns:repeat(2,minmax(0,1fr))}
+ :root[data-elemento] .ficha-cabeca h1,:root[data-elemento] .ficha-cabeca h1 input {font-size:25px}
+ :root[data-elemento] .ficha-cabeca {padding:14px}
+ :root[data-elemento] .ficha-cabeca .retrato {width:64px;height:82px}
+ :root[data-elemento] .painel-vitais .recursos {grid-template-columns:1fr}
+ :root[data-elemento] .painel-vitais .titulo-secao > small {font-size:8px}
+}
+@media(prefers-reduced-motion:reduce) {
+ :root:not([data-animacoes="sempre"])[data-elemento] .roda-elemento i {animation:none!important;transform:none!important;filter:none!important}
+ :root:not([data-animacoes="sempre"])[data-elemento] .simbolo-elemento {opacity:1!important}
+}
+@media print {
+ :root[data-elemento] {--fundo:#fff;--painel:#fff;--painel-2:#f3f3f3;--campo:#fff;--tinta:#222;--osso:#333;--apagado:#555;--linha:#bbb;--linha-forte:#666;--elemento-cor:#333}
+ .roda-elemento i {animation:none!important;filter:none!important}
+ :root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:1fr 1fr}
+}
+
+@media(prefers-reduced-motion:reduce) {
+ :root:not([data-animacoes="sempre"]) .sigilo-roda, :root:not([data-animacoes="sempre"]) .sigilo-roda * {animation:none!important;transform:none!important;filter:none!important}
+ :root:not([data-animacoes="sempre"]) .sigilo-roda {opacity:1!important}
+ :root:not([data-animacoes="sempre"]) .sigilo-roda > g:not(.sangue-gotas), :root:not([data-animacoes="sempre"]) .sigilo-roda .conhecimento-centro {opacity:1!important}
+ :root:not([data-animacoes="sempre"]) .sangue-gotas, :root:not([data-animacoes="sempre"]) .energia-descarga, :root:not([data-animacoes="sempre"]) .medo-nodo, :root:not([data-animacoes="sempre"]) .morte-fluxo {display:none!important}
+}
+@media print {
+ .sigilo-roda,.sigilo-roda * {animation:none!important;transform:none!important;filter:none!important;opacity:1!important}
+ .sangue-gotas,.energia-descarga,.medo-nodo,.morte-fluxo {display:none!important}
+}
+/* v0.18 — avisos acima, roda e recursos lado a lado, status na linha seguinte. */
+:root[data-elemento] .ficha-alertas {display:grid;gap:10px;margin:0 0 14px}
+:root[data-elemento] .ficha-alertas:empty {display:none}
+:root[data-elemento] .ficha-alertas .avisos-ficha {margin:0;padding:12px 16px;border:1px solid var(--linha-forte);border-left:3px solid var(--vela);background:var(--painel);border-radius:var(--raio)}
+:root[data-elemento] .ficha-alertas .avisos-ficha summary {cursor:pointer;color:var(--vela);font-size:11px}
+:root[data-elemento] .ficha-alertas .avisos-ficha ul {margin:8px 0 0;padding-left:18px;font-size:13px}
+:root[data-elemento] .ficha-alertas .pendencias {margin:0}
+:root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:minmax(260px,.9fr) minmax(0,1.1fr);gap:16px;align-items:start}
+:root[data-elemento] .visao-agente > .painel-vitais {margin:0}
+:root[data-elemento] .visao-agente .painel-vitais .recursos {grid-template-columns:1fr;gap:8px}
+:root[data-elemento] .visao-agente .painel-vitais .titulo-secao {margin-bottom:12px}
+:root[data-elemento] .visao-agente .recurso {padding:10px 12px}
+:root[data-elemento] .visao-agente .recurso .numeros {font-size:22px}
+:root[data-elemento] .visao-agente .recurso .sigla {font-size:10px}
+:root[data-elemento] .visao-agente .recurso .barra {margin:7px 0}
+:root[data-elemento] .visao-agente .recurso .acoes-rec input {min-height:30px;font-size:12px}
+:root[data-elemento] .visao-agente .recurso .acoes-rec .btn {min-height:30px;padding:5px 9px}
+:root[data-elemento] .visao-agente .recurso .acoes-rec .icone-btn {height:30px}
+:root[data-elemento] .visao-agente .recurso > .linha {gap:6px}
+:root[data-elemento] .visao-agente .recurso > .linha small {font-size:10px;line-height:1.4}
+:root[data-elemento] .painel-status {margin:0 0 16px;padding:18px}
+:root[data-elemento] .painel-status .numeros-chave {grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px}
+:root[data-elemento] .painel-status > .grade.c2 {grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+:root[data-elemento] .painel-status > .linha {justify-content:flex-end}
+@media(max-width:680px) {
+ :root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:1fr}
+ :root[data-elemento] .painel-status .numeros-chave {grid-template-columns:repeat(3,minmax(0,1fr))}
+ :root[data-elemento] .painel-status > .grade.c2 {grid-template-columns:1fr}
+}
+@media print {
+ :root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:1fr 1fr}
+}
+
+/* ═══════════════════════════ contaminação (antes contaminacao.css) ═══════════════════════════ */
+/* A exposição preenche os vãos da ficha. Painéis e controles ficam acima da camada. */
+:root {
+  --nivel-infeccao: 0;
+  --infeccao: 0;
+  --surto-fundo: #a50d35;
+  --surto-traco: #df2a56;
+  --surto-luz: #ffb3b2;
+}
+:root[data-elemento="morte"] {
+  --surto-fundo: #83849c;
+  --surto-traco: #a7a7bc;
+  --surto-luz: #edebf0;
+}
+:root[data-elemento="conhecimento"] {
+  --surto-fundo: #b77c16;
+  --surto-traco: #e8b93f;
+  --surto-luz: #fff1ad;
+}
+:root[data-elemento="energia"] {
+  --surto-fundo: #703af8;
+  --surto-traco: #bd77ff;
+  --surto-luz: #b2faff;
+}
+:root[data-elemento="medo"] {
+  --surto-fundo: #a9cddf;
+  --surto-traco: #e2f0fb;
+  --surto-luz: #ffffff;
+}
+
+.contaminacao-site {
+  position: fixed;
+  inset: 0 0 0 238px;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  color: var(--surto-traco);
+  isolation: isolate;
+  contain: layout paint;
+}
+.area-trabalho > :is(#conteudo, .barra-contexto, .rodape) { position: relative; z-index: 1; }
+
+.atmosfera-infeccao {
+  position: absolute;
+  inset: -6%;
+  opacity: calc(.16 + var(--infeccao) * .46);
+  background:
+    radial-gradient(ellipse at 4% 18%, var(--surto-fundo), transparent 44%),
+    radial-gradient(ellipse at 98% 76%, var(--surto-fundo), transparent 43%);
+}
+.travessia-infeccao {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: calc(.32 + var(--infeccao) * .66);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.travessia-infeccao path { vector-effect: non-scaling-stroke; }
+.infeccao-halo { stroke: var(--surto-fundo); stroke-width: calc(12px + var(--infeccao) * 22px); opacity: .42; filter: blur(7px); }
+.infeccao-eixo { stroke: var(--surto-traco); stroke-width: calc(2px + var(--infeccao) * 7px); opacity: .72; }
+.infeccao-ramo { stroke: var(--surto-traco); stroke-width: calc(1px + var(--infeccao) * 3px); opacity: .64; }
+.infeccao-fluxo {
+  stroke: var(--surto-luz);
+  stroke-width: calc(1px + var(--infeccao) * 2px);
+  opacity: .7;
+  stroke-dasharray: 4 15 1 30;
+}
+.marca-infeccao, .rastro-infeccao {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  translate: -50% -50%;
+}
+.marca-infeccao {
+  width: clamp(18px, calc(16px + var(--nivel-infeccao) * 4px), 54px);
+  aspect-ratio: 1;
+  background: currentColor;
+  mask: var(--sigilo-elemento) center / contain no-repeat;
+  rotate: var(--rot);
+  opacity: calc(.13 + var(--infeccao) * .28);
+}
+.rastro-infeccao {
+  width: min(var(--tamanho), 20vw);
+  overflow: visible;
+  color: var(--surto-traco);
+  opacity: calc(.17 + var(--infeccao) * .44);
+}
+
+/* Sangue: o pulso percorre veias e empurra gotas pelas bordas. */
+[data-infeccao-elemento="sangue"] .atmosfera-infeccao { animation: veias-sangue 5.6s ease-in-out infinite; }
+[data-infeccao-elemento="sangue"] .infeccao-fluxo { stroke-dasharray: 6 44; animation: correr-sangue 5.6s var(--fase) ease-in-out infinite; }
+[data-infeccao-elemento="sangue"] .infeccao-eixo { stroke-width: calc(4px + var(--infeccao) * 10px); }
+[data-infeccao-elemento="sangue"] .rastro-infeccao {
+  width: min(calc(var(--tamanho) * .36), 7vw);
+  filter: drop-shadow(0 0 6px var(--surto-fundo));
+  animation: gota-sangue 6.8s var(--fase) ease-in infinite;
+}
+[data-infeccao-elemento="sangue"] .marca-infeccao { animation: veias-sangue 5.6s var(--fase) ease-in-out infinite; }
+
+/* Morte: sulcos de lodo, espirais lentas e partículas de cinza. */
+[data-infeccao-elemento="morte"] .atmosfera-infeccao {
+  background:
+    radial-gradient(ellipse at 2% 25%, #737388a0, transparent 38%),
+    radial-gradient(ellipse at 97% 71%, #9b99ad88, transparent 34%);
+  animation: lodo-morte 14s ease-in-out infinite alternate;
+}
+[data-infeccao-elemento="morte"] .infeccao-eixo {
+  stroke: #7d7c91;
+  stroke-width: calc(5px + var(--infeccao) * 10px);
+  stroke-dasharray: 26 9 2 7 7 4;
+}
+[data-infeccao-elemento="morte"] .infeccao-ramo { stroke: #c3bdce; stroke-dasharray: 2 6 10 3; }
+[data-infeccao-elemento="morte"] .infeccao-fluxo { stroke-dasharray: .25 2 1 5; animation: desgaste-morte 24s var(--fase) linear infinite; }
+[data-infeccao-elemento="morte"] .rastro-infeccao { animation: espiral-morte 20s var(--fase) linear infinite; }
+[data-infeccao-elemento="morte"] .marca-infeccao { animation: cinza-morte 12s var(--fase) ease-in-out infinite; }
+
+/* Conhecimento: inscrições douradas se escrevem e iluminam os selos. */
+[data-infeccao-elemento="conhecimento"] .atmosfera-infeccao {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 72px, #e4b64d33 73px, transparent 74px 110px),
+    radial-gradient(ellipse at 98% 43%, #a37629, transparent 32%),
+    radial-gradient(ellipse at 1% 64%, #8d6023, transparent 28%);
+  animation: iluminar-conhecimento 12s ease-in-out infinite;
+}
+[data-infeccao-elemento="conhecimento"] .infeccao-eixo { stroke-width: calc(1px + var(--infeccao) * 2px); }
+[data-infeccao-elemento="conhecimento"] .infeccao-ramo { stroke-dasharray: 4 6; }
+[data-infeccao-elemento="conhecimento"] .infeccao-fluxo { stroke-dasharray: 14 86; animation: inscrever-conhecimento 11s var(--fase) linear infinite; }
+[data-infeccao-elemento="conhecimento"] .rastro-infeccao { filter: drop-shadow(0 0 8px #e8b93f66); animation: alinhar-conhecimento 15s var(--fase) ease-in-out infinite; }
+[data-infeccao-elemento="conhecimento"] .marca-infeccao { rotate: 0deg; animation: iluminar-conhecimento 9s var(--fase) ease-in-out infinite; }
+
+/* Energia: circuitos se acendem em sequência, com descargas em lilás e ciano. */
+[data-infeccao-elemento="energia"] .atmosfera-infeccao {
+  background:
+    radial-gradient(ellipse at 7% 35%, #6934e8, transparent 44%),
+    radial-gradient(ellipse at 94% 73%, #c63dce, transparent 35%),
+    radial-gradient(ellipse at 70% 0%, #376aaa, transparent 38%);
+  animation: campo-energia 7s ease-in-out infinite alternate;
+}
+[data-infeccao-elemento="energia"] .infeccao-eixo { stroke-width: calc(1.5px + var(--infeccao) * 3px); filter: drop-shadow(0 0 4px #a368ff); }
+[data-infeccao-elemento="energia"] .infeccao-fluxo { stroke-dasharray: 3 13 1 33; filter: drop-shadow(0 0 5px #9cf5ff); animation: descarga-energia 4.4s var(--fase) linear infinite; }
+[data-infeccao-elemento="energia"] .rastro-infeccao { width: min(calc(var(--tamanho) * .49), 9vw); animation: acumulador-energia 4.4s var(--fase) ease-in-out infinite; }
+[data-infeccao-elemento="energia"] .marca-infeccao { animation: acumulador-energia 6s var(--fase) ease-in-out infinite; }
+
+/* Medo: a névoa atravessa as margens e anéis emergem por trás dela. */
+[data-infeccao-elemento="medo"] .atmosfera-infeccao {
+  inset: -18%;
+  opacity: calc(.23 + var(--infeccao) * .51);
+  background:
+    radial-gradient(ellipse at 9% 72%, #cde6f3a1, transparent 38%),
+    radial-gradient(ellipse at 88% 28%, #9abcccaa, transparent 39%),
+    radial-gradient(ellipse at 62% 100%, #e6f0f6a2, transparent 41%);
+  filter: blur(15px);
+  animation: nevoa-medo 12s ease-in-out infinite alternate;
+}
+[data-infeccao-elemento="medo"] .infeccao-halo { stroke-width: calc(15px + var(--infeccao) * 34px); filter: blur(13px); }
+[data-infeccao-elemento="medo"] .infeccao-eixo { filter: blur(3px); opacity: .46; }
+[data-infeccao-elemento="medo"] .infeccao-ramo { filter: blur(5px); opacity: .4; }
+[data-infeccao-elemento="medo"] .infeccao-fluxo { display: none; }
+[data-infeccao-elemento="medo"] .travessia-infeccao { animation: ondular-medo 16s ease-in-out infinite alternate; }
+[data-infeccao-elemento="medo"] .rastro-infeccao,
+[data-infeccao-elemento="medo"] .marca-infeccao { animation: presenca-medo 11s var(--fase) ease-in-out infinite; }
+
+@keyframes veias-sangue { 0%, 100% { scale: 1; } 16% { scale: 1.045; } 27% { scale: 1.01; } 40% { scale: 1.025; } }
+@keyframes correr-sangue { to { stroke-dashoffset: -100; } }
+@keyframes gota-sangue { 0% { transform: translateY(-32px) scale(.68); } 82% { opacity: calc(.17 + var(--infeccao) * .44); } 100% { transform: translateY(78px) scale(.88, 1.24); opacity: .06; } }
+@keyframes lodo-morte { to { transform: translate(2%, -3%) scale(1.09); } }
+@keyframes desgaste-morte { to { stroke-dashoffset: 120; } }
+@keyframes espiral-morte { to { transform: rotate(-360deg); } }
+@keyframes cinza-morte { 0%, 100% { transform: translateY(0) rotate(-8deg); } 50% { transform: translateY(32px) rotate(16deg); opacity: .1; } }
+@keyframes iluminar-conhecimento { 50% { opacity: calc(.35 + var(--infeccao) * .56); } }
+@keyframes inscrever-conhecimento { to { stroke-dashoffset: -100; } }
+@keyframes alinhar-conhecimento { 0%, 100% { transform: rotate(0deg); } 48%, 69% { transform: rotate(45deg); } }
+@keyframes campo-energia { to { transform: translateX(4%) scale(1.06); } }
+@keyframes descarga-energia { to { stroke-dashoffset: -100; } }
+@keyframes acumulador-energia { 0%, 100% { transform: scale(.75); } 48% { opacity: calc(.36 + var(--infeccao) * .53); transform: scale(1.13); } }
+@keyframes nevoa-medo { to { transform: translate(8%, -6%) scale(1.16); } }
+@keyframes ondular-medo { to { transform: translateY(3%) skewY(-2deg) scale(1.06); } }
+@keyframes presenca-medo { 0%, 100% { transform: scale(.8); opacity: calc(.1 + var(--infeccao) * .16); } 55% { transform: scale(1.22); opacity: calc(.27 + var(--infeccao) * .47); } }
+
+:root[data-contaminacao]:not([data-contaminacao="0"]) .pagina-ficha :is(.ficha-identificador, .secao-aba) > :is(span, small) {
+  background: var(--fundo);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+:root[data-contaminacao]:not([data-contaminacao="0"]) .pagina-ficha :is(.painel, .ficha-cabeca) {
+  border-color: color-mix(in srgb, var(--linha), var(--surto-traco) calc(10% + 25% * var(--infeccao)));
+  box-shadow: inset 0 0 13px var(--elemento-suave), var(--sombra);
+}
+:root[data-contaminacao]:not([data-contaminacao="0"]) .topo {
+  border-color: color-mix(in srgb, var(--linha), var(--surto-traco) calc(14% + 40% * var(--infeccao)));
+}
+
+@media (max-width: 1180px) { .contaminacao-site { left: 205px; } }
+@media (max-width: 820px) { .contaminacao-site { left: 0; } }
+@media (max-width: 560px) { .rastro-infeccao { width: min(var(--tamanho), 15vw); } }
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-animacoes="sempre"]) .contaminacao-site *, :root:not([data-animacoes="sempre"]) .contaminacao-site { animation: none !important; }
+}
+@media print { .contaminacao-site { display: none !important; } }

@@ -1,0 +1,175 @@
+// ═══════════ dados ═══════════
+// dados.js — rola dados. Base: dados.js do Tabuleiro do Arcana (sorteio justo com crypto)
+// + o TESTE do Ordem Paranormal: rola N d20 e fica com o MELHOR (ou o PIOR, se o atributo for 0).
+
+export function d(lados) {
+  // sorteio sem viés: descarta valores que deixariam alguns lados mais prováveis
+  const limite = Math.floor(0x100000000 / lados) * lados;
+  const n = new Uint32Array(1);
+  do crypto.getRandomValues(n); while (n[0] >= limite);
+  return (n[0] % lados) + 1;
+}
+
+// "2d6+3" -> [{ sinal: 1, n: 2, lados: 6 }, { sinal: 1, valor: 3 }]
+export function analisar(texto) {
+  const limpo = String(texto || '').toLowerCase().replace(/\s+/g, '').replace(/−/g, '-');
+  if (!limpo || limpo.length > 80 || !/^[-+]?(\d*d\d+|\d+)([-+](\d*d\d+|\d+))*$/.test(limpo)) throw new Error(`Não entendi "${texto}". Use algo como 2d6+3.`);
+  const termos = [];
+  for (const m of limpo.matchAll(/([-+]?)(\d*)d(\d+)|([-+]?)(\d+)/g)) {
+    if (m[3]) {
+      const n = Number(m[2] || 1), lados = Number(m[3]);
+      if (n < 1 || n > 100 || lados < 1 || lados > 1000) throw new Error('Use de 1 a 100 dados, com até 1000 lados.');
+      termos.push({ sinal: m[1] === '-' ? -1 : 1, n, lados });
+    } else termos.push({ sinal: m[4] === '-' ? -1 : 1, valor: Number(m[5]) });
+  }
+  return termos;
+}
+
+// Rola uma expressão de dano/efeito. Crítico no Ordem: MULTIPLICA os dados da arma (x2, x3…); bônus fixos não.
+// Multiplica os grupos da arma marcados no cálculo, inclusive Lancinante. Devolve { expr, total, detalhe, dados }.
+export function rolar(expr, { multiplicador = 1, gruposCritico = 1 } = {}) {
+  const termos = analisar(expr);
+  let total = 0, grupo = 0;
+  const pedacos = [], dados = [];
+  for (const t of termos) {
+    if (t.valor != null) { total += t.sinal * t.valor; pedacos.push((t.sinal < 0 ? '− ' : '+ ') + t.valor); continue; }
+    const n = grupo++ < gruposCritico ? t.n * multiplicador : t.n;
+    const valores = Array.from({ length: Math.min(200, n) }, () => d(t.lados));
+    const soma = valores.reduce((a, b) => a + b, 0);
+    total += t.sinal * soma;
+    dados.push({ lados: t.lados, valores });
+    pedacos.push((t.sinal < 0 ? '− ' : '+ ') + `[${valores.join(', ')}]`);
+  }
+  const detalhe = pedacos.join(' ').replace(/^\+ /, '');
+  return { expr: String(expr).replace(/\s+/g, ''), total, detalhe, dados };
+}
+
+// TESTE do Ordem: qtd d20, fica com o melhor (ou pior). bonus = soma fixa. margem = crítico (ataques).
+export function rolarTeste({ qtd = 1, pior = false, bonus = 0, margem = 21 } = {}) {
+  qtd = Math.max(1, Math.min(20, qtd));
+  const valores = Array.from({ length: qtd }, () => d(20));
+  const escolhido = pior ? Math.min(...valores) : Math.max(...valores);
+  const indice = valores.indexOf(escolhido);
+  return { valores, escolhido, indice, pior, bonus, total: escolhido + bonus, critico: escolhido >= margem, natural20: escolhido === 20, natural1: escolhido === 1 };
+}
+
+export const comSinal = n => (n >= 0 ? '+' : '−') + Math.abs(n);
+// "3d20+5" no jeito do livro: 3O+5 (O = dado). Aqui escrevemos "3d20 +5" e "pior de 2d20" quando atributo 0.
+export const textoTeste = ({ qtd, pior }, bonus) => `${pior ? 'pior de ' : ''}${qtd}d20${bonus ? ' ' + comSinal(bonus) : ''}`;
+
+// ═══════════ dano ═══════════
+const dado = d;
+export function sofrerDano(ficha, d, quantidade, { tipo = 'pv', rd = 0, metade = 0, ignorarTemp = false, rolarDado = dado } = {}) {
+  const recurso = tipo === 'mental' ? d.pd ? 'pd' : 'san' : 'pv';
+  const total = Math.max(0, Math.floor(quantidade / (2 ** metade)) - Math.max(0, rd));
+  const absorvido = recurso === 'pv' && !ignorarTemp ? Math.min(ficha.recursos.pvTemp, total) : 0;
+  ficha.recursos.pvTemp -= absorvido;
+  ficha.recursos[recurso] = d.atual[recurso] - (total - absorvido);
+  let peitoral;
+  if (recurso === 'pv' && !ficha.morto && d.atual.pv > 0 && ficha.recursos.pv <= 0
+    && ficha.itens?.some(i => i.nome === 'Peitoral da Segunda Chance' && i.ativo && i.qtd > 0)) {
+    const esforco = d.pd ? 'pd' : 'pe';
+    if (d.atual[esforco] + ficha.recursos.peTemp >= 5) {
+      const temporario = Math.min(5, ficha.recursos.peTemp);
+      ficha.recursos.peTemp -= temporario;
+      ficha.recursos[esforco] = d.atual[esforco] - (5 - temporario);
+      const risco = rolarDado(10);
+      const dadosCura = risco === 1 ? [] : Array.from({ length: 4 }, () => rolarDado(10));
+      ficha.morto = risco === 1;
+      ficha.recursos.pv = Math.min(d.pv, dadosCura.reduce((soma, valor) => soma + valor, 0));
+      ficha.recursos.morrendo = 0;
+      ficha.condicoes = ficha.condicoes.filter(c => c !== 'morrendo');
+      peitoral = { risco, dadosCura, morto: ficha.morto };
+    }
+  }
+  return { total, absorvido, recurso, atual: ficha.recursos[recurso], ...(peitoral ? { peitoral } : {}) };
+}
+
+export function recuperar(ficha, d, recurso, quantidade) {
+  const maximo = { pv: d.pv, pe: d.pe, pd: d.pdMax, san: d.san }[recurso];
+  const novo = Math.min(maximo, d.atual[recurso] + quantidade);
+  ficha.recursos[recurso] = novo;
+  return novo;
+}
+
+const EVOLUCAO_CONDICAO = { fraco: 'debilitado', debilitado: 'inconsciente', fatigado: 'exausto', exausto: 'inconsciente', frustrado: 'esmorecido' };
+const DERIVADAS = {
+  petrificado: ['inconsciente'], inconsciente: ['indefeso'], paralisado: ['imovel', 'indefeso'],
+  indefeso: ['desprevenido'], cego: ['desprevenido', 'lento'], atordoado: ['desprevenido'], surpreendido: ['desprevenido'],
+  agarrado: ['imovel', 'desprevenido'], enredado: ['lento', 'vulneravel'], exausto: ['debilitado', 'lento', 'vulneravel'],
+  fatigado: ['fraco', 'vulneravel'],
+};
+
+export function condicoesEfetivas(condicoes) {
+  const resultado = new Set();
+  function incluir(id) {
+    if (resultado.has(id)) return;
+    resultado.add(id);
+    for (const derivada of DERIVADAS[id] || []) incluir(derivada);
+  }
+  condicoes.forEach(incluir);
+  return resultado;
+}
+
+export function adicionarCondicao(ficha, id) {
+  const anterior = ficha.condicoes.includes(id);
+  if (!anterior) return ficha.condicoes.push(id);
+  const seguinte = EVOLUCAO_CONDICAO[id];
+  if (!seguinte) return;
+  ficha.condicoes = ficha.condicoes.filter(x => x !== id);
+  adicionarCondicao(ficha, seguinte);
+}
+
+export function resolverCondicoesDoTurno(ficha, calcular, rolarDado = dado, testar = rolarTeste) {
+  const avisos = [];
+  let d = calcular(ficha);
+  if (d.condicoesEfetivas.has('em-chamas')) {
+    const q = rolarDado(6);
+    sofrerDano(ficha, d, q, { rd: d.rd });
+    avisos.push(`Em Chamas: ${q} de dano de fogo antes de RD.`);
+    d = calcular(ficha);
+  }
+  if (d.condicoesEfetivas.has('sangrando')) {
+    const n = ficha.atributos.vig + d.ajusteDados.vig + d.ajusteDados.todos;
+    const t = testar({ qtd: n >= 1 ? n : 2 - n, pior: n < 1 });
+    if (t.total >= 20) {
+      ficha.condicoes = ficha.condicoes.filter(x => x !== 'sangrando');
+      avisos.push('Sangramento estabilizado pelo teste de Vigor.');
+    } else {
+      const q = rolarDado(6);
+      sofrerDano(ficha, d, q, { ignorarTemp: true });
+      avisos.push(`Sangramento: perda de ${q} PV.`);
+    }
+  }
+  return avisos;
+}
+
+// ═══════════ turnos ═══════════
+export function iniciarTurno(ficha) {
+  ficha.gastoTurno = 0;
+  ficha.efeitos = ficha.efeitos.filter(efeito => efeito.dura !== 'rodada');
+}
+
+export function encerrarTurno(ficha) {
+  for (const [id, prazo] of Object.entries(ficha.prazosCondicao || {})) {
+    if (prazo > 1) ficha.prazosCondicao[id]--;
+    else {
+      ficha.condicoes = ficha.condicoes.filter(c => c !== id);
+      delete ficha.prazosCondicao[id];
+    }
+  }
+}
+
+export function fimDeCena(ficha) {
+  ficha.efeitos = [];
+  const permanentes = new Set(['doente', 'petrificado', 'envenenado', 'asfixiado', 'inconsciente', 'morrendo', 'enlouquecendo']);
+  ficha.condicoes = ficha.condicoes.filter(c => permanentes.has(c) && !ficha.prazosCondicao?.[c]);
+  ficha.prazosCondicao = {};
+  ficha.turnoManualIniciado = false;
+  ficha.itens = ficha.itens.filter(i => !i.expiraCena);
+  ficha.gastoTurno = 0;
+  ficha.recursos.peTemp = 0;
+  ficha.usosCena = {};
+  ficha.recursos.morrendo = 0;
+  ficha.recursos.enlouquecendo = 0;
+}
