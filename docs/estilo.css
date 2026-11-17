@@ -1180,3 +1180,68 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 .def-linha small { font-size: .78rem; line-height: 1.3; }
 .def-linha > b { font-family: var(--fonte-titulo); font-size: 1.1rem; white-space: nowrap; }
 .def-outros input { width: 76px; text-align: center; }
+
+/* v0.31 — quadro da Versatilidade e Transcender em uma linha */
+.quadro-versatilidade { border: 1px dashed var(--linha-forte); border-radius: var(--raio); padding: 12px 14px; margin-top: 10px; background: var(--campo); }
+.quadro-versatilidade.escolhida { border: 1px solid var(--elemento-cor, var(--sangue)); background: linear-gradient(105deg, var(--elemento-suave, #0000), transparent 70%), var(--campo); }
+.quadro-versatilidade-escolha { margin: 6px 0 2px; font-size: 1.05rem; }
+.registro-transcender { padding-top: 8px; padding-bottom: 8px; }
+
+/* v0.31 — componentes ritualísticos na cor do elemento */
+.item-cartao.comp-sangue { --el: #c8141f; --el-fundo: #c8141f22; }
+.item-cartao.comp-morte { --el: #8d8d8d; --el-fundo: #6b6b6b26; }
+.item-cartao.comp-conhecimento { --el: #d9a521; --el-fundo: #d9a52122; }
+.item-cartao.comp-energia { --el: #a64dff; --el-fundo: #8b2cdf26; }
+.item-cartao.componente[class*="comp-"] { border-color: color-mix(in srgb, var(--el) 60%, transparent); border-left: 4px solid var(--el); background: linear-gradient(105deg, var(--el-fundo), transparent 65%), var(--campo); }
+.item-cartao.componente .sigilo { width: 26px; height: 26px; }
+
+/* v0.31 — rituais por círculo */
+.circulos-quadro { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 10px 0 4px; }
+.circulo-cartao { display: grid; gap: 2px; padding: 10px 12px; border: 1px solid var(--linha); border-radius: var(--raio); background: var(--campo); }
+.circulo-cartao b { font: 600 .78rem var(--fonte-dossie); letter-spacing: .06em; text-transform: uppercase; color: var(--apagado); }
+.circulo-num { font: 700 1.6rem var(--fonte-titulo); color: var(--tinta); }
+.circulo-num small { font-size: 1rem; color: var(--apagado); }
+.circulo-cartao > small { font-size: .78rem; color: var(--apagado); }
+.circulo-cartao.travado { opacity: .5; }
+.circulo-cartao.erro { border-color: var(--perigo); }
+.circulo-cartao.erro .circulo-num { color: var(--perigo); }
+
+/* v0.31 — perícias em linhas, com cor conforme o treinamento */
+.grau-0 { --g: var(--linha-forte); --g-fundo: transparent; }
+.grau-1 { --g: #3fae6e; --g-fundo: #3fae6e1c; }
+.grau-2 { --g: #4a95e0; --g-fundo: #4a95e01f; }
+.grau-3 { --g: #e2b335; --g-fundo: #e2b33522; }
+.pericias-legenda { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 4px 0 10px; font-size: .85rem; color: var(--apagado); }
+.grau-chip { display: inline-flex; align-items: center; gap: 6px; }
+.grau-chip i { width: 12px; height: 12px; border-radius: 3px; background: var(--g); display: inline-block; }
+.grau-chip.grau-0 i { background: transparent; border: 1px solid var(--g); }
+.grau-chip b { color: var(--tinta); }
+.pericias-grade { display: grid; gap: 4px; }
+.pericia-linha { display: grid; grid-template-columns: minmax(130px, 1.5fr) 48px minmax(120px, 150px) 76px minmax(170px, auto); align-items: center; gap: 10px;
+  padding: 5px 10px; border-left: 4px solid var(--g); border-radius: 6px; background: linear-gradient(90deg, var(--g-fundo), transparent 60%); }
+.pericia-linha:not(.pericia-cabeca):hover { background: linear-gradient(90deg, var(--g-fundo), color-mix(in srgb, var(--g) 8%, transparent)); }
+.pericia-cabeca { border-left-color: transparent; background: none; font: 600 .7rem var(--fonte-dossie); letter-spacing: .08em; text-transform: uppercase; color: var(--apagado); padding-top: 0; padding-bottom: 2px; }
+.pericia-nome { font-weight: 600; color: var(--tinta); }
+.grau-0 .pericia-nome { font-weight: 400; color: var(--apagado); }
+.pericia-atr { font: .78rem var(--fonte-dossie); color: var(--apagado); text-align: center; }
+.pericia-grau { min-height: 32px; padding: 3px 8px; border-color: var(--g) !important; }
+.grau-1 .pericia-grau, .grau-2 .pericia-grau, .grau-3 .pericia-grau { color: var(--g); font-weight: 700; }
+.pericia-outros { width: 64px; min-height: 30px; padding: 2px 6px; }
+.pericia-rolar { display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
+@media (max-width: 640px) {
+  .pericia-linha { grid-template-columns: 1fr auto; gap: 4px 8px; }
+  .pericia-cabeca { display: none; }
+  .pericia-atr { text-align: right; }
+  .pericia-rolar { grid-column: 1 / -1; justify-content: flex-start; }
+}
+
+/* v0.31 — aba Macros */
+.lista-macros { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); align-items: start; }
+.macro-cartao { --el: var(--elemento-cor, var(--sangue)); --el-fundo: var(--elemento-suave, transparent); }
+.macro-passos { display: grid; gap: 6px; margin-top: 10px; }
+.macro-passo { display: grid; grid-template-columns: 26px minmax(150px, 210px) 1fr auto; gap: 8px; align-items: center; }
+.macro-num { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font: 700 .8rem var(--fonte-ui); background: var(--el); color: var(--fundo); }
+.macro-alvo { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.macro-alvo input, .macro-alvo select { min-height: 34px; flex: 1 1 120px; }
+.macro-resultado .def-linha b { font-size: 1.3rem; }
+@media (max-width: 640px) { .macro-passo { grid-template-columns: 26px 1fr auto; } .macro-alvo { grid-column: 2 / -1; } }

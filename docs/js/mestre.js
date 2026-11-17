@@ -1,9 +1,9 @@
-import { sofrerDano, resolverCondicoesDoTurno, iniciarTurno, encerrarTurno, fimDeCena, d as dado, rolarTeste } from './combate.js?v=0.30.0';
-import { ELEMENTOS, ATRIBUTOS, CONDICOES, EVENTOS_INVESTIGACAO } from './catalogo.js?v=0.30.0';
-import { temPeso, derivar } from './regras.js?v=0.30.0';
-import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.30.0';
-import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal } from './util.js?v=0.30.0';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.30.0';
+import { sofrerDano, resolverCondicoesDoTurno, iniciarTurno, encerrarTurno, fimDeCena, d as dado, rolarTeste } from './combate.js?v=0.31.0';
+import { ELEMENTOS, ATRIBUTOS, CONDICOES, EVENTOS_INVESTIGACAO } from './catalogo.js?v=0.31.0';
+import { temPeso, derivar } from './regras.js?v=0.31.0';
+import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.31.0';
+import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal } from './util.js?v=0.31.0';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.31.0';
 // ═══════════ bestiario ═══════════
 // Fichas de referência. As habilidades de texto são resolvidas pelo mestre.
 export const AMEACAS_BASE = [

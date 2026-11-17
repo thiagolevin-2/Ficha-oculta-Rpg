@@ -1,7 +1,7 @@
-import { condicoesEfetivas } from './combate.js?v=0.30.0';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.30.0';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.30.0';
-import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.30.0';
+import { condicoesEfetivas } from './combate.js?v=0.31.0';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.31.0';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.31.0';
+import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.31.0';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -212,7 +212,7 @@ export function normalizar(f) {
     pericias, bonusPericia,
     turnoManualIniciado: !!f.turnoManualIniciado,
     profissao: txt(f.profissao, 40),
-    poderes: lista(f.poderes, 60).map(p => ({ id: PODER[p?.id] ? p.id : 'proprio', nome: txt(p?.nome, 80), resumo: txt(p?.resumo, 1000), escolha: txt(p?.escolha, 60), via: txt(p?.via, 60), uid: txt(p?.uid, 60) || uid() }))
+    poderes: lista(f.poderes, 60).map(p => ({ id: PODER[p?.id] ? p.id : 'proprio', nome: txt(p?.nome, 80), resumo: txt(p?.resumo, 1000), escolha: txt(p?.escolha, 60), via: txt(p?.via, 60), deVersatilidade: !!p?.deVersatilidade && !TRILHA[f.escolhas?.versatilidade], uid: txt(p?.uid, 60) || uid() }))
       .filter(p => p.id !== 'proprio' || p.nome),
     habilidadesProprias: lista(f.habilidadesProprias, 60).map(h => ({ nome: txt(h?.nome, 80), resumo: txt(h?.resumo, 1500), custo: txt(h?.custo, 30), uid: txt(h?.uid, 60) || uid() })).filter(h => h.nome),
     notasHabilidade: Object.fromEntries(Object.entries(f.notasHabilidade || {}).slice(0, 120).map(([k, v]) => [txt(k, 80), txt(v, 1500)])),
@@ -252,6 +252,7 @@ export function normalizar(f) {
       periciaKit: PERICIA[i?.periciaKit] ? i.periciaKit : '',
       escrito: !!i?.escrito, pericia: PERICIA[i?.pericia] ? i.pericia : '', periciaExtra: PERICIA[i?.periciaExtra] ? i.periciaExtra : '',
       mods: [...new Set(lista(i?.mods, 6))].filter(id => MOD_ACESSORIOS.some(m => m[0] === id)),
+      elemento: ['sangue', 'morte', 'conhecimento', 'energia'].includes(i?.elemento) ? i.elemento : '', // componentes ritualísticos
       maldicoes: [...new Set(lista(i?.maldicoes, 4))].filter(n => typeof n === 'string' && n.startsWith('Acessório amaldiçoado: ') && AMALDICOADOS[n]), // maldições de acessório aplicadas no item
       efeitos: lista(i?.efeitos, 6).map(e => ({ tipo: TIPOS_EFEITO_ITEM.includes(e?.tipo) ? e.tipo : '', alvo: txt(e?.alvo, 30), valor: int(e?.valor, -20, 20, 0) }))
         .filter(e => e.tipo && e.valor && (e.tipo === 'pericia' ? !!PERICIA[e.alvo] : e.tipo === 'atributo' ? ['agi', 'for', 'int', 'pre', 'vig'].includes(e.alvo) : true)),
@@ -267,6 +268,9 @@ export function normalizar(f) {
     paranormais: lista(f.paranormais, 40).filter(p => PODER_PARANORMAL[p?.id]).map(p => ({ uid: txt(p.uid, 60) || uid(), id: p.id, trocaRitualUsada: !!p.trocaRitualUsada, transcenderUid: txt(p.transcenderUid, 60), circuloAprender: int(p.circuloAprender, 0, 3), escolha: txt(p.escolha, 40), afinidade: !!p.afinidade, fonte: ['transcender', 'origem', 'outro'].includes(p.fonte) ? p.fonte : 'outro' })),
     medos: lista(f.medos, 20).filter(x => x && Number.isInteger(x.n) && x.n >= 2 && x.n <= 20).map(x => ({ uid: txt(x.uid, 60) || uid(), n: x.n })),
     insanidades: lista(f.insanidades, 20).filter(x => x && Number.isInteger(x.n) && x.n >= 1 && x.n <= 20).map(x => ({ uid: txt(x.uid, 60) || uid(), n: x.n, missao: !!x.missao })),
+    // Macros: sequências de rolagens com um clique (aba Macros)
+    macros: lista(f.macros, 30).map(m => ({ uid: txt(m?.uid, 60) || uid(), nome: txt(m?.nome, 60) || 'Macro', nota: txt(m?.nota, 300),
+      passos: lista(m?.passos, 8).map(p => ({ tipo: ['pericia', 'ataque', 'formula', 'gasto'].includes(p?.tipo) ? p.tipo : 'formula', alvo: txt(p?.alvo, 60), formula: txt(p?.formula, 40), rotulo: txt(p?.rotulo, 40), valor: int(p?.valor, 0, 99, 1) })) })),
     rolagensSalvas: lista(f.rolagensSalvas, 40).filter(r => r && txt(r.formula, 40) && /d/i.test(r.formula) && FORMULA.test(txt(r.formula, 40))).map(r => ({ uid: txt(r.uid, 60) || uid(), nome: txt(r.nome, 60) || 'Rolagem', formula: txt(r.formula, 40).replace(/\s+/g, '') })),
     efeitos: lista(f.efeitos, 30).map(e => ({ uid: txt(e?.uid, 60) || uid(), nome: txt(e?.nome, 80) || 'Efeito', dura: ['cena', 'rodada', 'proxima'].includes(e?.dura) ? e.dura : 'cena', nota: txt(e?.nota, 200), ef: limparEf(e?.ef) })),
     usosCena: Object.fromEntries(Object.entries(f.usosCena || {}).slice(0, 40).map(([k, v]) => [txt(k, 60), int(v, 0, 99, 0)])),
