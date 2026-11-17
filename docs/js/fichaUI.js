@@ -1,19 +1,19 @@
-import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.25.0';
-import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.25.0';
-import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM } from './regras.js?v=0.25.0';
-import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar } from './combate.js?v=0.25.0';
-import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.25.0';
-import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.25.0';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.25.0';
-import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.25.0';
+import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.28.0';
+import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.28.0';
+import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM } from './regras.js?v=0.28.0';
+import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar } from './combate.js?v=0.28.0';
+import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.28.0';
+import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.28.0';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.28.0';
+import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.28.0';
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.25.0', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.25.0', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.28.0', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.28.0', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
   // Os textos do Sobrevivendo ao Horror foram conferidos com o PDF e estão em dados/textos.json (v0.23).
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
@@ -394,6 +394,7 @@ function abaHabilidades(f, d) {
     ${d.trilha ? `${d.trilha.aviso ? `<p class="apagado" style="font-size:.88rem">${esc(d.trilha.aviso)}</p>` : ''}<div class="lista-hab">${d.trilhaHabs.map(h => hab(h.nome, h.resumo, `<span class="etiqueta">${ehSobrevivente(f) ? `Estágio ${h.nivel}` : temOpcional(f, 'patentes') ? ['', '', 'Agente especial', '', '', '', '', '', 'Oficial', '', '', '', '', 'Elite', '', '', '', '', '', '', 'Elite'][h.nivel] : temOpcional(f, 'nivelExp') ? `Nível ${h.nivel}` : `NEX ${NEX[h.nivel - 1]}%`}</span>`, 'trilha-' + h.nome, f, !h.liberada)).join('')}</div>`
       : `<p class="apagado">Escolha a trilha ${ehSobrevivente(f) ? 'no estágio 2' : temOpcional(f, 'patentes') ? 'ao virar agente especial' : 'em NEX 10%'}.</p>`}
   </section></div>
+  ${secaoAfinidade(f, d)}
   <div class="grade c2" style="margin-top:14px">
   <section class="painel"><div class="titulo-secao"><h2 class="faixa">Habilidades próprias</h2><button class="btn pequeno" data-acao="add-propria">+ Adicionar</button></div>
     ${f.habilidadesProprias.map((h, i) => `<div class="hab"><span class="meta"><button class="icone-btn" data-acao="remover" data-lista="habilidadesProprias" data-i="${i}" aria-label="Remover">✕</button></span>
@@ -403,6 +404,37 @@ function abaHabilidades(f, d) {
   <section class="painel"><h2 class="faixa">Progressão</h2>
     <ul class="progressao">${d.progressao.map(l => `<li class="${l.atingido ? 'atingido' : ''}"><span class="n">${esc(l.rotulo)}</span><span>${l.itens.map(esc).join(', ')}</span></li>`).join('')}</ul>
   </section></div>`;
+}
+
+// ---------- Afinidade elemental (Livro de Regras p. 110 e 114) ----------
+// Elemento opressor (p. 98–107): Sangue oprime Conhecimento, Morte oprime Sangue, Energia oprime Morte, Conhecimento oprime Energia
+const OPRESSOR_DE = { conhecimento: 'sangue', sangue: 'morte', morte: 'energia', energia: 'conhecimento' };
+function secaoAfinidade(f, d) {
+  const el = f.elementoAfinidade;
+  if (!el && d.nexAtual < 50) return '';
+  const nome = id => ELEM[id]?.nome || id;
+  if (!el) return `<section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa">Afinidade elemental</h2><button class="btn pequeno sangue" data-acao="escolher-conexao">Escolher elemento</button></div>
+    <p>NEX 50%: você se conecta a um elemento (Conhecimento, Energia, Morte ou Sangue). A escolha não muda depois. A afinidade se desenvolve no próximo poder paranormal que você receber.</p></section>`;
+  const ativa = !!d.afinidade, op = OPRESSOR_DE[el];
+  const comAfinidade = f.paranormais.filter(p => p.afinidade).map(p => PODER_PARANORMAL[p.id]).filter(Boolean);
+  const podemReceber = f.paranormais.filter(p => !p.afinidade && poderParaAfinidade(f, PODER_PARANORMAL[p.id], el) === p).map(p => PODER_PARANORMAL[p.id]);
+  const formas = f.rituais.map(r => [r, RITUAIS.find(x => semAcento(x.nome) === semAcento(r.nome))]).filter(([, c]) => c && (c.elementos?.length ? c.elementos : [c.elemento]).every(e => e === el))
+    .flatMap(([r, c]) => [['discente', 'Discente'], ['verdadeiro', 'Verdadeiro']].filter(([k]) => c[k]?.afinidade).map(([, n]) => `${r.nome} (${n})`));
+  const item = (titulo, texto, extra = '') => `<div class="hab${ativa ? '' : ' trancada'}"><b>${titulo}</b><p>${texto}</p>${extra}</div>`;
+  return `<section class="painel painel-afinidade el-${el}${ativa ? ' ativa' : ''}" style="margin-top:14px">
+    <div class="titulo-secao"><h2 class="faixa">${sigilo(el, 'var(--el)')} Afinidade · ${esc(nome(el))}</h2><span class="etiqueta">${ativa ? 'desenvolvida' : 'conectado: desenvolve no próximo poder paranormal'}</span></div>
+    ${ativa ? '' : `<p class="apagado" style="font-size:.88rem">Você está conectado a ${esc(nome(el))}. Os benefícios abaixo começam quando você receber o próximo poder paranormal (Transcender, Versatilidade ou outra fonte).</p>`}
+    <div class="lista-hab">
+      ${item('Rituais sem componentes', `Conjura rituais de ${esc(nome(el))} sem componentes ritualísticos. Pode aprender rituais e formas que exigem afinidade com ${esc(nome(el))}.`,
+        formas.length ? `<p class="apagado" style="font-size:.88rem">Formas que pedem afinidade nos seus rituais: ${formas.map(esc).join(', ')}.</p>` : '')}
+      ${item('Resistência do elemento', `<b>+2d20</b> em testes contra efeitos de ${esc(nome(el))}.`)}
+      ${item('Elemento opressor', `<b>−2d20</b> em testes contra efeitos de ${esc(nome(op))}, o elemento opressor de ${esc(nome(el))}.`)}
+      ${item('Poderes com afinidade', `Pode escolher de novo um poder paranormal de ${esc(nome(el))} que já tem, para receber o benefício da linha “Afinidade”.`,
+        `${comAfinidade.length ? `<p style="font-size:.9rem">Com afinidade: ${comAfinidade.map(p => `<b>${esc(p.nome)}</b> (${esc((p.afinidade || '').replace(/\.$/, ''))})`).join('; ')}.</p>` : ''}${podemReceber.length ? `<p class="aviso-afinidade" style="font-size:.88rem">Podem receber afinidade: ${podemReceber.map(p => esc(p.nome)).join(', ')} (aba Poderes).</p>` : ''}`)}
+      ${d.progressaoNex ? item('Alterações do elemento', `Com NEX & Experiência, você recebe as alterações de ${esc(nome(el))} em NEX 60%, 75% e 90% (veja a Progressão de NEX abaixo).`) : ''}
+    </div>
+    <p class="apagado" style="font-size:.85rem;margin-top:8px">Livro de Regras p. 114. Os testes contra efeitos do elemento dependem da situação: some ou tire os dados na hora da rolagem.</p>
+  </section>`;
 }
 
 function secaoProgressaoNex(f, d) {
@@ -450,12 +482,12 @@ function entradaTranscender(registro, poder, i) {
     ${nome ? '' : '<p class="apagado">Poder pendente de escolha.</p><button class="btn pequeno" data-acao="transcender">Escolher poder</button>'}</div>`;
 }
 
-// Afinidade (Livro de Regras): com afinidade num elemento, escolher de novo um poder paranormal desse elemento
-// dá o benefício de Afinidade. A afinidade se desenvolve no Transcender seguinte à conexão (NEX 50%), então nesse
-// Transcender o elemento da conexão já vale: dá para repetir o poder ali mesmo.
+// Afinidade (Livro de Regras p. 110 e 114): com afinidade num elemento, escolher de novo um poder paranormal desse
+// elemento dá o benefício de Afinidade. A afinidade se desenvolve na primeira vez que a personagem transcende depois
+// da conexão (NEX 50%), e "transcender" é receber qualquer poder paranormal: nessa escolha o elemento já vale.
 function elementoAfinidadeDisponivel(f, d, fonte) {
   if (d.afinidade) return d.afinidade;
-  return fonte === 'transcender' && f.elementoAfinidade && d.nexAtual >= 50 ? f.elementoAfinidade : '';
+  return f.elementoAfinidade && d.nexAtual >= 50 ? f.elementoAfinidade : ''; // qualquer poder paranormal recebido conta como transcender
 }
 // O poder já escolhido que pode receber a afinidade agora (do elemento certo, ainda sem afinidade); null = não pode
 function poderParaAfinidade(f, def, el) {
@@ -465,6 +497,8 @@ function poderParaAfinidade(f, def, el) {
   if (tem.some(x => x.afinidade && elDe(x) === el)) return null;
   return tem.find(x => !x.afinidade && elDe(x) === el) || null;
 }
+// Possuído (SaH, Poder Não Desejado): a vaga de poder de ocultista só aceita Transcender (vivência de idade continua livre)
+const bloqueadoPossuido = (d, ficha, p) => !!d.possuido && p.id !== 'transcender' && viaPoder(ficha, d, p) === 'classe';
 // Transcender e poderes paranormais têm contadores separados.
 function secaoParanormais(f, d, transcender) {
   const ELEM_COR = { conhecimento: 'conhecimento', energia: 'energia', morte: 'morte', sangue: 'sangue', variavel: 'variavel' };
@@ -472,8 +506,8 @@ function secaoParanormais(f, d, transcender) {
     const def = PODER_PARANORMAL[p.id];
     const el = def.elemento === 'variavel' ? (semAcento(p.escolha) || 'variavel') : def.elemento;
     const brilha = !p.afinidade && poderParaAfinidade(f, def, elementoAfinidadeDisponivel(f, d, 'transcender')) === p;
-    return `<div class="hab el-${ELEM_COR[el] || 'variavel'}${brilha ? ' brilho-afinidade' : ''}" style="border-left-color:var(--el)"${brilha ? ` title="Afinidade disponível: ${d.afinidade ? 'escolha este poder de novo (Transcender ou + Poder paranormal)' : 'use Transcender e escolha este poder de novo'}"` : ''}><span class="meta">${sigilo(ELEM_COR[el] || 'variavel', 'var(--el)')}<span class="etiqueta">${p.fonte === 'transcender' ? 'Transcender' : p.fonte === 'origem' ? 'Origem' : 'Outro'}</span>${p.afinidade ? '<span class="etiqueta">afinidade</span>' : ''}${def.fonte === 'SaH' ? '<span class="etiqueta sah">SaH</span>' : ''}${dAtual ? botaoUsar(def.nome, dAtual) : ''}<button class="icone-btn" data-acao="remover-paranormal" data-i="${i}" aria-label="Remover ${esc(def.nome)}">✕</button></span>
-      <b>${esc(def.nome)}${p.escolha ? ` (${esc(p.escolha)})` : ''}</b><p>${esc(p.afinidade ? 'Afinidade: ' + def.afinidade : def.resumo)}</p>${brilha ? `<p class="aviso-afinidade"><b>Afinidade disponível.</b> ${d.afinidade ? 'Escolha este poder de novo' : 'Use Transcender e escolha este poder de novo'} para ganhar: ${esc(def.afinidade)}</p>` : ''}${(() => { const b = botoesDados(def.nome, def.resumo + ' ' + (p.afinidade ? def.afinidade : '') + ' ' + (textoCompleto('habilidades', def.nome) || '')); return b ? `<div class="linha" style="margin-top:6px">${b}</div>` : ''; })()}</div>`;
+    return `<div class="hab el-${ELEM_COR[el] || 'variavel'}${brilha ? ' brilho-afinidade' : ''}" style="border-left-color:var(--el)"${brilha ? ` title="Afinidade disponível: 'escolha este poder de novo no próximo poder paranormal (Transcender ou + Poder paranormal)'"` : ''}><span class="meta">${sigilo(ELEM_COR[el] || 'variavel', 'var(--el)')}<span class="etiqueta">${p.fonte === 'transcender' ? 'Transcender' : p.fonte === 'origem' ? 'Origem' : 'Outro'}</span>${p.afinidade ? '<span class="etiqueta">afinidade</span>' : ''}${def.fonte === 'SaH' ? '<span class="etiqueta sah">SaH</span>' : ''}${dAtual ? botaoUsar(def.nome, dAtual) : ''}<button class="icone-btn" data-acao="remover-paranormal" data-i="${i}" aria-label="Remover ${esc(def.nome)}">✕</button></span>
+      <b>${esc(def.nome)}${p.escolha ? ` (${esc(p.escolha)})` : ''}</b><p>${esc(p.afinidade ? 'Afinidade: ' + def.afinidade : def.resumo)}</p>${brilha ? `<p class="aviso-afinidade"><b>Afinidade disponível.</b> No próximo poder paranormal (Transcender ou + Poder paranormal), escolha este de novo para ganhar: ${esc(def.afinidade)}</p>` : ''}${(() => { const b = botoesDados(def.nome, def.resumo + ' ' + (p.afinidade ? def.afinidade : '') + ' ' + (textoCompleto('habilidades', def.nome) || '')); return b ? `<div class="linha" style="margin-top:6px">${b}</div>` : ''; })()}</div>`;
   }).join('');
   const T = d.transcenderes, LT = d.limiteTranscender;
   return `<section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa sangue">Poderes paranormais</h2>
@@ -481,7 +515,8 @@ function secaoParanormais(f, d, transcender) {
     <p class="apagado" style="font-size:.88rem">${d.transcenderSeparado
       ? 'Sobrevivendo ao Horror (NEX & Experiência, p. 98): Transcender não é poder de classe. Cada vez que seu NEX chega a uma faixa de alteração (25, 35, 50, 60, 75 ou 90%), você pode realizar o ritual de conexão e transcender uma vez (é opcional). Como a Sanidade vem do nível, transcender não a reduz (há uma opção mais dura na aba Notas).'
       : 'Livro de Regras: Transcender é um poder de classe. Cada um ocupa um poder de classe e você não ganha a Sanidade daquele aumento de NEX.'}
-    ${f.elementoAfinidade ? (d.afinidade ? ` Afinidade com <b>${esc(f.elementoAfinidade)}</b> desenvolvida.` : ` Conectado a <b>${esc(f.elementoAfinidade)}</b>: a afinidade se desenvolve no próximo poder paranormal que você receber.`) : ''}</p>
+    ${d.possuido ? ` <b>Possuído:</b> ${d.pontosPossessao} pontos de possessão (3 + 2 por Transcender); novos poderes de ocultista viram Transcender.` : ''}
+    ${f.elementoAfinidade ? (d.afinidade ? ` Afinidade com <b>${esc(f.elementoAfinidade)}</b> desenvolvida.` : ` Conectado a <b>${esc(f.elementoAfinidade)}</b>: a afinidade se desenvolve no próximo poder paranormal que você receber (Transcender, Versatilidade ou outra fonte).`) : ''}</p>
     ${d.transcenderSeparado && T ? `<h3 class="titulo-vermelho">Transcender</h3><div class="lista-hab">${f.poderes.map((p, i) => p.id === 'transcender' ? entradaTranscender(p, transcender.get(p.uid), i) : '').join('')}</div>` : ''}
     <div class="lista-hab">${lista || '<p class="apagado">Nenhum poder paranormal.</p>'}</div>
     <div class="linha" style="margin-top:10px"><button class="btn sangue" data-acao="transcender">Transcender</button><button class="btn" data-acao="janela-paranormal" data-fonte="${d.paranormalDaOrigem && !f.paranormais.some(p => p.fonte === 'origem') ? 'origem' : 'outro'}">+ Poder paranormal${d.paranormalDaOrigem && !f.paranormais.some(p => p.fonte === 'origem') ? ' (Traços do Outro Lado)' : ''}</button>
@@ -651,15 +686,15 @@ function numerosAlvo(d, tipo, alvo) {
   return { cat: Math.min(4, alvo.categoria + mods.length + (alvo.maldicoes || []).length), esp: Math.max(0, alvo.espacos - Number(mods.includes('discreto'))) };
 }
 // Os dois cartões: Modificar e Amaldiçoar
-function cartoesMod(d, tipo, i, alvo) {
+function cartoesMod(d, tipo, i, alvo, daJanelaEditar = false) {
   const mods = alvo.mods || [];
   const nMal = tipo === 'item' ? (alvo.maldicoes || []).length : mods.filter(m => MODIFICACAO[m]?.maldicao).length;
   const nMod = tipo === 'item' ? mods.length : mods.length - nMal;
   const n = numerosAlvo(d, tipo, alvo);
   const plural = (k, um, varios, nada) => (k ? `${k} ${k === 1 ? um : varios}` : nada);
   return `<div class="cartoes cartoes-mod">
-      <button class="cartao" data-acao="${tipo === 'item' ? 'acessorio' : 'janela-mod'}" data-tipo="${tipo}" data-i="${i}" data-modo="modificar"><b>Modificar</b><small>${plural(nMod, 'modificação', 'modificações', 'Nenhuma modificação')}${tipo === 'item' ? ' · perícia' : ''}</small></button>
-      <button class="cartao cartao-amaldicoar" data-acao="janela-mod" data-tipo="${tipo}" data-i="${i}" data-modo="amaldicoar"><b>Amaldiçoar</b><small>${plural(nMal, 'maldição', 'maldições', 'Sem maldição')}</small></button>
+      <button class="cartao" data-acao="${tipo === 'item' ? 'acessorio' : daJanelaEditar ? 'editar-para-mod' : 'janela-mod'}" data-tipo="${tipo}" data-i="${i}" data-modo="modificar"><b>Modificar</b><small>${plural(nMod, 'modificação', 'modificações', 'Nenhuma modificação')}${tipo === 'item' ? ' · perícia' : ''}</small></button>
+      <button class="cartao cartao-amaldicoar" data-acao="${daJanelaEditar ? 'editar-para-mod' : 'janela-mod'}" data-tipo="${tipo}" data-i="${i}" data-modo="amaldicoar"><b>Amaldiçoar</b><small>${plural(nMal, 'maldição', 'maldições', 'Sem maldição')}</small></button>
     </div><small class="apagado">Categoria ${cat(n.cat)} · ${n.esp} espaço(s)</small>`;
 }
 function janelaMod(f, tipo, i, modo) {
@@ -1483,13 +1518,13 @@ export function acoesFicha(ctx) {
         registro = ficha.poderes.findLast(p => p.id === 'transcender' && !p.escolha);
         if (!registro) {
           if (!viaPoder(ficha, derivar(ficha), PODER.transcender)) return ctx.avisar('Não há vaga para Transcender.', true);
-          registro = { id: 'transcender', escolha: '', uid: uid() };
+          registro = { id: 'transcender', escolha: '', uid: uid(), via: viaPoder(ficha, derivar(ficha), PODER.transcender) === 'trilha' ? 'trilha' : '' };
           ficha.poderes.push(registro);
         }
         registro.escolha = def.nome;
       }
       ficha.paranormais.push({ uid: uid(), id: def.id, escolha, circuloAprender: def.id === 'aprender-ritual' ? circuloDeAprender(derivar(ficha).nexAtual) : 0, afinidade: el.dataset.afinidade === '1', fonte, transcenderUid: registro?.uid || '' });
-      const desenvolveu = fonte === 'transcender' && ficha.elementoAfinidade && !ficha.afinidadeAtiva && derivar(ficha).nexAtual >= 50;
+      const desenvolveu = !!ficha.elementoAfinidade && !ficha.afinidadeAtiva && derivar(ficha).nexAtual >= 50; // LR p. 110: transcende sempre que recebe um poder paranormal
       if (desenvolveu) ficha.afinidadeAtiva = true;
       fecharModal(); ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render();
       ctx.avisar(`${def.nome}${el.dataset.afinidade === '1' ? ' (afinidade)' : ''} adicionado.${desenvolveu ? ` Você transcendeu e desenvolveu afinidade com ${ficha.elementoAfinidade}.` : ''}`);
@@ -1828,14 +1863,14 @@ export function acoesFicha(ctx) {
       const i = Number(el.dataset.i), a = f().armas[i];
       const c = (k, rot, tipo = 'text', extra = '') => `<label class="campo"><span>${rot}</span><input type="${tipo}" data-modal-arma="${k}" value="${esc(a[k])}" ${extra}></label>`;
       const s = (k, rot, ops) => `<label class="campo"><span>${rot}</span><select data-modal-arma="${k}">${ops.map(([v, n]) => `<option value="${v}" ${String(a[k]) === String(v) ? 'selected' : ''}>${n}</option>`).join('')}</select></label>`;
-      abrirModal(`Arma · ${a.nome}`, `<div class="grade c2">${c('nome', 'Nome')}${s('uso', 'Tipo de ataque', [['corpo', 'Corpo a corpo (Luta)'], ['arremesso', 'Arremesso (Pontaria + For no dano)'], ['disparo', 'Disparo (Pontaria)'], ['fogo', 'Arma de fogo (Pontaria)']])}
+      abrirModal(`Arma · ${a.nome}`, `<div class="bloco-mod-topo">${cartoesMod(derivar(f()), 'arma', i, a, true)}</div><div class="grade c2">${c('nome', 'Nome')}${s('uso', 'Tipo de ataque', [['corpo', 'Corpo a corpo (Luta)'], ['arremesso', 'Arremesso (Pontaria + For no dano)'], ['disparo', 'Disparo (Pontaria)'], ['fogo', 'Arma de fogo (Pontaria)']])}
         ${s('prof', 'Proficiência', [['simples', 'Simples'], ['taticas', 'Tática'], ['pesadas', 'Pesada']])}${c('dano', 'Dano (ex.: 2d6)')}
         ${c('margem', 'Margem de ameaça', 'number', 'min="2" max="20"')}${c('mult', 'Multiplicador', 'number', 'min="2" max="6"')}
         ${c('bonusAtaque', 'Bônus no ataque', 'number')}${c('bonusDano', 'Bônus no dano', 'number')}
         ${s('categoria', 'Categoria', [[0, '0'], [1, 'I'], [2, 'II'], [3, 'III'], [4, 'IV']])}${c('espacos', 'Espaços', 'number', 'min="0" step="0.5"')}
         ${temOpcional(f(), 'municao') ? c('capacidade', 'Capacidade', 'number', 'min="0"') + c('carregada', 'Carregada', 'number', 'min="0"') + c('reserva', 'Reserva', 'number', 'min="0"') : ''}
         ${c('alcance', 'Alcance')}${s('tipo', 'Tipo de dano', Object.entries(TIPOS_DANO))}${c('municao', 'Munição')}
-        <div style="grid-column:1/-1"><p class="apagado">Modificações e maldições: use os cartões <b>Modificar</b> e <b>Amaldiçoar</b> da arma, na aba Inventário.</p>
+        <div style="grid-column:1/-1">
           <h3 class="titulo-vermelho">Ritual Amaldiçoar Arma ou maldição própria</h3><div class="grade c3"><label class="campo"><span>Maldição</span><select data-maldicao="tipo">${MALDICOES_ARMA.map(m => `<option value="${m.id}" ${a.maldicao?.tipo === m.id ? 'selected' : ''}>${esc(m.nome)}</option>`).join('')}</select></label>
           <label class="campo"><span>Elemento</span><select data-maldicao="elemento">${['', 'sangue', 'morte', 'conhecimento', 'energia'].map(e => `<option value="${e}" ${a.maldicao?.elemento === e ? 'selected' : ''}>${e ? e[0].toUpperCase() + e.slice(1) : '—'}</option>`).join('')}</select></label>
           <label class="campo"><span>Dano extra (ex.: 1d6)</span><input data-maldicao="dados" value="${esc(a.maldicao?.dados || '')}" placeholder="preenche sozinho"></label>
@@ -1861,9 +1896,9 @@ export function acoesFicha(ctx) {
     'editar-protecao': el => {
       const i = Number(el.dataset.i), p = f().protecoes[i];
       const c = (k, rot, tipo = 'text') => `<label class="campo"><span>${rot}</span><input type="${tipo}" data-modal-prot="${k}" value="${esc(p[k])}"></label>`;
-      abrirModal(`Proteção · ${p.nome}`, `<div class="grade c2">${c('nome', 'Nome')}<label class="campo"><span>Tipo</span><select data-modal-prot="peso">${[['leve', 'Leve'], ['pesada', 'Pesada'], ['escudo', 'Escudo']].map(([v, n]) => `<option value="${v}" ${p.peso === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+      abrirModal(`Proteção · ${p.nome}`, `<div class="bloco-mod-topo">${cartoesMod(derivar(f()), 'protecao', i, p, true)}</div><div class="grade c2">${c('nome', 'Nome')}<label class="campo"><span>Tipo</span><select data-modal-prot="peso">${[['leve', 'Leve'], ['pesada', 'Pesada'], ['escudo', 'Escudo']].map(([v, n]) => `<option value="${v}" ${p.peso === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
         ${c('defesa', 'Defesa', 'number')}${c('rd', 'RD', 'number')}${c('categoria', 'Categoria (0–4)', 'number')}${c('espacos', 'Espaços', 'number')}${c('nota', 'Anotação / maldição / efeito especial')}</div>
-        <p class="apagado">Modificações e maldições: use os cartões <b>Modificar</b> e <b>Amaldiçoar</b> da proteção, na aba Inventário.</p>`,
+`,
         `<button class="btn perigo" data-acao="remover" data-lista="protecoes" data-i="${i}">Remover</button><span class="espaco"></span><button class="btn sangue" data-acao="salvar-protecao" data-i="${i}">Salvar</button>`, true);
     },
     'salvar-protecao': el => { const ficha = f(), i = Number(el.dataset.i), p = { ...ficha.protecoes[i] }; document.querySelectorAll('[data-modal-prot]').forEach(x => { p[x.dataset.modalProt] = x.type === 'number' ? Number(x.value) : x.value; }); ficha.protecoes[i] = p; fecharModal(); ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render(); },
@@ -1893,6 +1928,10 @@ export function acoesFicha(ctx) {
       else { it.ativo = !it.ativo; if (it.ativo) registrarMaldições(ficha); }
       salvar();
       ctx.avisar(`${it.nome} ${estaEquipado(it) ? 'equipado: o efeito vale na ficha.' : 'desequipado: o efeito saiu da ficha.'}`);
+    },
+    'editar-para-mod': el => { // salva o que foi editado na janela e abre Modificar/Amaldiçoar
+      acoesFicha(ctx)[el.dataset.tipo === 'arma' ? 'salvar-arma' : 'salvar-protecao']({ dataset: { i: el.dataset.i } });
+      janelaMod(f(), el.dataset.tipo, Number(el.dataset.i), el.dataset.modo);
     },
     'janela-mod': el => janelaMod(f(), el.dataset.tipo, Number(el.dataset.i), el.dataset.modo),
     'alternar-mod': el => {
@@ -2004,13 +2043,14 @@ export function acoesFicha(ctx) {
       const lista = poderesParaFicha(ficha).filter(p => !(d.transcenderSeparado && p.id === 'transcender')).sort(alfa);
       const grupos = [['Classe', p => p.classe === ficha.classe], ['Todas as classes', p => p.classe === 'todas'], ['Gerais (SaH)', p => p.classe === 'geral' || (p.classe !== ficha.classe && p.classe !== 'todas')]];
       abrirModal('Escolher poder', `<input type="search" placeholder="Procurar poder…" data-filtro-modal autofocus aria-label="Procurar poder" style="margin-bottom:10px">
-        ${grupos.map(([nome, fn]) => { const ps = lista.filter(fn); return ps.length ? `<h3 class="titulo-vermelho">${nome}</h3><div class="cartoes">${ps.map(p => { const tem = ficha.poderes.some(x => x.id === p.id); const ok = cumpreRequisito(ficha, d, p.req); return `<button class="cartao" data-acao="add-poder" data-id="${p.id}" data-busca="${esc(semAcento(p.nome + ' ' + p.resumo))}" ${!ok || !viaPoder(ficha, d, p) || (tem && !p.repete) ? 'disabled' : ''}><span class="linha"><b>${esc(p.nome)}</b><span class="espaco"></span>${fonteTag(p.fonte)}</span>${p.req ? `<small style="color:${ok ? 'var(--ok)' : 'var(--perigo)'}">Pré: ${esc(p.req)}</small>` : ''}<small>${esc(p.resumo)}</small></button>`; }).join('')}</div>` : ''; }).join('')}`, '', true);
+        ${grupos.map(([nome, fn]) => { const ps = lista.filter(fn); return ps.length ? `<h3 class="titulo-vermelho">${nome}</h3><div class="cartoes">${ps.map(p => { const tem = ficha.poderes.some(x => x.id === p.id); const ok = cumpreRequisito(ficha, d, p.req); return `<button class="cartao" data-acao="add-poder" data-id="${p.id}" data-busca="${esc(semAcento(p.nome + ' ' + p.resumo))}" ${!ok || !viaPoder(ficha, d, p) || (tem && !p.repete) || bloqueadoPossuido(d, ficha, p) ? 'disabled' : ''}><span class="linha"><b>${esc(p.nome)}</b><span class="espaco"></span>${fonteTag(p.fonte)}</span>${p.req ? `<small style="color:${ok ? 'var(--ok)' : 'var(--perigo)'}">Pré: ${esc(p.req)}</small>` : ''}<small>${esc(p.resumo)}</small>${bloqueadoPossuido(d, ficha, p) ? '<small class="apagado">Possuído: novos poderes de ocultista viram Transcender.</small>' : ''}</button>`; }).join('')}</div>` : ''; }).join('')}`, '', true);
     },
     'add-poder': el => {
       const ficha = f(), p = PODER[el.dataset.id], d = derivar(ficha);
       if (p && !p.repete && ficha.poderes.some(x => x.id === p.id)) return ctx.avisar('Este poder já foi aprendido.');
       if (!p || !poderesParaFicha(ficha).some(x => x.id === p.id) || !cumpreRequisito(ficha, d, p.req)) return ctx.avisar('Pré-requisitos do poder não cumpridos.', true);
       if (!viaPoder(ficha, d, p)) return ctx.avisar('Não há uma vaga disponível para este poder.', true);
+      if (bloqueadoPossuido(d, ficha, p)) return ctx.avisar('Possuído (Poder Não Desejado): todo novo poder de ocultista vira Transcender.', true);
       if (p.id === 'transcender') { fecharModal(); return acoesFicha(ctx)['transcender'](); }
       escolhaDoPoder(ctx, ficha, p, escolha => {
         const fx = f(), via = viaPoder(fx, derivar(fx), p);

@@ -1,5 +1,5 @@
-import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.25.0';
-import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.25.0';
+import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.28.0';
+import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.28.0';
 // ═══════════ catalogo ═══════════
 // catalogo.js — as regras do sistema escritas como DADOS.
 // Tudo aqui são números e nomes das regras + resumos curtos, escritos com outras palavras.
@@ -421,9 +421,9 @@ export const TRILHAS = [
     [20, 'Chagas da Resistência', 'Quando a Sanidade chegaria a 0, gaste 10 PV para ficar com SAN 1.'],
   ], 'SaH'),
   T('possuido', 'Possuído', 'ocultista', [
-    [2, 'Poder Não Desejado', 'Todo novo poder de ocultista vira Transcender. Ganha pontos de possessão (3 + 2 por Transcender): cada PP recupera 10 PV ou 2 PE (até sua Presença por turno); recupera 1 PP ao dormir.'],
+    [2, 'Poder Não Desejado', 'Todo novo poder de ocultista vira Transcender. Ganha pontos de possessão (3 + 2 por Transcender): cada PP recupera 10 PV ou 2 PE (até sua Presença por turno); recupera 1 PP ao dormir.', { possuido: true }],
     [8, 'As Sombras Dentro de Mim', 'Recupera +2 PP ao dormir. 2 PE: a entidade guia seus músculos e você ganha +1 dado em Acrobacia, Atletismo e Furtividade por uma rodada (e ações chamam menos atenção em furtividade).'],
-    [13, 'Ele Me Ensina', 'Escolha entre Transcender ou receber o primeiro poder de outra trilha de ocultista (cumprindo os pré-requisitos).'],
+    [13, 'Ele Me Ensina', 'Escolha entre Transcender ou receber o primeiro poder de outra trilha de ocultista (cumprindo os pré-requisitos).', { transcenderExtra: 1 }],
     [20, 'Tornamo-nos Um', 'Ganha um “presente” do elemento de afinidade, por 6 PE: Sangue recupera 50 PV; Morte dá um turno extra; Conhecimento dá um poder qualquer na cena (custa Sanidade se falhar em Vontade); Energia teleporta em alcance médio.'],
   ], 'SaH', { aviso: 'Trilha com regras próprias (pontos de possessão): confira no livro Sobrevivendo ao Horror, p. 28.' }),
   T('parapsicologo', 'Parapsicólogo', 'ocultista', [

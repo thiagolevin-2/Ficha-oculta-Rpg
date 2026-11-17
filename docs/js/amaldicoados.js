@@ -1,4 +1,4 @@
-import { MODIFICACAO, PODER_PARANORMAL, RITUAIS } from './catalogo.js?v=0.25.0';
+import { MODIFICACAO, PODER_PARANORMAL, RITUAIS } from './catalogo.js?v=0.28.0';
 // ═══════════ amaldicoados ═══════════
 // amaldicoados.js — efeitos dos itens amaldiçoados e paranormais para a aba Combate › Itens amaldiçoados.
 // Fontes: Livro de Regras (p. 147–151 impressas), Sobrevivendo ao Horror (p. 57–61) e Arquivos Secretos.

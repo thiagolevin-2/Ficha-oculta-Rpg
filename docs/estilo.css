@@ -1161,3 +1161,9 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 .numeros-mod { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 8px 0 14px; }
 .numeros-mod .chave { text-align: center; }
 .numeros-mod b.erro { color: var(--perigo); }
+.bloco-mod-topo { margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px dashed var(--linha); }
+
+/* v0.28 — afinidade elemental na aba Habilidades */
+.painel-afinidade { border-left: 4px solid var(--el); }
+.painel-afinidade.ativa { background: linear-gradient(105deg, var(--el-fundo), transparent 60%), var(--painel); }
+.painel-afinidade h2 .sigilo { width: 26px; height: 26px; vertical-align: middle; margin-right: 6px; }

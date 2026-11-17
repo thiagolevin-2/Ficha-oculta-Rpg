@@ -1,5 +1,5 @@
 // A exposição acompanha o NEX efetivo da ficha. A camada é só visual.
-import { nexDaFicha } from './regras.js?v=0.25.0';
+import { nexDaFicha } from './regras.js?v=0.28.0';
 const ELEMENTOS = ['sangue', 'morte', 'conhecimento', 'energia', 'medo'];
 const elementoVisual = id => ELEMENTOS.includes(id) ? id : 'sangue';
 

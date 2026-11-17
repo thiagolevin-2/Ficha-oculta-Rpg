@@ -1,7 +1,7 @@
-import { condicoesEfetivas } from './combate.js?v=0.25.0';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.25.0';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.25.0';
-import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.25.0';
+import { condicoesEfetivas } from './combate.js?v=0.28.0';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.28.0';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.28.0';
+import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.28.0';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -33,7 +33,8 @@ export function problemaAoAprender(ficha, derivada, ritual) {
 }
 
 export function viaPoder(ficha, d, poder) {
-  if (poder.id === 'transcender' && d.transcenderSeparado) return d.transcenderes < d.limiteTranscender ? 'nex' : '';
+  if (poder.id === 'transcender' && d.transcenderTrilhaLivre > 0) return 'trilha'; // Ele Me Ensina (Possuído)
+  if (poder.id === 'transcender' && d.transcenderSeparado) return d.transcenderNexLivre > 0 ? 'nex' : '';
   const possuiVivencia = d.faixa?.id === 'adulto' && ficha.classe !== 'mundano';
   const vivenciaUsada = ficha.poderes.some(p => p.via === 'vivencia');
   const vagasComuns = d.slotsPoder - Number(possuiVivencia) + Number(d.versatilidade && !ficha.escolhas.versatilidade);
@@ -644,7 +645,16 @@ export function derivar(f) {
   const transcenderes = f.poderes.filter(p => p.id === 'transcender').length;
   const limiarNex = [25, 35, 50, 60, 75, 90];
   const transcenderSeparado = nexSeparado(f); // SaH p. 98: com NEX separado, Transcender deixa de ser poder de classe (vale também para o sobrevivente)
-  const limiteTranscender = transcenderSeparado ? limiarNex.filter(x => nexAtual >= x).length : slotsPoder + (versatilidade ? 1 : 0);
+  // Vagas de Transcender dadas por habilidade (Ele Me Ensina, do Possuído): não ocupam poder de classe
+  const transcenderExtra = soma('transcenderExtra');
+  const transcenderTrilha = f.poderes.filter(p => p.id === 'transcender' && p.via === 'trilha').length;
+  const transcenderTrilhaLivre = Math.max(0, transcenderExtra - transcenderTrilha);
+  const chamadosNex = limiarNex.filter(x => nexAtual >= x).length;
+  const limiteTranscender = (transcenderSeparado ? chamadosNex : slotsPoder + (versatilidade ? 1 : 0)) + transcenderExtra;
+  // NEX separado: cada faixa de NEX é um "chamado"; quem não transcende antes do próximo perde a chance (Livro de Regras p. 110).
+  // Por isso fica no máximo 1 Transcender pendente, mesmo que faixas antigas tenham passado sem uso.
+  const transcenderNexLivre = transcenderSeparado ? Math.min(1, Math.max(0, chamadosNex - (transcenderes - transcenderTrilha))) : 0;
+  const pontosPossessao = tem('possuido') ? 3 + 2 * transcenderes : 0; // Possuído: 3 + 2 por Transcender
   const paranormalDaOrigem = ORIGEM[f.origem]?.id === 'cultista' && origemAtiva(f) ? 1 : 0;
   const limiteParanormais = transcenderes + paranormalDaOrigem + (f.bonus.paranormais || 0);
   const paranormaisUsados = f.paranormais.length;
@@ -731,7 +741,7 @@ export function derivar(f) {
   const esquiva = PER.reflexos.grau >= 1 ? PER.reflexos.bonus : null;
 
   // --- PENDÊNCIAS: o que falta fazer na ficha ---
-  const transcenderLivres = transcenderSeparado ? Math.max(0, limiteTranscender - transcenderes) : Math.max(0, slotsPoder + (versatilidade ? 1 : 0) - poderesEscolhidos);
+  const transcenderLivres = (transcenderSeparado ? transcenderNexLivre : Math.max(0, slotsPoder + (versatilidade ? 1 : 0) - poderesEscolhidos)) + transcenderTrilhaLivre;
   const pend = [];
   const aumentosFaltando = Math.max(0, slotsAtributo - f.aumentos.length);
   if (aumentosFaltando) pend.push({ id: 'atributo', texto: `${aumentosFaltando} aumento(s) de atributo para escolher`, acao: 'aumento-atributo' });
@@ -740,7 +750,8 @@ export function derivar(f) {
   if (grausFaltando) pend.push({ id: 'grau', texto: `${grausFaltando} grau(s) de treinamento: ${porGrau} perícias para virar ${neq >= 14 ? 'veterano ou expert' : 'veterano'}`, acao: 'grau-treinamento' });
   const poderesLivres = Math.max(0, slotsPoder + (versatilidade ? 1 : 0) - poderesEscolhidos - (versatilidade && f.escolhas.versatilidade ? 1 : 0));
   if (poderesLivres) pend.push({ id: 'poder', texto: `${poderesLivres} poder(es) de classe para escolher${transcenderSeparado ? '' : ' (Transcender conta como um)'}`, acao: 'escolher-poder' });
-  if (transcenderSeparado && transcenderLivres) pend.push({ id: 'transcender', texto: `${transcenderLivres} Transcender disponível(is): seu NEX chegou a uma faixa de alteração (25/35/50/60/75/90%). É opcional.`, acao: 'transcender' });
+  if (transcenderSeparado && transcenderNexLivre) pend.push({ id: 'transcender', texto: 'Transcender disponível: seu NEX chegou a uma faixa de alteração (25/35/50/60/75/90%). É opcional, mas se não transcender antes da próxima faixa, perde esta chance.', acao: 'transcender' });
+  if (transcenderTrilhaLivre) pend.push({ id: 'transcender-trilha', texto: 'Ele Me Ensina: Transcender (ou o primeiro poder de outra trilha de ocultista, anotado à mão)', acao: 'transcender' });
   if (nexAtual >= 50 && !f.elementoAfinidade) pend.push({ id: 'conexao', texto: 'NEX 50%: escolher o elemento de conexão (vira afinidade no próximo Transcender)', acao: 'escolher-conexao' });
   if (f.paranormais.length < limiteParanormais) pend.push({ id: 'paranormal', texto: `${limiteParanormais - f.paranormais.length} poder(es) paranormal(is) para escolher`, acao: 'janela-paranormal' });
   if (limiteRituais && f.rituais.length < limiteRituais) pend.push({ id: 'rituais', texto: `${limiteRituais - f.rituais.length} ritual(is) para aprender (até o ${circuloMax}º círculo)`, aba: 'rituais' });
@@ -755,7 +766,7 @@ export function derivar(f) {
     pendencias: pend, afinidade: f.afinidadeAtiva ? f.elementoAfinidade : '', transcenderLivres, limiteRituais, porGrau, nomesAtivos: f.efeitos.map(e => e.nome),
     nivel: n, nivelEq: neq, textoNivel: textoNivel(f), nexAtual, alteracoesNex, nexSeparado: nexSeparado(f), progressaoNex: usaProgressaoNex(f), pd, pv, pe, san, pdMax, atual, machucado, limitePE, limiteRitual,
     defesa, rd, desl, cargaMax, cargaUsada, sobrecarregado, itemMochila: itemMochila?.uid || '', temMochilaUtil, penalCarga, prof, pericias, PER, ataques, habilidades, trilha, trilhaHabs,
-    poderesEscolhidos, expansao, forcaSaber, slotsPoder, slotsAtributo, slotsGrau, versatilidade, trilhaEm, transcenderes, limiteTranscender, transcenderSeparado, limiteParanormais, paranormaisUsados, paranormalDaOrigem, porElemento, ativo, sangueFervente,
+    poderesEscolhidos, expansao, forcaSaber, slotsPoder, slotsAtributo, slotsGrau, versatilidade, trilhaEm, transcenderes, limiteTranscender, transcenderSeparado, transcenderNexLivre, transcenderTrilhaLivre, pontosPossessao, possuido: tem('possuido'), limiteParanormais, paranormaisUsados, paranormalDaOrigem, porElemento, ativo, sangueFervente,
     limiteAcao: limitePE + soma('limiteAcao'), circuloMax, vagasRituais, vagasEspecificas, dtRitual, rituais, patente, usoCategoria,
     iniciativa, bloqueio, esquiva, rdMental, sentidoTatico, combateDefensivo, avisos: [...new Set(avisos)], efs, ajusteDados,
     progressao: progressaoTexto(f, n),
