@@ -1,19 +1,19 @@
-import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.33.0';
-import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.33.0';
-import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM } from './regras.js?v=0.33.0';
-import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar } from './combate.js?v=0.33.0';
-import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.33.0';
-import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.33.0';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.33.0';
-import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.33.0';
+import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.36.0';
+import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.36.0';
+import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM } from './regras.js?v=0.36.0';
+import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar } from './combate.js?v=0.36.0';
+import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.36.0';
+import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.36.0';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.36.0';
+import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.36.0';
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.33.0', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.33.0', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.36.0', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.36.0', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
   // Os textos do Sobrevivendo ao Horror foram conferidos com o PDF e estão em dados/textos.json (v0.23).
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
@@ -1044,7 +1044,7 @@ function janelaGasto(f, d, alvo, ops) {
     ? `<div class="hab"><b>${esc(o.nome)}</b> <small class="apagado">até ${o.maxPassos}× +${o.valorPasso} · custo: ${Array.from({ length: o.maxPassos }, (_, j) => `${j + 1}× = ${o.custoPorPassos(j + 1)} ${k}`).join(', ')}</small>
         <div class="grade c2" style="margin-top:6px"><label class="campo"><span>+${o.valorPasso} no ATAQUE (vezes)</span><input type="number" id="ae-ataque" min="0" max="${o.maxPassos}" value="0"></label><label class="campo"><span>+${o.valorPasso} no DANO (vezes)</span><input type="number" id="ae-dano" min="0" max="${o.maxPassos}" value="0"></label></div>
         ${o.nota ? `<p>${esc(o.nota)}</p>` : ''}</div>`
-    : `<label class="check hab"><input type="checkbox" id="gasto-${o.id}"><span><b>${esc(o.nome)}</b> — ${o.custo} ${k}: ${o.bonus ? `+${o.bonus}` : ''}${o.dados ? `+${o.dados}d20` : ''}${o.dadoExtra ? `+${o.dadoExtra}` : ''}${o.nota ? ` <small class="apagado">(${esc(o.nota)})</small>` : ''}</span></label>`).join('');
+    : `<label class="check hab"><input type="checkbox" id="gasto-${o.id}"><span><b>${esc(o.nome)}</b> — ${o.custo} ${k}: ${o.bonus ? `+${o.bonus}` : ''}${o.dados ? `+${o.dados}d20` : ''}${o.dadoExtra ? `+${o.dadoExtra}` : ''}${o.margem ? `+${o.margem} na margem` : ''}${o.rerrolar ? 'rolar de novo' : ''}${o.furtivoD8 ? 'furtivo em d8' : ''}${o.nota ? ` <small class="apagado">(${esc(o.nota)})</small>` : ''}</span></label>`).join('');
   const dadosAlvo = JSON.stringify(alvo).replace(/"/g, '&quot;');
   abrirModal(titulo, `<p class="apagado">Você tem <b>${d.atual[d.pd ? 'pd' : 'pe']} ${k}</b> (limite ${d.limitePE} por turno). Marque o que quer gastar nesta rolagem:</p><div class="lista-hab">${linhas}</div>`,
     `<button class="btn fantasma" data-acao="rolar-sem-gasto" data-alvo="${dadosAlvo}">Rolar sem gastar</button><button class="btn sangue" data-acao="rolar-com-gasto" data-alvo="${dadosAlvo}">Gastar e rolar</button>`);
@@ -1054,6 +1054,11 @@ const ritualDeToque = (ritual, catalogo) =>
   /\btoque\b/i.test(ritual.alcance || catalogo.alcance || '');
 
 // Janela de CONJURAR: custo do ritual + extras (Ampliar, Acelerar, Camuflar, formas avançadas) + pagar com PV (Flagelador)
+// Habilidades de gasto que servem no teste de Ocultismo da conjuração (bônus, dados a mais ou dado extra;
+// trocar de perícia ou de atributo não se aplica ao Custo do Paranormal)
+function gastosOcultismo(f, d) {
+  return opcoesGasto(f, d, { tipo: 'pericia', id: 'ocultismo' }).filter(o => !o.troca && !o.atr && !o.caos && !o.carga && typeof o.custo === 'number' && (o.bonus || o.dados || o.dadoExtra));
+}
 function janelaConjurar(ctx, f, d, i) {
   const r = d.rituais[i], k = d.pd ? 'PD' : 'PE';
   const cat = RITUAIS.find(x => semAcento(x.nome) === semAcento(r.nome)) || {};
@@ -1076,6 +1081,7 @@ function janelaConjurar(ctx, f, d, i) {
     ${ritualDeToque(r, cat) ? '<p class="apagado">Confirme o toque e aplique o efeito ao alvo na mesa. Os dados do ritual são rolados normalmente.</p>' : podeResolverRitual(cat.id, r.formula, r.resistencia) ? `<label class="campo"><span>Alvo para resolver resistência e dano</span><select id="conj-alvo"><option value="">Apenas conjurar</option>${opcoesAlvos(ctx, f).replace(' selected', '')}</select></label><label class="campo"><span>Recurso do alvo</span><select id="conj-recurso"><option value="pv">PV</option><option value="mental">Sanidade / PD</option></select></label>` : ''}
     <h3 class="titulo-vermelho">Forma</h3><div class="lista-hab">${formas.map(([id, nome, c, ok, req], j) => `<label class="check hab"><input type="radio" name="conj-forma" value="${id}" data-custo="${c}" ${j === 0 ? 'checked' : ''} ${ok ? '' : 'disabled'}><span><b>${nome}</b> — total <b>${r.custo + c} ${k}</b>${c ? ` (${r.custo} + ${c})` : ''}${req ? ` <small class="apagado">${esc(req)}</small>` : ''}</span></label>`).join('')}</div>
     ${op.length ? `<h3 class="titulo-vermelho">Extras</h3><div class="lista-hab">${op.map(([id, n, c]) => `<label class="check hab"><input type="checkbox" id="conj-${id}" data-custo="${c}"><span>${esc(n)} <b>+${c} ${k}</b></span></label>`).join('')}</div>` : ''}
+    ${(() => { if (r.elemento === 'medo') return ''; const ops = gastosOcultismo(f, d); return ops.length ? `<h3 class="titulo-vermelho">Teste de Ocultismo (Custo do Paranormal)</h3><div class="lista-hab">${ops.map(o => `<label class="check hab"><input type="checkbox" id="conj-oc-${o.id}" data-gasto-oc="${o.id}"><span><b>${esc(o.nome)}</b> +${o.custo} ${k}: ${[o.bonus ? `+${o.bonus}` : '', o.dados ? `+${o.dados}d20` : '', o.dadoExtra ? `+${o.dadoExtra}` : ''].filter(Boolean).join(' ')} no teste${o.nota ? ` <small class="apagado">(${esc(o.nota)})</small>` : ''}</span></label>`).join('')}</div><p class="apagado" style="font-size:.82rem">Este gasto é à parte do custo do ritual: não muda a DT.</p>` : ''; })()}
     <div class="grade c2" style="margin-top:8px"><label class="campo"><span>Outro custo (${k})</span><input type="number" min="0" id="conj-outro" value="0"></label>
       <label class="campo"><span>Concentração: DT de Vontade (0 = sem teste)</span><input type="number" min="0" id="conj-vontade" value="0"></label></div>
     ${flagelo ? `<label class="check hab"><input type="checkbox" id="conj-flagelo"><span><b>Poder do Flagelo:</b> pagar com PV (2 PV por ${k}).</span></label>` : ''}
@@ -1282,7 +1288,7 @@ export function acoesFicha(ctx) {
       if (ataque && !ataqueValido(ataque)) return;
       if (alvo.id === 'reflexos' && d.reflexosFalha) return ctx.avisar('Falha automática em Reflexos.');
       const ops = opcoesGasto(ficha, d, alvo);
-      let custo = 0, minimo = 0, bonus = 0, dados = 0, danoExtra = 0, troca = null, atr = null, caos = 0, carga = false; const extras = [], danoDados = [], nomes = [];
+      let custo = 0, minimo = 0, bonus = 0, dados = 0, danoExtra = 0, troca = null, atr = null, caos = 0, carga = false, margemExtra = 0, rerrolar = false, furtivoD8 = false; const extras = [], danoDados = [], nomes = [];
       for (const o of ops) {
         if (o.id === 'ataque-especial') {
           const at = inteiro(document.getElementById('ae-ataque')?.value, 0, 8, 0), dn = inteiro(document.getElementById('ae-dano')?.value, 0, 8, 0);
@@ -1291,7 +1297,7 @@ export function acoesFicha(ctx) {
         } else if (document.getElementById('gasto-' + o.id)?.checked) {
           custo += o.custo; minimo = Math.max(minimo, o.custo); bonus += o.bonus || 0; dados += o.dados || 0; nomes.push(o.nome.replace(/ \(.*\)$/, ''));
           if (o.dadoExtra) extras.push(o.dadoExtra); if (o.danoDados) danoDados.push(o.danoDados);
-          if (o.troca) troca = o.troca; if (o.atr) atr = o.atr; if (o.caos) caos = o.caos; if (o.carga) carga = true;
+          if (o.troca) troca = o.troca; if (o.atr) atr = o.atr; if (o.caos) caos = o.caos; if (o.carga) carga = true; if (o.margem) margemExtra += o.margem; if (o.rerrolar) rerrolar = true; if (o.furtivoD8) furtivoD8 = true;
         }
       }
       const k = d.pd ? 'PD' : 'PE';
@@ -1310,10 +1316,16 @@ export function acoesFicha(ctx) {
         const nome = troca ? `${d.PER[alvo.id].nome} → ${p.nome}` : p.nome;
         const atributo = atr || alvo.atr ? ` · ${ATRIBUTOS.find(a => a.id === p.atrUsado).nome}` : '';
         item = await testar({ titulo: nome + atributo + sufixo, quem: quem(), dados: pool(p.dados, dados), bonus: p.bonus + bonus }, p.atrUsado);
+        if (rerrolar) { // rolar de novo e ficar com o melhor (ex.: Mapa Celeste, do Mateiro)
+          const segundo = await testar({ titulo: `${nome}${atributo} · 2ª rolagem`, quem: quem(), dados: pool(p.dados, dados), bonus: p.bonus + bonus }, p.atrUsado);
+          if (segundo.total > item.total) item = segundo;
+          ctx.avisar(`Rolou duas vezes: fica o melhor, ${item.total}.`);
+        }
         danoDaIdade(p.atrUsado);
       } else {
         const a = d.ataques[alvo.i];
-        item = await rolarTesteUI({ titulo: `Ataque · ${a.nome}${sufixo}`, quem: quem(), dados: pool(a.dados, dados), bonus: a.bonus + bonus, margem: a.margem, mult: a.mult, gruposCritico: a.gruposCritico, tipo: 'ataque', formulaDano: a.formula + (danoExtra ? `+${danoExtra}` : '') + danoDados.map(x => '+' + x).join('') });
+        const dadosFurtivos = danoDados.map(x => (furtivoD8 ? x.replace(/d6$/, 'd8') : x));
+        item = await rolarTesteUI({ titulo: `Ataque · ${a.nome}${sufixo}`, quem: quem(), dados: pool(a.dados, dados), bonus: a.bonus + bonus, margem: Math.max(2, a.margem - margemExtra), mult: a.mult, gruposCritico: a.gruposCritico, tipo: 'ataque', formulaDano: a.formula + (danoExtra ? `+${danoExtra}` : '') + dadosFurtivos.map(x => '+' + x).join('') });
       }
       // Valer-se do Caos: o dado extra é o último rolado
       if (caos && item?.valores) {
@@ -1748,7 +1760,7 @@ export function acoesFicha(ctx) {
     },
     'ativo': el => { const ficha = f(); ficha.ativos[el.dataset.k] = !ficha.ativos[el.dataset.k]; salvar(); },
     'rolar-atributo': el => { const d = derivar(f()); const a = ATRIBUTOS.find(x => x.id === el.dataset.atr); const aj = d.ajusteDados[a.id] + d.ajusteDados.todos; const n = f().atributos[a.id] + aj; testar({ titulo: a.nome, quem: quem(), dados: n >= 1 ? { qtd: n, pior: false } : { qtd: 2 - n, pior: true }, bonus: a.id === 'pre' && temPeso(f(), 'rabugento') ? -5 : 0 }, a.id).then(() => danoDaIdade(a.id)); },
-    'rolar-iniciativa': () => { const d = derivar(f()); testar({ titulo: 'Iniciativa', quem: quem(), dados: d.iniciativa.dados, bonus: d.iniciativa.bonus }, d.iniciativa.atrUsado); },
+    'rolar-iniciativa': () => acoesFicha(ctx)['rolar-pericia']({ dataset: { id: 'iniciativa' } }), // abre os gastos (Eclético, origem…) como qualquer perícia
     'adicionar-pacote': el => {
       const ficha = f();
       const a = derivar(ficha).ataques[Number(el.dataset.i)];
@@ -1880,8 +1892,12 @@ export function acoesFicha(ctx) {
       let custo = r.custo + d.custoCondicao + (avancada?.custo || 0) + inteiro(document.getElementById('conj-outro')?.value, 0, 50, 0);
       document.querySelectorAll('[id^="conj-"][data-custo]').forEach(c => { if (c.checked) custo += Number(c.dataset.custo); });
       const dtVontade = inteiro(document.getElementById('conj-vontade')?.value, 0, 99, 0);
+      const marcadosOc = new Set([...document.querySelectorAll('[data-gasto-oc]:checked')].map(c => c.dataset.gastoOc));
+      const opsOc = r.elemento === 'medo' ? [] : gastosOcultismo(ficha, d).filter(o => marcadosOc.has(o.id));
+      const gastoOc = opsOc.reduce((s, o) => s + o.custo, 0);
       if (document.getElementById('conj-flagelo')?.checked) { const pv = custo * 2; if (d.atual.pv <= pv) return ctx.avisar('PV insuficientes.', true); ficha.recursos.pv = d.atual.pv - pv; ficha.gastoTurno += custo; }
-      else if (!gastar(ficha, d, custo, d.limiteRitual, 0)) return ctx.avisar(`${K} insuficiente (precisa de ${custo}).`, true);
+      else if (!gastar(ficha, d, custo + gastoOc, d.limiteRitual, 0)) return ctx.avisar(`${K} insuficiente (precisa de ${custo + gastoOc}).`, true);
+      if (gastoOc && document.getElementById('conj-flagelo')?.checked && !gastar(ficha, derivar(ficha), gastoOc)) return ctx.avisar(`${K} insuficiente para ${opsOc.map(o => o.nome).join(', ')}.`, true);
       ctx.salvarFicha(ficha); fecharModal(); ctx.render();
       const nomeForma = forma?.value === 'discente' ? ' (discente)' : forma?.value === 'verdadeiro' ? ' (verdadeira)' : '';
       const formulaD = formulaDaForma(r.nome, forma?.value, r.formula, r.formulaFinal);
@@ -1955,9 +1971,12 @@ export function acoesFicha(ctx) {
       if (r.elemento !== 'medo') {
         const oc = d.PER.ocultismo, dt = 20 + custo;
         const armadura = ficha.protecoes.filter(p => p.vestida).some(p => p.peso === 'pesada') ? -2 : ficha.protecoes.filter(p => p.vestida).some(p => p.peso === 'leve') ? -1 : 0;
-        const base = oc.dados.pior ? 2 - oc.dados.qtd : oc.dados.qtd, q = base + armadura;
+        const base = oc.dados.pior ? 2 - oc.dados.qtd : oc.dados.qtd, q = base + armadura + opsOc.reduce((s, o) => s + (o.dados || 0), 0);
+        let bonusOc = opsOc.reduce((s, o) => s + (o.bonus || 0), 0);
+        const notasOc = opsOc.map(o => o.nome);
+        for (const o of opsOc) if (o.dadoExtra) { const x = rolar(o.dadoExtra).total; bonusOc += x; notasOc.push(`${o.dadoExtra}=${x}`); }
         proxima.dt = String(dt);
-        const t = await testar({ titulo: `Custo do Paranormal · ${r.nome}${nomeForma}`, quem: quem(), dados: q >= 1 ? { qtd: q, pior: false } : { qtd: 2 - q, pior: true }, bonus: oc.bonus }, oc.atrUsado, ficha, dt);
+        const t = await testar({ titulo: `Custo do Paranormal · ${r.nome}${nomeForma}${notasOc.length ? ` (${notasOc.join(', ')})` : ''}`, quem: quem(), dados: q >= 1 ? { qtd: q, pior: false } : { qtd: 2 - q, pior: true }, bonus: oc.bonus + bonusOc }, oc.atrUsado, ficha, dt);
         proxima.dt = '';
         if (t.total < dt) {
           const fx = ficha, dx = derivar(fx); const perm = t.total <= dt - 5;

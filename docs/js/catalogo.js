@@ -1,5 +1,5 @@
-import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.33.0';
-import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.33.0';
+import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.36.0';
+import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.36.0';
 // ═══════════ catalogo ═══════════
 // catalogo.js — as regras do sistema escritas como DADOS.
 // Tudo aqui são números e nomes das regras + resumos curtos, escritos com outras palavras.
@@ -269,6 +269,8 @@ const GASTOS_ORIGEM = {
   legista: { custo: 2, bonus: 5, pericias: ['medicina'], nota: 'primeiros socorros ou necropsia' },
   motorista: { custo: 2, bonus: 5, pericias: ['pilotagem', 'fortitude', 'reflexos', 'vontade'], nota: 'pilotando' },
   reporter: { custo: 2, bonus: 5, pericias: ['investigacao'] },
+  mateiro: { custo: 2, pericias: ['sobrevivencia'], rerrolar: true, nota: 'rola de novo e fica com o melhor' },
+  'seguranca-ex-panacea': { custo: 2, bonus: 5, pericias: ['luta'], nota: 'teste de manobra de combate' },
 };
 for (const [id, g] of Object.entries(GASTOS_ORIGEM)) { const o = ORIGENS.find(x => x.id === id); if (o) o.gasto = g; }
 // efeitos automáticos extras de origens
@@ -277,6 +279,7 @@ Object.assign(ORIGENS.find(o => o.id === 'experimento'), { ef: { rd: 2, experime
 Object.assign(ORIGENS.find(o => o.id === 'operario'), { ef: { ferramenta: true } });
 // Arquivos Secretos (catalogo-as.js)
 ORIGENS.push(...ORIGENS_AS.map(o => O(o.id, o.nome, o.pericias, o.poder, o.resumo, o.fonte)));
+for (const [id, g] of Object.entries(GASTOS_ORIGEM)) { const o = ORIGENS.find(x => x.id === id); if (o && !o.gasto) o.gasto = g; }
 export const ORIGEM = Object.fromEntries(ORIGENS.map(o => [o.id, o]));
 
 // ---------- Trilhas ----------

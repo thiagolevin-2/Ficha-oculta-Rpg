@@ -1,9 +1,9 @@
 // rolagem.js — rolar testes, ataques e dano; mostrar o resultado; guardar o histórico.
 // Os dados 3D (do Arcana) só MOSTRAM um resultado já sorteado: a animação não decide nada.
-import { rolarTeste, rolar, comSinal } from './combate.js?v=0.33.0';
-import { animateDice, diceAnimationsEnabled, setDiceAnimations, diceFromValues } from './dados3d.js?v=0.33.0';
-import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.33.0';
-import { esc, avisar } from './util.js?v=0.33.0';
+import { rolarTeste, rolar, comSinal } from './combate.js?v=0.36.0';
+import { animateDice, diceAnimationsEnabled, setDiceAnimations, diceFromValues } from './dados3d.js?v=0.36.0';
+import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.36.0';
+import { esc, avisar } from './util.js?v=0.36.0';
 let historico = carregarRolagens();
 // modificadores da PRÓXIMA rolagem (bandeja): dados a mais/menos e bônus fixo
 export const proxima = { dados: 0, bonus: 0, dt: '' };
@@ -14,7 +14,10 @@ export function limparHistorico() { historico = []; salvarRolagens(historico); a
 export const animacoesLigadas = () => diceAnimationsEnabled();
 export const ligarAnimacoes = v => setDiceAnimations(v);
 
+// Ouvintes de rolagem: cada rolagem registrada também vai para eles (ex.: o feed da mesa online)
+export const ouvintesRolagem = [];
 function registrar(item) {
+  for (const fn of ouvintesRolagem) { try { fn(item); } catch (e) { console.warn(e); } }
   historico.unshift({ ...item, quando: Date.now() });
   historico = historico.slice(0, 60);
   salvarRolagens(historico);

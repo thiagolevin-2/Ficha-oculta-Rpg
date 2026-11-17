@@ -1253,3 +1253,54 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 .macro-gasto input[type=number] { width: 64px; min-height: 32px; }
 .macro-alvo .mini .linha { flex-wrap: nowrap; }
 :root[data-tema] .macro-alvo .mini .linha input { width: 56px !important; min-width: 0; flex: 0 0 56px; }
+
+/* v0.35 — mesa online */
+.codigo-mesa { display: flex; align-items: baseline; gap: 12px; margin: 6px 0 10px; }
+.codigo-mesa span { font: 600 .72rem var(--fonte-dossie); letter-spacing: .1em; text-transform: uppercase; color: var(--apagado); }
+.codigo-mesa b { font: 700 2.2rem var(--fonte-titulo); letter-spacing: .08em; color: var(--elemento-cor, var(--sangue)); }
+.online-sim { color: var(--ok); font-size: .8rem; }
+.online-nao { color: var(--apagado); font-size: .8rem; }
+.jogador-mesa.offline { opacity: .6; }
+.recursos-mesa { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-top: 6px; font-size: .85rem; }
+.barra-mini { display: block; height: 6px; border-radius: 3px; background: var(--linha); overflow: hidden; margin-top: 2px; }
+.barra-mini b { display: block; height: 100%; background: var(--cor); }
+.feed-mesa { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 60vh; overflow: auto; }
+.feed-mesa li { display: grid; grid-template-columns: auto 1fr auto; gap: 2px 8px; align-items: baseline; padding: 6px 8px; border-left: 3px solid var(--linha-forte); background: var(--campo); border-radius: 4px; }
+.feed-mesa li.critico { border-left-color: var(--vela); }
+.feed-mesa li.escondida { opacity: .65; border-left-style: dashed; }
+.feed-mesa li > small { grid-column: 1 / -1; }
+.feed-quem { font: 600 .78rem var(--fonte-ui); color: var(--elemento-cor, var(--sangue)); }
+.feed-titulo { font-size: .88rem; }
+.feed-total { font: 700 1.2rem var(--fonte-titulo); }
+.painel-mesa { position: fixed; right: 14px; bottom: 70px; z-index: 40; width: min(360px, calc(100vw - 28px)); max-height: 75vh; overflow: auto; background: var(--painel); border: 1px solid var(--linha-forte); border-radius: var(--raio); padding: 12px 14px; box-shadow: var(--sombra); }
+.ini-mesa { list-style: none; margin: 4px 0 10px; padding: 0; display: grid; gap: 3px; }
+.ini-mesa li { padding: 4px 8px; border-radius: 4px; background: var(--campo); font-size: .9rem; }
+.ini-mesa li.vez { outline: 1px solid var(--elemento-cor, var(--sangue)); font-weight: 700; }
+.bandeja .btn.mesa-on { border-color: var(--ok); }
+.entrar-mesa { margin-bottom: 14px; padding: 10px 14px; }
+.entrar-mesa .linha { flex-wrap: wrap; align-items: center; gap: 8px; }
+
+/* Bestiário, NPCs e retratos */
+.el-nenhum { --el: var(--linha-forte); --el-fundo: transparent; }
+.best-filtros { display: grid; grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); gap: 8px; align-items: end; }
+@media (max-width: 700px) { .best-filtros { grid-template-columns: 1fr 1fr; } .best-filtros .campo:first-child { grid-column: 1 / -1; } }
+.best-cartao b { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.best-cartao b svg, .ameaca-bloco .titulo-secao svg { width: 18px; height: 18px; }
+.texto-livro { white-space: pre-wrap; font-size: .93rem; line-height: 1.5; max-height: 55vh; overflow: auto; padding: 10px 12px; border: 1px solid var(--linha); border-radius: var(--raio); background: var(--fundo); }
+.texto-livro-box { margin-top: 8px; }
+.texto-livro-box > summary { cursor: pointer; font-family: var(--fonte-ui); font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--sangue); padding: 4px 0; }
+.npc-topo { display: flex; gap: 12px; align-items: flex-start; }
+.retrato-mini { width: 76px; height: 76px; object-fit: cover; border-radius: var(--raio); border: 1px solid var(--linha-forte); flex: none; }
+.retrato-grande { display: block; max-width: 100%; max-height: 50vh; margin: 0 auto 10px; border-radius: var(--raio); border: 1px solid var(--linha-forte); }
+.retrato-campo { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.retrato { width: 96px; height: 96px; flex: none; border: 1px dashed var(--linha-forte); border-radius: var(--raio); display: grid; place-items: center; overflow: hidden; font-size: .75rem; color: var(--apagado, #888); }
+.retrato img { width: 100%; height: 100%; object-fit: cover; }
+.npc-bloco { border-top-color: var(--linha-forte); }
+.npc-bloco.rel-aliado { border-top-color: var(--ok); }
+.npc-bloco.rel-hostil { border-top-color: var(--sangue); }
+.npc-bloco.rel-desconfiado { border-top-color: var(--vela); }
+.mostrado { border: 1px solid var(--linha-forte); border-radius: var(--raio); padding: 8px; margin-bottom: 6px; }
+.mostrado img, .mostrado-antigo img { display: block; max-width: 100%; max-height: 260px; margin: 0 auto 6px; border-radius: var(--raio); }
+.mostrado p, .mostrado-antigo p { white-space: pre-wrap; font-size: .9rem; margin: 4px 0 0; }
+.mostrado-antigo { font-size: .9rem; margin: 2px 0; }
+.mostrado-antigo summary { cursor: pointer; }

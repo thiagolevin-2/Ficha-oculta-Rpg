@@ -1,7 +1,7 @@
-import { condicoesEfetivas } from './combate.js?v=0.33.0';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.33.0';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.33.0';
-import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.33.0';
+import { condicoesEfetivas } from './combate.js?v=0.36.0';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.36.0';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.36.0';
+import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.36.0';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -911,7 +911,9 @@ export function opcoesGasto(f, d, alvo) {
     if (temPoder('minha-dor-me-impulsiona') && ['acrobacia', 'atletismo', 'furtividade'].includes(p.id) && d.atual.pv <= d.pv - 5) ops.push({ id: 'minha-dor', nome: 'Minha Dor me Impulsiona', custo: 1, dadoExtra: '1d6' });
     const g = origemAtiva(f) ? ORIGEM[f.origem]?.gasto : null;
     if (g && (!g.atr || g.atr.includes(p.atrUsado)) && (!g.pericias || g.pericias.includes(p.id)) && !(g.exceto || []).includes(p.id))
-      ops.push({ id: 'origem', nome: ORIGEM[f.origem].poder, custo: g.custo, bonus: g.bonus, nota: g.nota || '' });
+      ops.push({ id: 'origem', nome: ORIGEM[f.origem].poder, custo: g.custo, bonus: g.bonus, rerrolar: !!g.rerrolar, nota: g.nota || '' });
+    if (temPoder('papinho-sedutor') && p.atrUsado === 'pre') ops.push({ id: 'papinho', nome: 'Papinho Sedutor', custo: 1, bonus: 5, nota: 'para seduzir alguém' });
+    if (f.trilha === 'maledictologo' && trilhaLiberada(f, 2) && p.id === 'ocultismo') ops.push({ id: 'identificacao-macabra', nome: 'Identificação Macabra', custo: 1, dadoExtra: '1d10', nota: 'identificar item amaldiçoado ou ritual' });
   }
   if (alvo.tipo === 'ataque') {
     const a = d.ataques[alvo.i];
@@ -920,10 +922,16 @@ export function opcoesGasto(f, d, alvo) {
       const dobra = f.trilha === 'guerreiro' && trilhaLiberada(f, 20) && a.uso === 'corpo';
       ops.push({ id: 'ataque-especial', nome: 'Ataque Especial', maxPassos: max, custoPorPassos: k => (patentes ? k : k + 1), valorPasso: dobra ? 10 : 5, nota: dobra ? 'Potência Máxima: bônus dobrados' : 'cada +5 vai no ataque ou no dano' });
     }
+    const temPoderA = id => f.poderes.some(x => x.id === id);
+    // Especialista em Matar (AS02): +4 no ataque ou dano por passo; 2 PE (+4), NEX 25% 3 PE (+8), 55% 4 PE (+12), 85% 5 PE (+16)
+    if (temPoderA('especialista-em-matar') && !ops.some(o => o.id === 'ataque-especial'))
+      ops.push({ id: 'ataque-especial', nome: 'Especialista em Matar', maxPassos: n >= 17 ? 4 : n >= 11 ? 3 : n >= 5 ? 2 : 1, custoPorPassos: k => k + 1, valorPasso: 4, nota: 'cada +4 vai no ataque ou no dano' });
+    if (temPoderA('tiro-intuitivo') && a.uso !== 'corpo') ops.push({ id: 'tiro-intuitivo', nome: 'Tiro Intuitivo', custo: 2, margem: 2, nota: 'ataque à distância sem mirar: +2 na margem de ameaça' });
     if (f.trilha === 'durao' && trilhaLiberada(f, 4)) ops.push({ id: 'pancada', nome: 'Pancada Forte', custo: 1, dados: 1 });
     if (f.trilha === 'infiltrador' && trilhaLiberada(f, 2)) {
-      const nd = trilhaLiberada(f, 20) ? 4 : trilhaLiberada(f, 13) ? 3 : trilhaLiberada(f, 8) ? 2 : 1;
+      const nd = (trilhaLiberada(f, 20) ? 4 : trilhaLiberada(f, 13) ? 3 : trilhaLiberada(f, 8) ? 2 : 1) + (f.poderes.some(x => x.id === 'assassinato-furtivo') ? 1 : 0); // Assassinato Furtivo: +1d6
       ops.push({ id: 'furtivo', nome: 'Ataque Furtivo', custo: 1, danoDados: `${nd}d6`, nota: 'alvo desprevenido ou flanqueado; uma vez por rodada' });
+      if (f.poderes.some(x => x.id === 'assassinato-furtivo')) ops.push({ id: 'assassinato-d8', nome: 'Assassinato Furtivo: dados d8', custo: 2, furtivoD8: true, nota: 'junto com o Ataque Furtivo, ao acertar' });
     }
   }
   const temPar = id => f.paranormais.some(x => x.id === id);

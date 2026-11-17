@@ -1,17 +1,19 @@
-import { registrarMaldições } from './amaldicoados.js?v=0.33.0';
-import { LIVROS_DIGITALIZADOS, NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.33.0';
-import { aplicarContaminacao } from './contaminacao.js?v=0.33.0';
-import { ELEMENTOS_VISUAIS, aplicarElemento, aplicarAnimacoes, sistemaReduzMovimento, $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.33.0';
-import { normalizar, derivar } from './regras.js?v=0.33.0';
-import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, carregarAnimacoes, salvarAnimacoes, espacoUsado } from './armazenamento.js?v=0.33.0';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.33.0';
-import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.33.0';
-import { telaMestre, acoesMestre, campoMestre } from './mestre.js?v=0.33.0';
-import { definirRaizModal, fecharModal, htmlHistorico, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.33.0';
+import { registrarMaldições } from './amaldicoados.js?v=0.36.0';
+import { LIVROS_DIGITALIZADOS, NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.36.0';
+import { aplicarContaminacao } from './contaminacao.js?v=0.36.0';
+import { ELEMENTOS_VISUAIS, aplicarElemento, aplicarAnimacoes, sistemaReduzMovimento, $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.36.0';
+import { normalizar, derivar } from './regras.js?v=0.36.0';
+import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, carregarAnimacoes, salvarAnimacoes, espacoUsado } from './armazenamento.js?v=0.36.0';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.36.0';
+import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.36.0';
+import { telaMestre, acoesMestre, campoMestre, htmlFeed } from './mestre.js?v=0.36.0';
+import { mesa, quandoMesaMudar, quandoMostrar, quandoComando, quandoPedirFicha, enviarFicha, resumoFicha, rolagemNaMesa, entrarMesa, sairDaMesa, voltarSeEstavaNaMesa, normalizarCodigo, abrirMesa, codigoGuardadoDoMestre } from './mesa.js?v=0.36.0';
+import { sofrerDano, recuperar, adicionarCondicao } from './combate.js?v=0.36.0';
+import { definirRaizModal, fecharModal, htmlHistorico, ouvintesRolagem, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.36.0';
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
 
-export const VERSAO = '0.33.0';
+export const VERSAO = '0.36.0';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -31,7 +33,7 @@ let buscaLivroDigital = '';
 async function abrirLivroDigital(id, pagina=1) {
   if (!LIVROS_DIGITALIZADOS.some(v=>v.id===id)) return;
   try {
-    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.33.0', {cache:'no-cache'});
+    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.36.0', {cache:'no-cache'});
     if (!resp.ok) throw new Error('Não foi possível carregar esta transcrição.');
     livroDigital = await resp.json(); paginaDigital = Math.min(Math.max(1, Number(pagina)||1),livroDigital.paginas.length); buscaLivroDigital = '';
     render();
@@ -42,11 +44,11 @@ async function abrirLivroDigital(id, pagina=1) {
 }
 
 async function carregarSuplementos(){
-  try { const r=await fetch('dados/suplementos.json?v=0.33.0'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
+  try { const r=await fetch('dados/suplementos.json?v=0.36.0'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
 }
 async function carregarReferenciasSAH(){
   try {
-    const r = await fetch('dados/sah_referencias.json?v=0.33.0', {cache:'no-cache'});
+    const r = await fetch('dados/sah_referencias.json?v=0.36.0', {cache:'no-cache'});
     if(r.ok) SAH_REF = await r.json();
   } catch(e){ console.warn('Índice do Sobrevivendo ao Horror não disponível', e); }
 }
@@ -59,7 +61,7 @@ const ctx = {
   render: () => render(),
   fichas: () => estado.fichas,
   fichaAtual: () => estado.fichas.find(f => f.id === estado.rota.id),
-  salvarFicha(f) { f.atualizadoEm = new Date().toISOString(); const i = estado.fichas.findIndex(x => x.id === f.id); if (i >= 0) estado.fichas[i] = f; if (!salvarFichas(estado.fichas)) avisar('Não consegui salvar: o armazenamento do navegador está cheio. Exporte as fichas e remova retratos grandes.', true); },
+  salvarFicha(f) { if (mesa.papel === 'jogador' && f.id === mesa.fichaId) setTimeout(() => enviarFicha(resumoFicha(f, derivar(f))), 0); f.atualizadoEm = new Date().toISOString(); const i = estado.fichas.findIndex(x => x.id === f.id); if (i >= 0) estado.fichas[i] = f; if (!salvarFichas(estado.fichas)) avisar('Não consegui salvar: o armazenamento do navegador está cheio. Exporte as fichas e remova retratos grandes.', true); },
   adicionarFicha(f) { estado.fichas.unshift(f); salvarFichas(estado.fichas); },
   apagarFicha(id) { estado.fichas = estado.fichas.filter(f => f.id !== id); salvarFichas(estado.fichas); },
 };
@@ -70,6 +72,7 @@ function lerRota() {
   const [tela, id, pagina] = h.split('/');
   if (tela === 'acervo' && LIVROS_DIGITALIZADOS.some(livro => livro.id === id)) return {tela:'acervo', livro:id, pagina:Math.max(1,Number(pagina)||1)};
   if (tela === 'agente' && id) return { tela: 'ficha', id };
+  if (tela === 'mesa') return { tela: 'mesa', codigo: normalizarCodigo(decodeURIComponent(id || '')) };
   if (['agentes', 'novo', 'mestre', 'sobre', 'acervo'].includes(tela)) return { tela };
   return { tela: 'inicio' };
 }
@@ -121,9 +124,50 @@ function barraContexto() {
   const nomes = {inicio:'Visão geral',agentes:'Dossiês de agentes',novo:'Recrutamento',ficha:'Arquivo de agente',mestre:'Controle de operações',acervo:'Acervo de suplementos',sobre:'Sobre o projeto'};
   return `<div class="barra-contexto"><span>ARQUIVO OCULTO <b>/</b> ${nomes[r] || 'Visão geral'}</span><span class="contexto-status"><i></i>${ELEMENTOS_VISUAIS.find(e => e.id === estado.elemento).nome.toUpperCase()} · MEMBRANA INSTÁVEL</span></div>`;
 }
+// ---------- Mesa online: entrar com o código, painel do jogador ----------
+function telaEntrarMesa(codigo) {
+  const fs = estado.fichas;
+  return `<div class="pagina"><section class="painel"><h1 class="faixa sangue">Entrar na mesa</h1>
+    ${codigo ? `<div class="codigo-mesa"><span>Código</span><b>${esc(codigo)}</b></div>` : `<p class="aviso-ocr">Código inválido. Peça ao mestre o código no formato OCULTA-XXXX.</p>`}
+    ${mesa.erro ? `<p class="aviso-ocr">${esc(mesa.erro)}</p>` : ''}
+    ${codigo ? (fs.length ? `<p>Escolha a ficha que vai usar na mesa. O mestre verá PV, ${'PE/PD'}, Sanidade, Defesa e condições dela, e poderá aplicar dano, cura e condições.</p>
+      <div class="cartoes">${fs.map(f => { const d = derivar(f); return `<button class="cartao" data-acao="mesa-entrar" data-id="${esc(f.id)}" data-codigo="${esc(codigo)}"><b>${esc(f.nome || 'Sem nome')}</b><small>${esc(CLASSES[f.classe]?.nome || '')} · NEX ${d.nexAtual ?? f.nex}% · PV ${d.atual.pv}/${d.pv}</small></button>`; }).join('')}</div>`
+      : '<p class="vazio">Você ainda não tem fichas neste navegador. Crie uma em Agentes e volte por este link.</p><a class="btn sangue" href="#/novo" data-acao="novo-agente">+ Novo agente</a>') : ''}
+  </section></div>`;
+}
+function painelMesa() {
+  if (!mesa.papel || !estado.mesaAberta) return '';
+  const ini = mesa.iniciativa;
+  const status = { aberta: '● mesa aberta', conectada: '● conectado', conectando: 'conectando…', reconectando: 'reconectando…', 'esperando o mestre': 'esperando o mestre abrir a mesa…', abrindo: 'abrindo…', erro: 'erro' }[mesa.status] || mesa.status;
+  const ficha = mesa.papel === 'jogador' ? estado.fichas.find(f => f.id === mesa.fichaId) : null;
+  return `<aside class="painel-mesa" aria-label="Mesa online"><div class="titulo-secao"><h3 style="margin:0">Mesa ${esc(mesa.codigo)}</h3><button class="icone-btn" data-acao="mesa-painel" aria-label="Fechar">✕</button></div>
+    <p class="apagado" style="font-size:.85rem;margin:2px 0 8px">${esc(status)}${ficha ? ` · jogando com <b>${esc(ficha.nome || 'Agente')}</b>` : mesa.papel === 'mestre' ? ' · você é o mestre' : ''}</p>
+    ${mesa.erro ? `<p class="aviso-ocr">${esc(mesa.erro)}</p>` : ''}
+    <h4 class="titulo-vermelho" style="margin:6px 0 2px">Iniciativa${ini ? ` · rodada ${ini.rodada}` : ''}</h4>
+    ${ini?.ordem?.length ? `<ol class="ini-mesa">${ini.ordem.map((p, i) => `<li class="${ini.ativo && i === ini.vez ? 'vez' : ''}">${esc(p.nome)}${p.tipo === 'ameaca' ? ' <small class="apagado">ameaça</small>' : ''}</li>`).join('')}</ol>` : '<p class="apagado">Sem combate agora.</p>'}
+    ${mesa.mostrados?.length ? `<h4 class="titulo-vermelho" style="margin:6px 0 2px">O mestre mostrou</h4>${mesa.mostrados.map((x, i) => i === 0
+      ? `<div class="mostrado">${x.imagem ? `<img src="${esc(x.imagem)}" alt="${esc(x.nome)}">` : ''}<b>${esc(x.nome)}</b>${x.descricao ? `<p>${esc(x.descricao)}</p>` : ''}</div>`
+      : `<details class="mostrado-antigo"><summary>${esc(x.nome)}</summary>${x.imagem ? `<img src="${esc(x.imagem)}" alt="${esc(x.nome)}">` : ''}${x.descricao ? `<p>${esc(x.descricao)}</p>` : ''}</details>`).join('')}` : ''}
+    <h4 class="titulo-vermelho" style="margin:6px 0 2px">Feed da mesa</h4>${htmlFeed(mesa.feed, { mestre: mesa.papel === 'mestre' })}
+    <div class="linha fim" style="margin-top:8px">${mesa.papel === 'jogador' ? '<button class="btn pequeno perigo" data-acao="mesa-sair">Sair da mesa</button>' : '<a class="btn pequeno" href="#/mestre">Abrir a Área do Mestre</a>'}</div></aside>`;
+}
+// Comandos que o mestre manda para a ficha deste jogador
+function aplicarComandoDoMestre(cmd) {
+  const f = estado.fichas.find(x => x.id === mesa.fichaId); if (!f) return;
+  const d = derivar(f), v = Math.max(0, Math.floor(Number(cmd.valor) || 0));
+  let msg = '';
+  if (cmd.acao === 'dano' && v) { const r = sofrerDano(f, d, v, { tipo: cmd.tipo === 'mental' ? 'mental' : 'pv', rd: cmd.tipo === 'mental' ? d.rdMental : d.rd }); msg = `${r?.total ?? v} de dano${cmd.tipo === 'mental' ? ' mental' : ''}`; }
+  else if (cmd.acao === 'cura' && v) { recuperar(f, d, ['pv', 'pe', 'san', 'pd'].includes(cmd.recurso) ? cmd.recurso : 'pv', v); msg = `+${v} ${String(cmd.recurso || 'pv').toUpperCase()}`; }
+  else if (cmd.acao === 'condicoes' && Array.isArray(cmd.lista)) { f.condicoes = []; for (const c of cmd.lista.slice(0, 40)) if (typeof c === 'string') adicionarCondicao(f, c); msg = cmd.lista.length ? 'condições atualizadas' : 'condições removidas'; }
+  else return;
+  ctx.salvarFicha(normalizar(f)); Object.assign(f, normalizar(f)); render();
+  avisar(`O mestre aplicou: ${msg}.`);
+}
+
 function listaAgentes() {
   const fs = estado.fichas;
-  return `<div class="pagina"><div class="titulo-secao"><h1 class="faixa">Agentes</h1>
+  return `<div class="pagina"><section class="painel entrar-mesa"><div class="linha"><b>Mesa online</b><input id="mesa-codigo" placeholder="Código do mestre (OCULTA-XXXX)" aria-label="Código da mesa" style="max-width:260px"><button class="btn pequeno sangue" data-acao="mesa-ir">Entrar na mesa</button>${mesa.papel === 'jogador' ? `<span class="etiqueta">na mesa ${esc(mesa.codigo)}</span>` : ''}</div></section>
+  <div class="titulo-secao"><h1 class="faixa">Agentes</h1>
     <div class="linha"><a class="btn sangue" href="#/novo" data-acao="novo-agente">+ Novo agente</a><button class="btn" data-acao="importar">Importar</button>${fs.length ? '<button class="btn fantasma" data-acao="exportar-todos">Exportar todos</button>' : ''}</div></div>
     ${fs.length ? `<div class="lista-fichas">${fs.map(f => {
       const d = derivar(f);
@@ -193,7 +237,7 @@ function sobre() {
 }
 function bandeja() {
   const naFicha = estado.rota?.tela === 'ficha' && ctx.fichaAtual();
-  return `<div class="bandeja">${naFicha ? '<button class="btn" data-acao="janela-macros">⚡ Macros</button>' : ''}<button class="btn" data-acao="historico" aria-expanded="${estado.historicoAberto}">🎲 Rolagens</button></div>
+  return `${painelMesa()}<div class="bandeja">${mesa.papel ? `<button class="btn${mesa.status === 'aberta' || mesa.status === 'conectada' ? ' mesa-on' : ''}" data-acao="mesa-painel" aria-expanded="${!!estado.mesaAberta}">🌐 Mesa</button>` : ''}${naFicha ? '<button class="btn" data-acao="janela-macros">⚡ Macros</button>' : ''}<button class="btn" data-acao="historico" aria-expanded="${estado.historicoAberto}">🎲 Rolagens</button></div>
   ${estado.historicoAberto ? `<aside class="historico" aria-label="Histórico de rolagens"><div class="titulo-secao"><h3 style="margin:0">Próxima rolagem</h3><button class="icone-btn" data-acao="historico" aria-label="Fechar">✕</button></div>
     <div class="grade c3" style="grid-template-columns:repeat(3,1fr);gap:6px"><label class="campo"><span>d20 a mais ±</span><input type="number" id="prox-dados" data-prox="dados" value="${proxima.dados}" min="-5" max="5"></label><label class="campo"><span>Bônus</span><input type="number" id="prox-bonus" data-prox="bonus" value="${proxima.bonus}"></label><label class="campo"><span>DT</span><input type="number" id="prox-dt" data-prox="dt" value="${esc(proxima.dt)}" placeholder="—"></label></div>
     <p class="apagado" style="font-size:.8rem;margin:4px 0 8px">Dados e bônus valem só para a próxima rolagem (ex.: Ataque Especial +5, ajuda de aliado +1d20). A DT fica até você apagar.</p>
@@ -207,6 +251,7 @@ function render() {
   else if (r.tela === 'novo') corpo = telaCriador(estado.criador || (estado.criador = novoRascunho()));
   else if (r.tela === 'ficha') { const f = ctx.fichaAtual(); corpo = f ? telaFicha(f, estado.ui) : `<div class="pagina"><p class="vazio">Agente não encontrado neste navegador. <a href="#/agentes">Voltar</a></p></div>`; }
   else if (r.tela === 'mestre') corpo = telaMestre(estado.fichas);
+  else if (r.tela === 'mesa') corpo = telaEntrarMesa(r.codigo);
   else if (r.tela === 'acervo') corpo = acervo();
   else if (r.tela === 'sobre') corpo = sobre();
   else corpo = inicio();
@@ -223,6 +268,10 @@ function botaoAnimacoes() {
   return `<button class="btn pequeno botao-animacoes${sempre ? ' ligado' : ''}" data-acao="alternar-animacoes" aria-pressed="${sempre}" title="${sempre ? 'Animações ligadas mesmo com o sistema pedindo menos movimento. Clique para voltar a seguir o sistema.' : `${parado ? 'Seu sistema pede menos movimento, então as animações estão paradas. ' : 'As animações seguem o sistema. '}Clique para deixá-las sempre ligadas.`}">${sempre ? '✦ Animações: ligadas' : parado ? '◌ Animações: paradas' : '✦ Animações: automáticas'}</button>`;
 }
 const acoes = {
+  'mesa-painel': () => { estado.mesaAberta = !estado.mesaAberta; render(); },
+  'mesa-ir': () => { const c = normalizarCodigo(document.getElementById('mesa-codigo')?.value); if (!c) return avisar('Código inválido. Use o formato OCULTA-XXXX.', true); location.hash = `#/mesa/${c}`; },
+  'mesa-entrar': async el => { await entrarMesa(el.dataset.codigo, el.dataset.id); estado.mesaAberta = true; location.hash = `#/agente/${el.dataset.id}`; },
+  'mesa-sair': () => { if (!confirm('Sair da mesa online?')) return; sairDaMesa(); estado.mesaAberta = false; render(); },
   'alternar-animacoes': () => {
     estado.animacoes = estado.animacoes === 'sempre' ? 'sistema' : 'sempre';
     salvarAnimacoes(estado.animacoes); aplicarAnimacoes(estado.animacoes); render();
@@ -323,6 +372,14 @@ document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && $('#moda
 estado.rota = lerRota();
 if (estado.rota.tela === 'novo') estado.criador = novoRascunho();
 if (estado.rota.tela === 'acervo' && estado.rota.livro) abrirLivroDigital(estado.rota.livro, estado.rota.pagina);
+// ---------- Mesa online ----------
+ouvintesRolagem.push(rolagemNaMesa);
+quandoMesaMudar(() => render());
+quandoPedirFicha(() => { const f = estado.fichas.find(x => x.id === mesa.fichaId); if (f) enviarFicha(resumoFicha(f, derivar(f))); });
+quandoComando(aplicarComandoDoMestre);
+quandoMostrar(item => { estado.mesaAberta = true; render(); avisar(`O mestre mostrou: ${item.nome}`); });
+voltarSeEstavaNaMesa();                        // jogador que recarregou volta para a mesa
+if (codigoGuardadoDoMestre()) abrirMesa();     // mestre que recarregou reabre a mesa com o mesmo código
 render();
 Promise.all([carregarTextos(),carregarSuplementos(),carregarReferenciasSAH()]).then(render);
 try { navigator.storage?.persist?.(); } catch {}
