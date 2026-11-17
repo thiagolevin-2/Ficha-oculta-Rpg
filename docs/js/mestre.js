@@ -1,10 +1,10 @@
-import { sofrerDano, resolverCondicoesDoTurno, iniciarTurno, encerrarTurno, fimDeCena, d as dado, rolarTeste } from './combate.js?v=0.40.2';
-import { ELEMENTOS, ATRIBUTOS, CONDICOES, EVENTOS_INVESTIGACAO, CLASSES, LIVROS_DIGITALIZADOS } from './catalogo.js?v=0.40.2';
-import { temPeso, derivar, normalizar } from './regras.js?v=0.40.2';
-import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.40.2';
-import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal, reduzirImagem } from './util.js?v=0.40.2';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.40.2';
-import { mesa, abrirMesa, fecharMesa, publicarIniciativa, comandoParaJogador, linkConvite, mostrarAosJogadores, imagemValida } from './mesa.js?v=0.40.2';
+import { sofrerDano, resolverCondicoesDoTurno, iniciarTurno, encerrarTurno, fimDeCena, d as dado, rolarTeste } from './combate.js?v=0.40.3';
+import { ELEMENTOS, ATRIBUTOS, CONDICOES, EVENTOS_INVESTIGACAO, CLASSES, LIVROS_DIGITALIZADOS } from './catalogo.js?v=0.40.3';
+import { temPeso, derivar, normalizar } from './regras.js?v=0.40.3';
+import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.40.3';
+import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal, reduzirImagem } from './util.js?v=0.40.3';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.40.3';
+import { mesa, abrirMesa, fecharMesa, publicarIniciativa, comandoParaJogador, linkConvite, mostrarAosJogadores, imagemValida } from './mesa.js?v=0.40.3';
 // ═══════════ bestiario ═══════════
 // Fichas de referência. As habilidades de texto são resolvidas pelo mestre.
 export const AMEACAS_BASE = [
@@ -63,7 +63,7 @@ export function definirBestiario(lista) { BESTIARIO = lista.map(preparar); retur
 export async function carregarBestiario() {
   if (BESTIARIO) return BESTIARIO;
   let lista = [];
-  const partes = await Promise.all(ARQUIVOS_BESTIARIO.map(async n => { try { const r = await fetch(`dados/${n}.json?v=0.40.2`); return r.ok ? await r.json() : []; } catch (e) { console.warn('Bestiário indisponível', n, e); return []; } }));
+  const partes = await Promise.all(ARQUIVOS_BESTIARIO.map(async n => { try { const r = await fetch(`dados/${n}.json?v=0.40.3`); return r.ok ? await r.json() : []; } catch (e) { console.warn('Bestiário indisponível', n, e); return []; } }));
   lista = partes.flat();
   return definirBestiario(lista);
 }

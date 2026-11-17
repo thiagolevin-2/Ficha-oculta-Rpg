@@ -27,14 +27,21 @@ export function analisar(texto) {
 
 // Rola uma expressão de dano/efeito. Crítico no Ordem: MULTIPLICA os dados da arma (x2, x3…); bônus fixos não.
 // Multiplica os grupos da arma marcados no cálculo, inclusive Lancinante. Devolve { expr, total, detalhe, dados }.
-export function rolar(expr, { multiplicador = 1, gruposCritico = 1 } = {}) {
+// A macro pode aplicar o multiplicador a todos os termos de uma parcela de dano extra.
+export function rolar(expr, { multiplicador = 1, gruposCritico = 1, multiplicarExpressao = false } = {}) {
   const termos = analisar(expr);
   let total = 0, grupo = 0;
   const pedacos = [], dados = [];
   for (const t of termos) {
-    if (t.valor != null) { total += t.sinal * t.valor; pedacos.push((t.sinal < 0 ? '− ' : '+ ') + t.valor); continue; }
-    const n = grupo++ < gruposCritico ? t.n * multiplicador : t.n;
-    const valores = Array.from({ length: Math.min(200, n) }, () => d(t.lados));
+    if (t.valor != null) {
+      const valor = multiplicarExpressao ? t.valor * multiplicador : t.valor;
+      total += t.sinal * valor;
+      pedacos.push((t.sinal < 0 ? '− ' : '+ ') + valor);
+      continue;
+    }
+    const multiplica = grupo++ < gruposCritico || multiplicarExpressao;
+    const n = multiplica ? t.n * multiplicador : t.n;
+    const valores = Array.from({ length: multiplicarExpressao ? n : Math.min(200, n) }, () => d(t.lados));
     const soma = valores.reduce((a, b) => a + b, 0);
     total += t.sinal * soma;
     dados.push({ lados: t.lados, valores });

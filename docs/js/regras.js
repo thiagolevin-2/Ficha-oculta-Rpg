@@ -1,7 +1,7 @@
-import { condicoesEfetivas } from './combate.js?v=0.40.2';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.40.2';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.2';
-import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.40.2';
+import { condicoesEfetivas } from './combate.js?v=0.40.3';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.40.3';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.3';
+import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.40.3';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -275,7 +275,9 @@ export function normalizar(f) {
       passos: lista(m?.passos, 8).map(p => ({ tipo: ['pericia', 'ataque', 'acerto', 'formula', 'gasto'].includes(p?.tipo) ? p.tipo : 'formula', alvo: txt(p?.alvo, 60), formula: txt(p?.formula, 40), rotulo: txt(p?.rotulo, 40), valor: int(p?.valor, 0, 99, 1),
         pericia: PERICIAS.some(x => x.id === p?.pericia) ? p.pericia : '', alcanceAtaque: p?.alcanceAtaque === 'distancia' ? 'distancia' : 'corpo',
         danoArma: txt(p?.danoArma, 40).trim(), tipoDanoArma: txt(p?.tipoDanoArma, 20), tipoDano: txt(p?.tipoDano, 20),
-        danosExtras: lista(p?.danosExtras, LIMITE_DANOS_EXTRAS_MACRO).map(e => ({ formula: txt(e?.formula, 40).trim(), tipo: txt(e?.tipo, 20) })),
+        danosExtras: lista(p?.danosExtras, LIMITE_DANOS_EXTRAS_MACRO).map(e => ({
+          formula: txt(e?.formula, 40).trim(), tipo: txt(e?.tipo, 20), multiplicaCritico: e?.multiplicaCritico === true,
+        })),
         criticoProprio: !!p?.criticoProprio, margem: int(p?.margem, 2, 20, 20), mult: int(p?.mult, 2, 6, 2) })) })),
     rolagensSalvas: lista(f.rolagensSalvas, 40).filter(r => r && txt(r.formula, 40) && /d/i.test(r.formula) && FORMULA.test(txt(r.formula, 40))).map(r => ({ uid: txt(r.uid, 60) || uid(), nome: txt(r.nome, 60) || 'Rolagem', formula: txt(r.formula, 40).replace(/\s+/g, '') })),
     efeitos: lista(f.efeitos, 30).map(e => ({ uid: txt(e?.uid, 60) || uid(), nome: txt(e?.nome, 80) || 'Efeito', dura: ['cena', 'rodada', 'proxima'].includes(e?.dura) ? e.dura : 'cena', nota: txt(e?.nota, 200), ef: limparEf(e?.ef) })),

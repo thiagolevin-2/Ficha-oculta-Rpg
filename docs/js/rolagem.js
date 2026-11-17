@@ -1,9 +1,9 @@
 // rolagem.js — rolar testes, ataques e dano; mostrar o resultado; guardar o histórico.
 // Os dados 3D (do Arcana) só MOSTRAM um resultado já sorteado: a animação não decide nada.
-import { rolarTeste, rolar, comSinal } from './combate.js?v=0.40.2';
-import { animateDice, diceAnimationsEnabled, setDiceAnimations, diceFromValues } from './dados3d.js?v=0.40.2';
-import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.40.2';
-import { esc, avisar } from './util.js?v=0.40.2';
+import { rolarTeste, rolar, comSinal } from './combate.js?v=0.40.3';
+import { animateDice, diceAnimationsEnabled, setDiceAnimations, diceFromValues } from './dados3d.js?v=0.40.3';
+import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.40.3';
+import { esc, avisar } from './util.js?v=0.40.3';
 let historico = carregarRolagens();
 // modificadores da PRÓXIMA rolagem (bandeja): dados a mais/menos e bônus fixo
 export const proxima = { dados: 0, bonus: 0, dt: '' };
@@ -46,10 +46,10 @@ export async function rolarTesteUI({ titulo, quem = '', dados, bonus = 0, margem
   return item;
 }
 
-export async function rolarDanoUI({ titulo, quem = '', formula, multiplicador = 1, gruposCritico = 1, tipo = 'dano', rotulo = '' }) {
+export async function rolarDanoUI({ titulo, quem = '', formula, multiplicador = 1, gruposCritico = 1, multiplicarExpressao = false, tipo = 'dano', rotulo = '' }) {
   let r;
-  try { r = rolar(formula, { multiplicador, gruposCritico }); } catch (e) { avisar(e.message, true); return null; }
-  const item = { tipo, titulo, quem, formula, multiplicador, total: r.total, detalhe: r.detalhe, grupos: r.dados, rotulo };
+  try { r = rolar(formula, { multiplicador, gruposCritico, multiplicarExpressao }); } catch (e) { avisar(e.message, true); return null; }
+  const item = { tipo, titulo, quem, formula, multiplicador, multiplicarExpressao, total: r.total, detalhe: r.detalhe, grupos: r.dados, rotulo };
   await animar(item);
   registrar(item);
   mostrarResultado(item);
@@ -119,7 +119,8 @@ function mostrarResultado(item) {
       <p class="apagado dossie-txt" style="margin-top:6px">${item.pior ? 'Atributo 0: fica com o PIOR dado.' : `${item.valores.length}d20, fica com o MELHOR.`}${item.tipo === 'ataque' ? ` Crítico em ${item.margem}+ (×${item.mult}).` : ''}</p>
       ${texto ? `<div class="veredito ${classe}">${texto}</div>` : ''}</div>`;
   } else {
-    corpo = `<div class="resultado-grande"><div class="total">${item.total}</div><p class="dossie-txt">${esc(item.formula)}${item.multiplicador > 1 ? ` · crítico ×${item.multiplicador} (só os dados da arma)` : ''}</p><p class="apagado dossie-txt">${esc(item.detalhe)}</p></div>`;
+    const critico = item.multiplicador > 1 ? ` · crítico ×${item.multiplicador} (${item.multiplicarExpressao ? 'dano extra inteiro' : 'só os dados da arma'})` : '';
+    corpo = `<div class="resultado-grande"><div class="total">${item.total}</div><p class="dossie-txt">${esc(item.formula)}${critico}</p><p class="apagado dossie-txt">${esc(item.detalhe)}</p></div>`;
   }
   const rodape = efeitoPendente?.item === item
     ? `<button class="btn fantasma" data-acao="fechar-modal">Fechar</button><button class="btn sangue" data-acao="resolver-efeito-ritual" data-token="${efeitoPendente.token}">Resolver efeito do ritual</button>`

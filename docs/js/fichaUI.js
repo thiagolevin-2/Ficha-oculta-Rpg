@@ -1,19 +1,19 @@
-import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.40.2';
-import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.40.2';
-import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO } from './regras.js?v=0.40.2';
-import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, analisar } from './combate.js?v=0.40.2';
-import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.40.2';
-import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.2';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.40.2';
-import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.40.2';
+import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.40.3';
+import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.40.3';
+import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO } from './regras.js?v=0.40.3';
+import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, analisar } from './combate.js?v=0.40.3';
+import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.40.3';
+import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.3';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.40.3';
+import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.40.3';
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.40.2', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.40.2', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.40.3', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.40.3', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
   // Os textos do Sobrevivendo ao Horror foram conferidos com o PDF e estão em dados/textos.json (v0.23).
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
@@ -982,6 +982,7 @@ function abaMacros(f, d) {
             <label class="mini"><span>Dano extra ${n + 1}</span><input data-campo="${campo}.formula" list="macro-dados-dano" maxlength="40" value="${esc(extra.formula)}" placeholder="Ex.: 1d6 ou 3"></label>
             ${selTipoDano(`${campo}.tipo`, extra.tipo, 'Sem tipo definido')}
             <button class="icone-btn" data-acao="macro-dano-remover" data-i="${i}" data-j="${j}" data-n="${n}" aria-label="Remover dano extra ${n + 1}">✕</button>
+            <label class="check macro-critico"><input type="checkbox" data-campo="${campo}.multiplicaCritico" data-tipo="bool" aria-label="Multiplicar dano extra ${n + 1} no crítico" ${extra.multiplicaCritico ? 'checked' : ''}><span>Multiplicar no crítico</span></label>
           </div>`;
         }).join('')}
         <button class="btn pequeno" data-acao="macro-dano-add" data-i="${i}" data-j="${j}" ${p.danosExtras.length >= LIMITE_DANOS_EXTRAS_MACRO ? 'disabled' : ''}>+ Dano extra</button>
@@ -1008,7 +1009,7 @@ function abaMacros(f, d) {
       <div class="linha" style="margin-top:8px"><button class="btn pequeno" data-acao="macro-passo-add" data-i="${i}" ${m.passos.length >= 8 ? 'disabled' : ''}>+ Passo</button><span class="espaco"></span><button class="btn pequeno perigo" data-acao="macro-remover" data-i="${i}">Remover macro</button></div>
     </div></details>`;
   return `<section class="painel"><div class="titulo-secao"><h2 class="faixa sangue">Macros</h2><button class="btn pequeno sangue" data-acao="macro-nova">+ Nova macro</button></div>
-    <p class="apagado" style="font-size:.9rem">Escolha a perícia do ataque. Em <b>+ Dano extra</b>, adicione dados (1d6) ou valores fixos (3) e escolha o tipo ou elemento de cada parcela. O crítico se aplica só aos dados do dano base.</p>
+    <p class="apagado" style="font-size:.9rem">Em <b>+ Dano extra</b>, adicione dados ou valores fixos. Marque <b>Multiplicar no crítico</b> para aplicar o multiplicador do ataque àquela parcela inteira.</p>
     <datalist id="macro-dados-dano">${[4, 6, 8, 10, 12, 20, 100].map(lados => `<option value="1d${lados}"></option>`).join('')}<option value="2d6"></option><option value="2d8"></option></datalist>
     ${f.macros.length ? `<div class="lista-macros">${f.macros.map(cartao).join('')}</div>` : '<p class="vazio">Nenhuma macro. Crie uma para rolar ataque e dano com um clique.</p>'}
   </section>`;
@@ -1476,7 +1477,7 @@ export function acoesFicha(ctx) {
     'macro-dano-add': el => {
       const passo = f().macros[Number(el.dataset.i)]?.passos[Number(el.dataset.j)];
       if (!passo || passo.danosExtras.length >= LIMITE_DANOS_EXTRAS_MACRO) return;
-      passo.danosExtras.push({ formula: '', tipo: '' });
+      passo.danosExtras.push({ formula: '', tipo: '', multiplicaCritico: false });
       salvar();
     },
     'macro-dano-remover': el => {
@@ -1537,12 +1538,22 @@ export function acoesFicha(ctx) {
             const tipoBase = nomeTipoDano(arma ? p.tipoDanoArma : p.tipoDano) || tipoPadrao;
             const r = await testar({ titulo: `${m.nome} · ${ataque}`, quem: autor, dados: acerto.dados, bonus: acerto.bonus, margem, mult, gruposCritico, tipo: 'ataque' }, per.atrUsado, ficha);
             linhas.push([ataque, r.total, r.critico ? 'crítico' : '']);
-            const danos = p.danosExtras.map(extra => ({ formula: extra.formula, tipo: nomeTipoDano(extra.tipo), multiplicador: 1, titulo: 'Dano extra' }));
+            const danos = p.danosExtras.map(extra => {
+              const multiplica = r.critico && extra.multiplicaCritico;
+              return {
+                formula: extra.formula, tipo: nomeTipoDano(extra.tipo), titulo: 'Dano extra',
+                multiplicador: multiplica ? mult : 1, multiplicarExpressao: multiplica,
+              };
+            });
             if (formula) danos.unshift({ formula, tipo: tipoBase, multiplicador: r.critico && /d/i.test(formula) ? mult : 1, gruposCritico, titulo: 'Dano' });
             let totalDano = 0;
             for (const parte of danos) {
               const tituloDano = `${parte.titulo} · ${nome}${parte.tipo ? ` (${parte.tipo})` : ''}`;
-              const dano = await rolarDanoUI({ titulo: `${m.nome} · ${tituloDano}`, quem: autor, formula: parte.formula, multiplicador: parte.multiplicador, gruposCritico: parte.gruposCritico, rotulo: parte.tipo ? `DANO DE ${parte.tipo.toUpperCase()}` : 'DANO' });
+              const dano = await rolarDanoUI({
+                titulo: `${m.nome} · ${tituloDano}`, quem: autor, formula: parte.formula,
+                multiplicador: parte.multiplicador, gruposCritico: parte.gruposCritico, multiplicarExpressao: parte.multiplicarExpressao,
+                rotulo: parte.tipo ? `DANO DE ${parte.tipo.toUpperCase()}` : 'DANO',
+              });
               if (!dano) continue;
               totalDano += dano.total;
               linhas.push([tituloDano, dano.total, parte.multiplicador > 1 ? `crítico ×${parte.multiplicador}` : '']);
