@@ -1,4 +1,4 @@
-import { MODIFICACAO, PODER_PARANORMAL, RITUAIS } from './catalogo.js?v=0.24.0';
+import { MODIFICACAO, PODER_PARANORMAL, RITUAIS } from './catalogo.js?v=0.25.0';
 // ═══════════ amaldicoados ═══════════
 // amaldicoados.js — efeitos dos itens amaldiçoados e paranormais para a aba Combate › Itens amaldiçoados.
 // Fontes: Livro de Regras (p. 147–151 impressas), Sobrevivendo ao Horror (p. 57–61) e Arquivos Secretos.
@@ -278,6 +278,7 @@ export function registrarMaldições(ficha, itemUsado) {
     if (['conhecimento', 'energia', 'morte', 'sangue', 'medo'].includes(el)) ficha.maldicoesAceitas[chave] ??= el;
   };
   for (const i of ficha.itens) {
+    if (i.qtd && (i.escrito || i.ativo)) for (const n of i.maldicoes || []) registrar('item:' + i.uid + ':' + n.replace('Acessório amaldiçoado: ', '').replace(/\s+/g, '-'), AMALDICOADOS[n]?.el);
     if (!i.qtd || (!i.ativo && i !== itemUsado)) continue;
     const el = AMALDICOADOS[i.nome]?.el;
     registrar('item:' + i.uid, el === 'variavel' || !el

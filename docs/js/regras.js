@@ -1,7 +1,7 @@
-import { condicoesEfetivas } from './combate.js?v=0.24.0';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.24.0';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.24.0';
-import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.24.0';
+import { condicoesEfetivas } from './combate.js?v=0.25.0';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.25.0';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.25.0';
+import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.25.0';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -251,6 +251,7 @@ export function normalizar(f) {
       periciaKit: PERICIA[i?.periciaKit] ? i.periciaKit : '',
       escrito: !!i?.escrito, pericia: PERICIA[i?.pericia] ? i.pericia : '', periciaExtra: PERICIA[i?.periciaExtra] ? i.periciaExtra : '',
       mods: [...new Set(lista(i?.mods, 6))].filter(id => MOD_ACESSORIOS.some(m => m[0] === id)),
+      maldicoes: [...new Set(lista(i?.maldicoes, 4))].filter(n => typeof n === 'string' && n.startsWith('Acessório amaldiçoado: ') && AMALDICOADOS[n]), // maldições de acessório aplicadas no item
       efeitos: lista(i?.efeitos, 6).map(e => ({ tipo: TIPOS_EFEITO_ITEM.includes(e?.tipo) ? e.tipo : '', alvo: txt(e?.alvo, 30), valor: int(e?.valor, -20, 20, 0) }))
         .filter(e => e.tipo && e.valor && (e.tipo === 'pericia' ? !!PERICIA[e.alvo] : e.tipo === 'atributo' ? ['agi', 'for', 'int', 'pre', 'vig'].includes(e.alvo) : true)),
        uid: txt(i?.uid, 60) || uid(), nome: txt(i?.nome, 80) || 'Item', categoria: int(i?.categoria, 0, 4, 0), espacos: Number.isFinite(+i?.espacos) ? Math.min(20, Math.max(0, +i.espacos)) : 1, qtd: int(i?.qtd, 0, 999, 1), nota: txt(i?.nota, 600) })),
@@ -349,7 +350,10 @@ export const TIPOS_EFEITO_ITEM = ['pericia', 'atributo', 'defesa', 'desl', 'rd',
 export function passivosComuns(f) {
   const out = [], vistos = new Set();
   for (const it of f.itens || []) {
-    if (!(it.qtd > 0) || !it.ativo || AMALDICOADOS[it.nome]) continue;
+    if (!(it.qtd > 0) || AMALDICOADOS[it.nome]) continue;
+    // maldições de acessório aplicadas no item (Amaldiçoar): valem com o acessório equipado
+    if (it.escrito || it.ativo) for (const n of it.maldicoes || []) if (AMALDICOADOS[n]?.passivo) out.push({ fonte: `${it.nome} (${n.replace('Acessório amaldiçoado: ', '')})`, ...AMALDICOADOS[n].passivo });
+    if (!it.ativo) continue;
     const def = PASSIVOS_ITENS[it.nome];
     if (def && !vistos.has(it.nome)) {
       vistos.add(it.nome);
@@ -709,7 +713,7 @@ export function derivar(f) {
   const usoCategoria = [0, 0, 0, 0, 0];
   for (const a of ataques) if (!a.automatica) usoCategoria[a.categoriaEfetiva]++;
   for (const p of f.protecoes) usoCategoria[Math.min(4, p.categoria + p.mods.length + Number(p.mods.some(m => MODIFICACAO[m]?.maldicao)))]++;
-  for (const i of f.itens) if (i.qtd > 0) usoCategoria[Math.max(0, Math.min(4, i.categoria + (i.mods || []).length) - (i === itemMochila ? 1 : 0))]++;
+  for (const i of f.itens) if (i.qtd > 0) usoCategoria[Math.max(0, Math.min(4, i.categoria + (i.mods || []).length + (i.maldicoes || []).length) - (i === itemMochila ? 1 : 0))]++;
   if (!ehSobrevivente(f)) for (let c = 1; c <= 4; c++) if (usoCategoria[c] > patente.itens[c - 1]) avisos.push(`Itens de categoria ${'I'.repeat(c).replace('IIII', 'IV')}: ${usoCategoria[c]} de ${patente.itens[c - 1]} permitidos pela patente.`);
 
   // --- recursos atuais (null = cheio) ---

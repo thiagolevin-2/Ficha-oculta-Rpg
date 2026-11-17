@@ -1146,3 +1146,18 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 /* v0.24 — botão de animações no menu */
 .botao-animacoes { width: 100%; margin-top: 8px; justify-content: flex-start; font-size: .78rem; letter-spacing: .02em; }
 .botao-animacoes.ligado { border-color: var(--elemento-cor, var(--sangue)); color: var(--tinta); }
+
+/* v0.24.1 — janela do acessório: campos extras só com a modificação marcada */
+.modal:has([data-ac-mod="funcao"]:not(:checked)) .so-funcao,
+.modal:has([data-ac-mod="instrumental"]:not(:checked)) .so-instrumental { display: none; }
+.so-funcao, .so-instrumental { margin: 0 0 8px 28px; }
+.ac-mods { margin-top: 10px; }
+.ac-mods > summary { cursor: pointer; color: var(--apagado); font-size: .9rem; margin-bottom: 6px; }
+
+/* v0.25 — cartões Modificar / Amaldiçoar e painel de números da janela */
+.cartoes-mod { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 8px 0 4px; }
+.cartoes-mod .cartao { padding: 10px 12px; }
+.cartao-amaldicoar { border-left: 3px solid var(--sangue) !important; }
+.numeros-mod { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 8px 0 14px; }
+.numeros-mod .chave { text-align: center; }
+.numeros-mod b.erro { color: var(--perigo); }

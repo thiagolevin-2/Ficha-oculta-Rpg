@@ -1,19 +1,19 @@
-import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.24.0';
-import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.24.0';
-import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM } from './regras.js?v=0.24.0';
-import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar } from './combate.js?v=0.24.0';
-import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.24.0';
-import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.24.0';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.24.0';
-import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.24.0';
+import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.25.0';
+import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.25.0';
+import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM } from './regras.js?v=0.25.0';
+import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar } from './combate.js?v=0.25.0';
+import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.25.0';
+import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.25.0';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.25.0';
+import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.25.0';
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.24.0', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.24.0', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.25.0', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.25.0', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
   // Os textos do Sobrevivendo ao Horror foram conferidos com o PDF e estão em dados/textos.json (v0.23).
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
@@ -346,13 +346,6 @@ function formulaDaForma(nome, forma, base, final) {
   return f;
 }
 // Maldições do Livro de Regras (p. 145–147), agrupadas por elemento, como caixinhas (contam como modificação: +1 categoria).
-function listaMaldicoes(lista, marcadas, atributo) {
-  if (!lista.length) return '';
-  const ordem = ['conhecimento', 'energia', 'morte', 'sangue'], nomes = { conhecimento: 'Conhecimento', energia: 'Energia', morte: 'Morte', sangue: 'Sangue' };
-  return `<h3 class="titulo-vermelho">Maldições do Livro de Regras (+1 categoria cada)</h3>
-    <p class="apagado" style="font-size:.85rem;margin:0 0 6px">Preço: ao falhar num teste do atributo do elemento (Int para Conhecimento, Agi para Energia, Pre para Morte, For ou Vig para Sangue), perde 2 de Sanidade por maldição desse elemento.</p>
-    ${ordem.map(el => { const ms = lista.filter(m => m.maldicao === el); return ms.length ? `<div class="lista-hab el-${el}">${ms.map(m => `<label class="check hab" style="border-left:3px solid var(--el)"><input type="checkbox" ${atributo}="${m.id}" ${marcadas.includes(m.id) ? 'checked' : ''}><span>${sigilo(el, 'var(--el)')} <b>${esc(m.nome)}</b> <small class="apagado">(${nomes[el]}) ${esc(m.resumo)}</small></span></label>`).join('')}</div>` : ''; }).join('')}`;
-}
 // ---------- Aba HABILIDADES ----------
 let dAtual = null; // derivação da ficha que está sendo desenhada (para os botões "Usar")
 function hab(nome, resumo, meta = '', chave = '', f = null, trancada = false) {
@@ -634,6 +627,64 @@ function cartaoRitual(f, d, r, i) {
     </div></details>`;
 }
 
+// ---------- Modificar e Amaldiçoar (cartões que abrem janelas; a ficha recalcula categoria, espaços e carga) ----------
+const MALDICOES_ACESSORIO = Object.keys(AMALDICOADOS).filter(n => n.startsWith('Acessório amaldiçoado: '));
+const NOME_EL_MALDICAO = { conhecimento: 'Conhecimento', energia: 'Energia', morte: 'Morte', sangue: 'Sangue', variavel: 'Elemento à escolha' };
+const alvoMod = (f, tipo, i) => (tipo === 'arma' ? f.armas[i] : tipo === 'protecao' ? f.protecoes[i] : f.itens[i]);
+const campoMod = (tipo, modo) => (tipo === 'item' && modo === 'amaldicoar' ? 'maldicoes' : 'mods');
+// Opções da janela: modificações comuns ou maldições (arma pelo tipo de ataque, proteção pelo peso, acessório: maldições de acessório)
+function opcoesMod(f, tipo, alvo, modo) {
+  if (tipo === 'item') return modo === 'amaldicoar'
+    ? MALDICOES_ACESSORIO.map(n => ({ id: n, nome: n.replace('Acessório amaldiçoado: ', ''), el: AMALDICOADOS[n].el, resumo: ITEM_INFO[n]?.resumo || AMALDICOADOS[n].nota || '' }))
+    : [];
+  const chave = tipo === 'arma' ? alvo.uso : alvo.peso;
+  return MODIFICACOES.filter(m => m.para.includes(chave) && (modo === 'amaldicoar' ? !!m.maldicao : !m.maldicao) && (m.fonte !== 'SaH' || f.modo === 'sah'))
+    .sort((x, y) => x.nome.localeCompare(y.nome, 'pt'))
+    .map(m => ({ id: m.id, nome: m.nome, el: m.maldicao, resumo: m.resumo, fonte: m.fonte, espacos: m.ef?.espacos || 0 }));
+}
+// Categoria efetiva e espaços do alvo, do mesmo jeito que a ficha calcula
+function numerosAlvo(d, tipo, alvo) {
+  const mods = alvo.mods || [];
+  const espMods = mods.reduce((x, m) => x + (MODIFICACAO[m]?.ef?.espacos || 0), 0);
+  if (tipo === 'arma') return { cat: d.ataques.find(x => x.uid === alvo.uid)?.categoriaEfetiva ?? Math.min(4, alvo.categoria + mods.length), esp: Math.max(0, alvo.espacos + espMods) };
+  if (tipo === 'protecao') return { cat: Math.min(4, alvo.categoria + mods.length + Number(mods.some(m => MODIFICACAO[m]?.maldicao))), esp: Math.max(0, alvo.espacos + espMods) };
+  return { cat: Math.min(4, alvo.categoria + mods.length + (alvo.maldicoes || []).length), esp: Math.max(0, alvo.espacos - Number(mods.includes('discreto'))) };
+}
+// Os dois cartões: Modificar e Amaldiçoar
+function cartoesMod(d, tipo, i, alvo) {
+  const mods = alvo.mods || [];
+  const nMal = tipo === 'item' ? (alvo.maldicoes || []).length : mods.filter(m => MODIFICACAO[m]?.maldicao).length;
+  const nMod = tipo === 'item' ? mods.length : mods.length - nMal;
+  const n = numerosAlvo(d, tipo, alvo);
+  const plural = (k, um, varios, nada) => (k ? `${k} ${k === 1 ? um : varios}` : nada);
+  return `<div class="cartoes cartoes-mod">
+      <button class="cartao" data-acao="${tipo === 'item' ? 'acessorio' : 'janela-mod'}" data-tipo="${tipo}" data-i="${i}" data-modo="modificar"><b>Modificar</b><small>${plural(nMod, 'modificação', 'modificações', 'Nenhuma modificação')}${tipo === 'item' ? ' · perícia' : ''}</small></button>
+      <button class="cartao cartao-amaldicoar" data-acao="janela-mod" data-tipo="${tipo}" data-i="${i}" data-modo="amaldicoar"><b>Amaldiçoar</b><small>${plural(nMal, 'maldição', 'maldições', 'Sem maldição')}</small></button>
+    </div><small class="apagado">Categoria ${cat(n.cat)} · ${n.esp} espaço(s)</small>`;
+}
+function janelaMod(f, tipo, i, modo) {
+  const alvo = alvoMod(f, tipo, i); if (!alvo) return;
+  const d = derivar(f), n = numerosAlvo(d, tipo, alvo), marcadas = alvo[campoMod(tipo, modo)] || [], ops = opcoesMod(f, tipo, alvo, modo);
+  const lim = ehSobrevivente(f) ? null : d.patente?.itens;
+  const painel = `<div class="numeros-chave numeros-mod">
+      <div class="chave"><b>${cat(n.cat)}</b><span>Categoria</span></div><div class="chave"><b>${n.esp}</b><span>Espaços</span></div>
+      <div class="chave"><b class="${d.sobrecarregado ? 'erro' : ''}">${d.cargaUsada}/${d.cargaMax}</b><span>Carga da ficha</span></div>
+      ${n.cat && lim ? `<div class="chave"><b class="${d.usoCategoria[n.cat] > lim[n.cat - 1] ? 'erro' : ''}">${d.usoCategoria[n.cat]}/${lim[n.cat - 1]}</b><span>Itens cat. ${cat(n.cat)}</span></div>` : ''}</div>`;
+  const cartao = o => {
+    const on = marcadas.includes(o.id), el = o.el ? (NOME_EL_MALDICAO[o.el] ? o.el : 'variavel') : '';
+    return `<button class="cartao${el ? ` el-${el}` : ''}" ${el ? 'style="border-left:4px solid var(--el)"' : ''} aria-pressed="${on}" data-acao="alternar-mod" data-tipo="${tipo}" data-i="${i}" data-modo="${modo}" data-id="${esc(o.id)}">
+      <span class="linha"><b>${esc(o.nome)}</b><span class="espaco"></span>${fonteTag(o.fonte || '')}<span class="etiqueta">${on ? '✓ aplicada' : '+1 categoria'}</span></span>
+      <small>${esc(o.resumo)}</small>${o.espacos ? `<small class="apagado">${o.espacos > 0 ? '+' : '−'}${Math.abs(o.espacos)} espaço</small>` : ''}</button>`;
+  };
+  const corpo = modo === 'amaldicoar'
+    ? `${['conhecimento', 'energia', 'morte', 'sangue', 'variavel'].map(el => { const g = ops.filter(o => o.el === el); return g.length ? `<h3 class="titulo-vermelho el-${el}">${sigilo(el, 'var(--el)')} ${NOME_EL_MALDICAO[el]}</h3><div class="cartoes">${g.map(cartao).join('')}</div>` : ''; }).join('')}
+       <p class="apagado" style="font-size:.85rem;margin-top:10px">Preço das maldições: ao falhar num teste do atributo do elemento (Int para Conhecimento, Agi para Energia, Pre para Morte, For ou Vig para Sangue), perde 2 de Sanidade por maldição desse elemento.${tipo === 'arma' ? ' O ritual Amaldiçoar Arma (dano extra do elemento) fica em Editar.' : ''}${tipo === 'item' ? ' O efeito vale com o acessório equipado.' : ''}</p>`
+    : `<div class="cartoes">${ops.map(cartao).join('') || '<p class="apagado">Não há modificações para este tipo.</p>'}</div>`;
+  abrirModal(`${modo === 'amaldicoar' ? 'Amaldiçoar' : 'Modificar'} · ${alvo.nome}`,
+    `<p class="apagado">Clique para aplicar ou tirar. Cada ${modo === 'amaldicoar' ? 'maldição' : 'modificação'} aumenta a categoria em +1 (máximo IV). A ficha recalcula na hora.</p>${painel}${ops.length ? corpo : '<p class="apagado">Não há opções para este item.</p>'}`,
+    '<button class="btn sangue" data-acao="fechar-modal">Pronto</button>', true);
+}
+
 // ---------- Itens do inventário (cartões que abrem como os rituais) ----------
 // Cartões abertos continuam abertos depois de salvar (o evento "toggle" não sobe, por isso a captura).
 const ITENS_ABERTOS = new Set();
@@ -669,6 +720,7 @@ function efeitoDoItem(it) {
     const { acessorio, exige, ...ef } = def;
     partes.push(descreverPassivo({ ...ef, pericia: { ...(ef.pericia || {}), ...(acessorio || {}) } }) + (exige ? ` (se for treinado em ${PERICIA[exige].nome})` : ''));
   }
+  for (const n of it.maldicoes || []) { const p = AMALDICOADOS[n]?.passivo; partes.push(`${n.replace('Acessório amaldiçoado: ', '')} (maldição)${p ? ': ' + descreverPassivo(p) : ''}`); }
   if (it.efeitos?.length) partes.push(descreverEfeitosItem(it.efeitos));
   return partes.filter(Boolean).join(' · ');
 }
@@ -678,7 +730,7 @@ function cartaoItem(f, d, itemSalvo, i) {
   const pendente = tipo === 'acessorio' && !it.pericia;
   const naMochila = d.itemMochila === it.uid;
   const efeito = efeitoDoItem(it);
-  const catEf = Math.max(0, Math.min(4, it.categoria + it.mods.length) - (naMochila ? 1 : 0));
+  const catEf = Math.max(0, Math.min(4, it.categoria + it.mods.length + (it.maldicoes || []).length) - (naMochila ? 1 : 0));
   const espEf = Math.max(0, it.espacos - Number(it.mods.includes('discreto')) - (naMochila ? 1 : 0));
   const linhaResumo = pendente ? 'Clique para escolher a perícia que este acessório melhora.'
     : efeito ? `Na ficha: ${efeito}${tipo && !eq ? ' (desligado enquanto estiver desequipado)' : ''}`
@@ -694,11 +746,12 @@ function cartaoItem(f, d, itemSalvo, i) {
       ${efeito ? `<p><b>Efeito na ficha:</b> ${esc(efeito)}${tipo && !eq ? ' <span class="apagado">(só vale equipado)</span>' : ''}</p>` : ''}
       ${it.efeitos?.length ? `<div class="linha" style="flex-wrap:wrap">${it.efeitos.map((e, k) => `<span class="etiqueta">${esc(descreverEfeitosItem([e]))} <button class="icone-btn" data-acao="item-efeito-remover" data-i="${i}" data-k="${k}" aria-label="Tirar o efeito ${esc(descreverEfeitosItem([e]))}">✕</button></span>`).join('')}</div>` : ''}
       <div class="linha" style="margin-top:8px;flex-wrap:wrap">
-        ${AMALDICOADOS[it.nome] ? '' : `<button class="btn pequeno" data-acao="item-efeito" data-i="${i}">+ Efeito na ficha</button>`}
-        ${tipo === 'acessorio' ? `<button class="btn pequeno" data-acao="acessorio" data-i="${i}">Acessório: perícia e modificações</button>` : ''}
+        ${AMALDICOADOS[it.nome] || tipo === 'acessorio' ? '' : `<button class="btn pequeno" data-acao="item-efeito" data-i="${i}">+ Efeito na ficha</button>`}
+
         ${it.nome.startsWith('Selo Paranormal') || it.nome === 'Dedo Decepado' ? `<button class="btn pequeno" data-acao="vincular-item" data-i="${i}">Vincular</button>` : ''}
         ${it.ritualSelo && it.qtd > 0 ? `<button class="btn pequeno sangue" data-acao="usar-selo" data-i="${i}">Ativar selo</button>` : ''}
       </div>
+      ${tipo === 'acessorio' ? cartoesMod(d, 'item', i, it) : ''}
       ${d.temMochilaUtil ? `<label class="check" style="margin-top:8px"><input type="checkbox" data-acao-check="mochila-utilidades" data-uid="${esc(it.uid)}" ${naMochila ? 'checked' : ''}><span><b>Guardar na Mochila de Utilidades</b><small>Este item ocupa 1 espaço a menos e conta como uma categoria abaixo. Só um item por vez.</small></span></label>` : ''}
       <div class="grade-mini" style="margin-top:8px">
         <label class="campo"><span>Nome</span><input data-campo="itens.${i}.nome" id="it-n-${i}" value="${esc(it.nome)}" aria-label="Nome do item"></label>
@@ -735,8 +788,8 @@ function abaInventario(f, d) {
   </section></div>
   <section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa sangue">Itens</h2><div class="linha"><button class="btn pequeno" data-acao="add-arma">+ Arma</button><button class="btn pequeno" data-acao="add-protecao">+ Proteção</button><button class="btn pequeno" data-acao="add-item-lista">+ Item da lista</button><button class="btn pequeno" data-acao="add-item">+ Item personalizado</button></div></div>
     ${f.itens.length ? `<div class="lista-itens">${f.itens.map((it, i) => cartaoItem(f, d, it, i)).join('')}</div>` : '<p class="vazio">Mochila vazia.</p>'}
-    ${f.armas.length || f.protecoes.length ? `<h3 class="titulo-vermelho">Armas e proteções</h3><div class="lista-hab">${f.armas.map((a, i) => `<div class="hab"><span class="meta"><button class="btn pequeno" data-acao="editar-arma" data-i="${i}">Editar / modificar</button></span><b>${esc(a.nome)}</b><p>${esc(a.dano)} · cat. ${cat(Math.min(4, a.categoria + a.mods.length))}${a.mods.length ? ' · ' + a.mods.map(m => MODIFICACAO[m].nome).join(', ') : ''}${a.maldicao?.tipo ? ' · amaldiçoada' : ''}</p></div>`).join('')}
-      ${f.protecoes.map((p, i) => `<div class="hab"><span class="meta"><button class="btn pequeno" data-acao="editar-protecao" data-i="${i}">Editar / modificar</button></span><b>${esc(p.nome)}</b><p>Defesa +${p.defesa} · cat. ${cat(Math.min(4, p.categoria + p.mods.length))}${p.mods.length ? ' · ' + p.mods.map(m => MODIFICACAO[m].nome).join(', ') : ''}</p></div>`).join('')}</div>` : ''}
+    ${f.armas.length || f.protecoes.length ? `<h3 class="titulo-vermelho">Armas e proteções</h3><div class="lista-hab">${f.armas.map((a, i) => `<div class="hab"><span class="meta"><button class="btn pequeno" data-acao="editar-arma" data-i="${i}">Editar</button></span><b>${esc(a.nome)}</b><p>${esc(a.dano)}${a.mods.length ? ' · ' + a.mods.map(m => MODIFICACAO[m].nome).join(', ') : ''}${a.maldicao?.tipo ? ' · Amaldiçoar Arma' : ''}</p>${cartoesMod(d, 'arma', i, a)}</div>`).join('')}
+      ${f.protecoes.map((p, i) => `<div class="hab"><span class="meta"><button class="btn pequeno" data-acao="editar-protecao" data-i="${i}">Editar</button></span><b>${esc(p.nome)}</b><p>Defesa +${p.defesa}${p.mods.length ? ' · ' + p.mods.map(m => MODIFICACAO[m].nome).join(', ') : ''}</p>${cartoesMod(d, 'protecao', i, p)}</div>`).join('')}</div>` : ''}
     <p class="apagado" style="font-size:.88rem;margin-top:8px">Clique num item para ver o que ele faz, equipar ou desequipar, escolher perícias e editar. Itens desequipados continuam ocupando espaço e categoria. Armas e proteções também aparecem na aba Combate e contam na carga. Cada modificação aumenta a categoria em +1.</p>
   </section>`;
 }
@@ -1782,8 +1835,7 @@ export function acoesFicha(ctx) {
         ${s('categoria', 'Categoria', [[0, '0'], [1, 'I'], [2, 'II'], [3, 'III'], [4, 'IV']])}${c('espacos', 'Espaços', 'number', 'min="0" step="0.5"')}
         ${temOpcional(f(), 'municao') ? c('capacidade', 'Capacidade', 'number', 'min="0"') + c('carregada', 'Carregada', 'number', 'min="0"') + c('reserva', 'Reserva', 'number', 'min="0"') : ''}
         ${c('alcance', 'Alcance')}${s('tipo', 'Tipo de dano', Object.entries(TIPOS_DANO))}${c('municao', 'Munição')}
-        <div style="grid-column:1/-1"><h3 class="titulo-vermelho">Modificações (+1 categoria cada)</h3><div class="lista-hab">${MODIFICACOES.filter(m => !m.maldicao && m.para.includes(a.uso) && (m.fonte !== 'SaH' || f().modo === 'sah')).sort((x, y) => x.nome.localeCompare(y.nome, 'pt')).map(m => `<label class="check hab"><input type="checkbox" data-mod-arma="${m.id}" ${(a.mods || []).includes(m.id) ? 'checked' : ''}><span><b>${esc(m.nome)}</b>${fonteTag(m.fonte || '')} <small class="apagado">${esc(m.resumo)}</small></span></label>`).join('')}</div>
-          ${listaMaldicoes(MODIFICACOES.filter(m => m.maldicao && m.para.includes(a.uso)), a.mods || [], 'data-mod-arma')}
+        <div style="grid-column:1/-1"><p class="apagado">Modificações e maldições: use os cartões <b>Modificar</b> e <b>Amaldiçoar</b> da arma, na aba Inventário.</p>
           <h3 class="titulo-vermelho">Ritual Amaldiçoar Arma ou maldição própria</h3><div class="grade c3"><label class="campo"><span>Maldição</span><select data-maldicao="tipo">${MALDICOES_ARMA.map(m => `<option value="${m.id}" ${a.maldicao?.tipo === m.id ? 'selected' : ''}>${esc(m.nome)}</option>`).join('')}</select></label>
           <label class="campo"><span>Elemento</span><select data-maldicao="elemento">${['', 'sangue', 'morte', 'conhecimento', 'energia'].map(e => `<option value="${e}" ${a.maldicao?.elemento === e ? 'selected' : ''}>${e ? e[0].toUpperCase() + e.slice(1) : '—'}</option>`).join('')}</select></label>
           <label class="campo"><span>Dano extra (ex.: 1d6)</span><input data-maldicao="dados" value="${esc(a.maldicao?.dados || '')}" placeholder="preenche sozinho"></label>
@@ -1797,7 +1849,6 @@ export function acoesFicha(ctx) {
       const ficha = f(), i = Number(el.dataset.i), a = { ...ficha.armas[i] };
       document.querySelectorAll('[data-modal-arma]').forEach(inp => { a[inp.dataset.modalArma] = inp.type === 'number' ? Number(inp.value) : inp.value; });
       document.querySelectorAll('[data-modal-arma-check]').forEach(inp => { a[inp.dataset.modalArmaCheck] = inp.checked; });
-      a.mods = [...document.querySelectorAll('[data-mod-arma]:checked')].map(x => x.dataset.modArma);
       const mal = {}; document.querySelectorAll('[data-maldicao]').forEach(x => { mal[x.dataset.maldicao] = x.value; });
       if (mal.tipo && !mal.dados) mal.dados = MALDICOES_ARMA.find(m => m.id === mal.tipo)?.dados || '';
       a.maldicao = mal;
@@ -1812,11 +1863,10 @@ export function acoesFicha(ctx) {
       const c = (k, rot, tipo = 'text') => `<label class="campo"><span>${rot}</span><input type="${tipo}" data-modal-prot="${k}" value="${esc(p[k])}"></label>`;
       abrirModal(`Proteção · ${p.nome}`, `<div class="grade c2">${c('nome', 'Nome')}<label class="campo"><span>Tipo</span><select data-modal-prot="peso">${[['leve', 'Leve'], ['pesada', 'Pesada'], ['escudo', 'Escudo']].map(([v, n]) => `<option value="${v}" ${p.peso === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
         ${c('defesa', 'Defesa', 'number')}${c('rd', 'RD', 'number')}${c('categoria', 'Categoria (0–4)', 'number')}${c('espacos', 'Espaços', 'number')}${c('nota', 'Anotação / maldição / efeito especial')}</div>
-        <h3 class="titulo-vermelho">Modificações (+1 categoria cada)</h3><div class="lista-hab">${MODIFICACOES.filter(m => !m.maldicao && m.para.includes(p.peso)).map(m => `<label class="check hab"><input type="checkbox" data-mod-prot="${m.id}" ${p.mods.includes(m.id) ? 'checked' : ''}><span><b>${esc(m.nome)}</b> <small class="apagado">${esc(m.resumo)}</small></span></label>`).join('')}</div>
-        ${listaMaldicoes(MODIFICACOES.filter(m => m.maldicao && m.para.includes(p.peso)), p.mods, 'data-mod-prot')}`,
+        <p class="apagado">Modificações e maldições: use os cartões <b>Modificar</b> e <b>Amaldiçoar</b> da proteção, na aba Inventário.</p>`,
         `<button class="btn perigo" data-acao="remover" data-lista="protecoes" data-i="${i}">Remover</button><span class="espaco"></span><button class="btn sangue" data-acao="salvar-protecao" data-i="${i}">Salvar</button>`, true);
     },
-    'salvar-protecao': el => { const ficha = f(), i = Number(el.dataset.i), p = { ...ficha.protecoes[i] }; document.querySelectorAll('[data-modal-prot]').forEach(x => { p[x.dataset.modalProt] = x.type === 'number' ? Number(x.value) : x.value; }); p.mods = [...document.querySelectorAll('[data-mod-prot]:checked')].map(x => x.dataset.modProt); ficha.protecoes[i] = p; fecharModal(); ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render(); },
+    'salvar-protecao': el => { const ficha = f(), i = Number(el.dataset.i), p = { ...ficha.protecoes[i] }; document.querySelectorAll('[data-modal-prot]').forEach(x => { p[x.dataset.modalProt] = x.type === 'number' ? Number(x.value) : x.value; }); ficha.protecoes[i] = p; fecharModal(); ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render(); },
     'add-item': () => { const ficha = f(); ficha.itens.push({ uid: uid(), nome: 'Novo item', categoria: 0, espacos: 1, qtd: 1, nota: '' }); salvar(); },
     'add-item-lista': () => {
       const ficha = f();
@@ -1844,6 +1894,20 @@ export function acoesFicha(ctx) {
       salvar();
       ctx.avisar(`${it.nome} ${estaEquipado(it) ? 'equipado: o efeito vale na ficha.' : 'desequipado: o efeito saiu da ficha.'}`);
     },
+    'janela-mod': el => janelaMod(f(), el.dataset.tipo, Number(el.dataset.i), el.dataset.modo),
+    'alternar-mod': el => {
+      const ficha = f(), { tipo, modo, id } = el.dataset, i = Number(el.dataset.i), alvo = alvoMod(ficha, tipo, i); if (!alvo) return;
+      const campo = campoMod(tipo, modo), lista = [...(alvo[campo] || [])], k = lista.indexOf(id);
+      if (k >= 0) lista.splice(k, 1);
+      else {
+        if (numerosAlvo(derivar(ficha), tipo, alvo).cat >= 4) return ctx.avisar('Este item já está na categoria IV: tire uma modificação ou maldição antes.', true);
+        lista.push(id);
+      }
+      alvo[campo] = lista;
+      if (modo === 'amaldicoar' && k < 0) registrarMaldições(ficha);
+      ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render();
+      janelaMod(f(), tipo, i, modo);
+    },
     'item-escolher': (el, ev) => { ev?.preventDefault(); acoesFicha(ctx).acessorio(el); },
     'item-efeito': el => {
       const i = Number(el.dataset.i), item = f().itens[i]; if (!item) return;
@@ -1865,9 +1929,18 @@ export function acoesFicha(ctx) {
     'acessorio': el => {
       const i = Number(el.dataset.i), item = f().itens[i]; if (!item) return;
       const pericias = (id, valor, nome) => `<label class="campo"><span>${nome}</span><select id="${id}"><option value="">—</option>${PERICIAS.filter(p => !['luta', 'pontaria'].includes(p.id)).map(p => `<option value="${p.id}" ${valor === p.id ? 'selected' : ''}>${p.nome}</option>`).join('')}</select></label>`;
-      abrirModal(item.nome, `<label class="check"><input type="checkbox" id="ac-ativo" ${item.escrito ? 'checked' : ''}> Equipado</label>
-        ${pericias('ac-pericia', item.pericia, 'Perícia principal')}${pericias('ac-extra', item.periciaExtra, 'Perícia adicional')}${pericias('ac-kit', item.periciaKit, 'Perícia do kit')}
-        ${MOD_ACESSORIOS.filter(([id]) => !['bateria', 'lente'].includes(id) || f().modo === 'sah').map(([id, nome, efeito]) => `<label class="check"><input type="checkbox" data-ac-mod="${id}" ${item.mods.includes(id) ? 'checked' : ''}><span>${nome} · ${efeito}</span></label>`).join('')}`,
+      // Só a perícia principal aparece de início; a da Função Adicional e a do kit (Instrumental) aparecem quando a modificação é marcada (CSS :has)
+      const mods = item.mods || [];
+      const mod = id => { const m = MOD_ACESSORIOS.find(x => x[0] === id); return m && (!['bateria', 'lente'].includes(id) || f().modo === 'sah') ? `<label class="check"><input type="checkbox" data-ac-mod="${id}" ${mods.includes(id) ? 'checked' : ''}><span><b>${m[1]}</b> · ${m[2]}</span></label>` : ''; };
+      abrirModal(item.nome, `<p class="apagado">Escolha a perícia que este ${item.nome === 'Utensílio' ? 'utensílio' : item.nome === 'Vestimenta' ? 'item vestido' : 'acessório'} melhora: +2 (ou +5 com Aprimorado). Luta e Pontaria não valem.</p>
+        ${pericias('ac-pericia', item.pericia, 'Perícia')}
+        <label class="check"><input type="checkbox" id="ac-ativo" ${item.escrito ? 'checked' : ''}><span><b>Equipado</b> · o bônus só vale equipado</span></label>
+        <details class="ac-mods" ${mods.length ? 'open' : ''}><summary>Modificações (opcional, cada uma aumenta a categoria em +1)</summary>
+          ${mod('aprimorado')}${mod('discreto')}
+          ${mod('funcao')}<div class="so-funcao">${pericias('ac-extra', item.periciaExtra, 'Perícia da função adicional')}${mod('aprimorado-extra')}</div>
+          ${mod('instrumental')}<div class="so-instrumental">${pericias('ac-kit', item.periciaKit, 'Perícia do kit')}</div>
+          ${mod('bateria')}${mod('lente')}
+        </details>`,
         `<button class="btn sangue" data-acao="salvar-acessorio" data-i="${i}">Salvar acessório</button>`);
     },
     'salvar-acessorio': el => {
@@ -1878,7 +1951,8 @@ export function acoesFicha(ctx) {
       item.periciaKit = document.getElementById('ac-kit').value;
       item.mods = [...document.querySelectorAll('[data-ac-mod]:checked')].map(x => x.dataset.acMod);
       if (!item.mods.includes('funcao') || !item.periciaExtra || item.periciaExtra === item.pericia) item.mods = item.mods.filter(m => m !== 'aprimorado-extra');
-      if (item.periciaExtra === item.pericia) item.periciaExtra = '';
+      if (item.periciaExtra === item.pericia || !item.mods.includes('funcao')) item.periciaExtra = '';
+      if (!item.mods.includes('instrumental')) item.periciaKit = '';
       fecharModal(); salvar();
     },
     'vincular-item': el => {
