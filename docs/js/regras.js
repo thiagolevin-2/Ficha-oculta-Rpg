@@ -1,7 +1,7 @@
-import { condicoesEfetivas } from './combate.js?v=0.31.0';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.31.0';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.31.0';
-import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.31.0';
+import { condicoesEfetivas } from './combate.js?v=0.33.0';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.33.0';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.33.0';
+import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.33.0';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -270,7 +270,9 @@ export function normalizar(f) {
     insanidades: lista(f.insanidades, 20).filter(x => x && Number.isInteger(x.n) && x.n >= 1 && x.n <= 20).map(x => ({ uid: txt(x.uid, 60) || uid(), n: x.n, missao: !!x.missao })),
     // Macros: sequências de rolagens com um clique (aba Macros)
     macros: lista(f.macros, 30).map(m => ({ uid: txt(m?.uid, 60) || uid(), nome: txt(m?.nome, 60) || 'Macro', nota: txt(m?.nota, 300),
-      passos: lista(m?.passos, 8).map(p => ({ tipo: ['pericia', 'ataque', 'formula', 'gasto'].includes(p?.tipo) ? p.tipo : 'formula', alvo: txt(p?.alvo, 60), formula: txt(p?.formula, 40), rotulo: txt(p?.rotulo, 40), valor: int(p?.valor, 0, 99, 1) })) })),
+      usaPd: !!m?.usaPd, pd: int(m?.pd, 0, 99, 1), // gastar PE/PD ao executar (o jogador marca e escolhe quanto)
+      passos: lista(m?.passos, 8).map(p => ({ tipo: ['pericia', 'ataque', 'acerto', 'formula', 'gasto'].includes(p?.tipo) ? p.tipo : 'formula', alvo: txt(p?.alvo, 60), formula: txt(p?.formula, 40), rotulo: txt(p?.rotulo, 40), valor: int(p?.valor, 0, 99, 1),
+        tipoDano: txt(p?.tipoDano, 20), margem: int(p?.margem, 2, 20, 20), mult: int(p?.mult, 2, 6, 2) })) })),
     rolagensSalvas: lista(f.rolagensSalvas, 40).filter(r => r && txt(r.formula, 40) && /d/i.test(r.formula) && FORMULA.test(txt(r.formula, 40))).map(r => ({ uid: txt(r.uid, 60) || uid(), nome: txt(r.nome, 60) || 'Rolagem', formula: txt(r.formula, 40).replace(/\s+/g, '') })),
     efeitos: lista(f.efeitos, 30).map(e => ({ uid: txt(e?.uid, 60) || uid(), nome: txt(e?.nome, 80) || 'Efeito', dura: ['cena', 'rodada', 'proxima'].includes(e?.dura) ? e.dura : 'cena', nota: txt(e?.nota, 200), ef: limparEf(e?.ef) })),
     usosCena: Object.fromEntries(Object.entries(f.usosCena || {}).slice(0, 40).map(([k, v]) => [txt(k, 60), int(v, 0, 99, 0)])),

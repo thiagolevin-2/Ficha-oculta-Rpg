@@ -1245,3 +1245,11 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 .macro-alvo input, .macro-alvo select { min-height: 34px; flex: 1 1 120px; }
 .macro-resultado .def-linha b { font-size: 1.3rem; }
 @media (max-width: 640px) { .macro-passo { grid-template-columns: 26px 1fr auto; } .macro-alvo { grid-column: 2 / -1; } }
+
+/* v0.33 — macros: ataque personalizado e gasto de PE/PD */
+.macro-alvo .mini { display: grid; gap: 2px; flex: 1 1 130px; }
+.macro-alvo .mini > span:first-child { font: 600 .66rem var(--fonte-dossie); letter-spacing: .06em; text-transform: uppercase; color: var(--apagado); }
+.macro-gasto { margin-top: 10px; align-items: center; gap: 8px; }
+.macro-gasto input[type=number] { width: 64px; min-height: 32px; }
+.macro-alvo .mini .linha { flex-wrap: nowrap; }
+:root[data-tema] .macro-alvo .mini .linha input { width: 56px !important; min-width: 0; flex: 0 0 56px; }
