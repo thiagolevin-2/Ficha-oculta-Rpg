@@ -1,5 +1,5 @@
-import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.40.6';
-import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.40.6';
+import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.40.7';
+import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.40.7';
 // ═══════════ catalogo ═══════════
 // catalogo.js — as regras do sistema escritas como DADOS.
 // Tudo aqui são números e nomes das regras + resumos curtos, escritos com outras palavras.

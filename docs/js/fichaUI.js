@@ -1,20 +1,20 @@
-import { carregarModelosItens, salvarModelosItens } from './armazenamento.js?v=0.40.6';
-import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS, CONJURACAO, PROTECAO_ELEMENTAL, ELEMENTOS_MALDICAO, passivoAmaldicoado } from './amaldicoados.js?v=0.40.6';
-import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.40.6';
-import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO, quantidadeMaldicoes, categoriaEquipamento } from './regras.js?v=0.40.6';
-import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, analisar } from './combate.js?v=0.40.6';
-import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.40.6';
-import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.6';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.40.6';
-import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.40.6';
+import { carregarModelosItens, salvarModelosItens } from './armazenamento.js?v=0.40.7';
+import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS, CONJURACAO, PROTECAO_ELEMENTAL, ELEMENTOS_MALDICAO, passivoAmaldicoado } from './amaldicoados.js?v=0.40.7';
+import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.40.7';
+import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO, quantidadeMaldicoes, categoriaEquipamento } from './regras.js?v=0.40.7';
+import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, analisar } from './combate.js?v=0.40.7';
+import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.40.7';
+import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.7';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.40.7';
+import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.40.7';
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.40.6', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.40.6', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.40.7', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.40.7', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
   // Os textos do Sobrevivendo ao Horror foram conferidos com o PDF e estão em dados/textos.json (v0.23).
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
@@ -117,7 +117,7 @@ function abaAgente(f, d) {
   return `<div class="ficha-alertas">${avisosDeRegra(d)}${painelPendencias(d)}</div>
   <div class="grade c2 visao-agente">
   <section class="painel painel-roda"><div class="titulo-secao"><h2 class="faixa sangue">Atributos</h2><button class="btn pequeno fantasma" data-acao="editar-atributos">Editar</button></div>
-    ${pentagramaAtributos(f.atributos, false, true)}
+    ${pentagramaAtributos(d.atributosEfetivos, false, true)}
     <p class="apagado" style="text-align:center;font-size:.9rem">Toque num atributo para rolar. ${d.slotsAtributo ? `Aumentos de atributo liberados: ${d.slotsAtributo}.` : ''}</p>
   </section>
   <section class="painel painel-vitais"><div class="titulo-secao"><h2 class="faixa">Sinais vitais</h2><small class="apagado dossie-txt">CONTROLE DE RECURSOS</small></div><div class="recursos">${recursos.join('')}</div></section>
@@ -1966,7 +1966,7 @@ export function acoesFicha(ctx) {
       ficha.poderes = ficha.poderes.filter(t => t !== registro); salvar();
     },
     'ativo': el => { const ficha = f(); ficha.ativos[el.dataset.k] = !ficha.ativos[el.dataset.k]; salvar(); },
-    'rolar-atributo': el => { const d = derivar(f()); const a = ATRIBUTOS.find(x => x.id === el.dataset.atr); const aj = d.ajusteDados[a.id] + d.ajusteDados.todos; const n = f().atributos[a.id] + aj; testar({ titulo: a.nome, quem: quem(), dados: n >= 1 ? { qtd: n, pior: false } : { qtd: 2 - n, pior: true }, bonus: a.id === 'pre' && temPeso(f(), 'rabugento') ? -5 : 0 }, a.id).then(() => danoDaIdade(a.id)); },
+    'rolar-atributo': el => { const d = derivar(f()); const a = ATRIBUTOS.find(x => x.id === el.dataset.atr); const aj = d.ajusteDados[a.id] + d.ajusteDados.todos; const n = d.atributosEfetivos[a.id] + aj; testar({ titulo: a.nome, quem: quem(), dados: n >= 1 ? { qtd: n, pior: false } : { qtd: 2 - n, pior: true }, bonus: a.id === 'pre' && temPeso(f(), 'rabugento') ? -5 : 0 }, a.id).then(() => danoDaIdade(a.id)); },
     'rolar-iniciativa': () => acoesFicha(ctx)['rolar-pericia']({ dataset: { id: 'iniciativa' } }), // abre os gastos (Eclético, origem…) como qualquer perícia
     'adicionar-pacote': el => {
       const ficha = f();
@@ -2290,7 +2290,7 @@ export function acoesFicha(ctx) {
     'pendencia': el => { const p = derivar(f()).pendencias.find(x => x.id === el.dataset.id); if (!p) return; if (p.acao) return acoesFicha(ctx)[p.acao]({ dataset: {} }); ctx.estado.ui.aba = p.aba; ctx.render(); },
     'editar-atributos': () => {
       const at = f().atributos;
-      abrirModal('Atributos', `<p class="apagado">Use para aumentos de atributo (NEX 20%, 50%, 80%, 95%) ou correções.</p><div class="grade c3">${ATRIBUTOS.map(a => `<label class="campo"><span>${a.nome}</span><input type="number" min="0" max="7" data-modal-atr="${a.id}" value="${at[a.id]}"></label>`).join('')}</div>`, '<button class="btn fantasma" data-acao="fechar-modal">Cancelar</button><button class="btn sangue" data-acao="salvar-atributos">Salvar</button>');
+      abrirModal('Atributos', `<p class="apagado">Edite os valores base para aumentos de atributo (NEX 20%, 50%, 80%, 95%) ou correções. Os bônus dos itens equipados entram automaticamente na roda.</p><div class="grade c3">${ATRIBUTOS.map(a => `<label class="campo"><span>${a.nome}</span><input type="number" min="0" max="7" data-modal-atr="${a.id}" value="${at[a.id]}"></label>`).join('')}</div>`, '<button class="btn fantasma" data-acao="fechar-modal">Cancelar</button><button class="btn sangue" data-acao="salvar-atributos">Salvar</button>');
     },
     'salvar-atributos': () => { const ficha = f(); document.querySelectorAll('[data-modal-atr]').forEach(i => { ficha.atributos[i.dataset.modalAtr] = inteiro(i.value, 0, tetoEtario(ficha, i.dataset.modalAtr, 7), 1); }); fecharModal(); salvar(); },
     'retrato': async () => {

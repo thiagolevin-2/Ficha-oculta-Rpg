@@ -1,7 +1,7 @@
-import { condicoesEfetivas } from './combate.js?v=0.40.6';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.40.6';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.6';
-import { passivosDeItens, passivoAmaldicoado, AMALDICOADOS, CONJURACAO, ELEMENTOS_MALDICAO } from './amaldicoados.js?v=0.40.6';
+import { condicoesEfetivas } from './combate.js?v=0.40.7';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.40.7';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.7';
+import { passivosDeItens, passivoAmaldicoado, AMALDICOADOS, CONJURACAO, ELEMENTOS_MALDICAO } from './amaldicoados.js?v=0.40.7';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -722,9 +722,9 @@ export function derivar(f, { armaUid, periciaAtaque, atributoDano, ritualExtra }
   const expansao = f.paranormais.filter(p => p.id === 'expansao-de-conhecimento').length;
   const poderesEscolhidos = f.poderes.filter(p => (!p.via || p.via === 'vivencia') && p.id !== 'proprio' && !(transcenderSeparado && p.id === 'transcender')).length;
   const pontosCriacao = (ehSobrevivente(f) ? CRIACAO_ATRIBUTOS.pontosSobrevivente : CRIACAO_ATRIBUTOS.pontos);
-  const somaAtr = ATRIBUTOS.reduce((s, a) => s + at[a.id], 0);
+  const somaAtr = ATRIBUTOS.reduce((s, a) => s + f.atributos[a.id], 0);
   const esperado = 5 + pontosCriacao + slotsAtributo;
-  if (somaAtr > esperado + (Object.values(at).some(v => v === 0) ? 1 : 0)) avisos.push(`Atributos somam ${somaAtr}; o esperado é até ${esperado} (+1 se um atributo estiver em 0).`);
+  if (somaAtr > esperado + (Object.values(f.atributos).some(v => v === 0) ? 1 : 0)) avisos.push(`Atributos somam ${somaAtr}; o esperado é até ${esperado} (+1 se um atributo estiver em 0).`);
   if (poderesEscolhidos > slotsPoder + (versatilidade ? 1 : 0) + (ORIGEM[f.origem]?.id === 'cultista' ? 1 : 0)) avisos.push(`Você tem ${poderesEscolhidos} poderes; o nível atual dá direito a ${slotsPoder}${versatilidade ? ' (+1 da versatilidade)' : ''}.`);
   if (!f.trilha && trilhaLiberada(f, 2)) avisos.push('Escolha sua trilha.');
   if (!f.origem) avisos.push('Escolha uma origem.');
