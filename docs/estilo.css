@@ -354,7 +354,7 @@ input[type="checkbox"], input[type="radio"] { width: 18px; height: 18px; min-hei
 .ameaca-bloco .linha-stat b { font-family: var(--fonte-ui); font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--sangue); margin-right: 4px; }
 
 /* ---------- Dados 3D (do Arcana, recolorido) ---------- */
-.dice3d-overlay { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: radial-gradient(circle at 50% 45%, #2a0b0bcc, #000000f0 70%); }
+.dice3d-overlay { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--sangue-escuro, #2a0b0b) 55%, transparent), #000000f0 70%); }
 .dice3d-stage { position: relative; width: min(720px, 96vw); height: min(560px, 82vh); display: grid; grid-template-rows: auto auto 1fr auto auto; padding: 14px; color: var(--pergaminho); font-family: var(--fonte-texto); }
 .dice3d-header { display: flex; justify-content: space-between; align-items: center; }
 .dice3d-brand { font: 700 .78rem var(--fonte-dossie); letter-spacing: .25em; color: var(--sangue); }
@@ -367,7 +367,7 @@ input[type="checkbox"], input[type="radio"] { width: 18px; height: 18px; min-hei
 .dice3d-result { text-align: center; display: grid; gap: 2px; }
 .dice3d-status { font: .78rem var(--fonte-dossie); color: #a8977f; }
 .dice3d-outcome { font: 700 1rem var(--fonte-ui); letter-spacing: .25em; }
-.dice3d-total { font: 900 3rem var(--fonte-titulo); color: #ff3b47; text-shadow: 0 0 24px #b3121f; line-height: 1; }
+.dice3d-total { font: 900 3rem var(--fonte-titulo); color: var(--elemento-cor, #ff3b47); text-shadow: 0 0 24px var(--sangue, #b3121f); line-height: 1; }
 .dice3d-note { text-align: center; font-size: .78rem; color: #a8977f; margin: 4px 0 0; }
 .dice3d-critical .dice3d-outcome { color: var(--vela); }
 .dice3d-success .dice3d-outcome { color: var(--ok); }
