@@ -1238,21 +1238,25 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 /* v0.31 — aba Macros */
 .lista-macros { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); align-items: start; }
 .macro-cartao { --el: var(--elemento-cor, var(--sangue)); --el-fundo: var(--elemento-suave, transparent); }
-.macro-passos { display: grid; gap: 6px; margin-top: 10px; }
-.macro-passo { display: grid; grid-template-columns: 26px minmax(150px, 210px) 1fr auto; gap: 8px; align-items: center; }
+.macro-passos { display: grid; gap: 12px; margin-top: 10px; }
+.macro-passo { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 10px; border: 1px solid var(--linha); border-radius: var(--raio); }
 .macro-num { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font: 700 .8rem var(--fonte-ui); background: var(--el); color: var(--fundo); }
-.macro-alvo { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-.macro-alvo input, .macro-alvo select { min-height: 34px; flex: 1 1 120px; }
+.macro-alvo { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 8px; align-items: end; }
+.macro-passo > select, .macro-alvo input:not([type=checkbox]), .macro-alvo select { min-width: 0; width: 100%; min-height: 34px; }
 .macro-resultado .def-linha b { font-size: 1.3rem; }
-@media (max-width: 640px) { .macro-passo { grid-template-columns: 26px 1fr auto; } .macro-alvo { grid-column: 2 / -1; } }
 
 /* v0.33 — macros: ataque personalizado e gasto de PE/PD */
-.macro-alvo .mini { display: grid; gap: 2px; flex: 1 1 130px; }
+.macro-alvo .mini { display: grid; gap: 2px; min-width: 0; }
 .macro-alvo .mini > span:first-child { font: 600 .66rem var(--fonte-dossie); letter-spacing: .06em; text-transform: uppercase; color: var(--apagado); }
+.macro-alvo .macro-critico, .macro-alvo .macro-dica { grid-column: 1 / -1; }
+.macro-danos-extras { grid-column: 1 / -1; display: grid; gap: 8px; justify-items: start; }
+.macro-dano-extra { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; gap: 8px; }
+@media (max-width: 480px) {
+  .macro-dano-extra { grid-template-columns: minmax(0, 1fr) auto; }
+  .macro-dano-extra > .mini:first-child { grid-column: 1 / -1; }
+}
 .macro-gasto { margin-top: 10px; align-items: center; gap: 8px; }
 .macro-gasto input[type=number] { width: 64px; min-height: 32px; }
-.macro-alvo .mini .linha { flex-wrap: nowrap; }
-:root[data-tema] .macro-alvo .mini .linha input { width: 56px !important; min-width: 0; flex: 0 0 56px; }
 
 /* v0.35 — mesa online */
 .codigo-mesa { display: flex; align-items: baseline; gap: 12px; margin: 6px 0 10px; }

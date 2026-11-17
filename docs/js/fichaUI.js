@@ -1,19 +1,19 @@
-import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.40.0';
-import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.40.0';
-import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM } from './regras.js?v=0.40.0';
-import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar } from './combate.js?v=0.40.0';
-import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.40.0';
-import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.0';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.40.0';
-import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.40.0';
+import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.40.2';
+import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.40.2';
+import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO } from './regras.js?v=0.40.2';
+import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, analisar } from './combate.js?v=0.40.2';
+import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.40.2';
+import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.2';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.40.2';
+import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.40.2';
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.40.0', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.40.0', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.40.2', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.40.2', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
   // Os textos do Sobrevivendo ao Horror foram conferidos com o PDF e estão em dados/textos.json (v0.23).
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
@@ -930,52 +930,87 @@ function blocoInterludio(f) {
 // Rolagens personalizadas: todos os dados (d2 = moeda, d100 = percentual), fórmulas livres, teste do Ordem e rolagens salvas na ficha.
 const DADOS_LIVRES = [[2, 'Moeda'], [4, 'd4'], [6, 'd6'], [8, 'd8'], [10, 'd10'], [12, 'd12'], [20, 'd20'], [100, 'd100']];
 // ---------- Aba MACROS: sequências de rolagens com um clique ----------
-const TIPOS_PASSO = [['acerto', 'Ataque personalizado'], ['ataque', 'Ataque e dano com arma'], ['pericia', 'Teste de perícia'], ['formula', 'Rolagem livre (fórmula)'], ['gasto', 'Gastar PE/PD']];
+const TIPOS_PASSO = [['ataque', 'Ataque com arma'], ['acerto', 'Ataque personalizado'], ['pericia', 'Teste de perícia'], ['formula', 'Rolagem livre (fórmula)'], ['gasto', 'Gastar PE/PD']];
+const USOS_ARMA_MACRO = [['corpo', 'Corpo a corpo'], ['disparo', 'Disparo'], ['arremesso', 'Arremesso'], ['fogo', 'Armas de fogo']];
 // Tipos de dano e elementos para o ataque personalizado da macro
 const TIPOS_DANO_MACRO = [['corte', 'Corte'], ['impacto', 'Impacto'], ['perfuracao', 'Perfuração'], ['balistico', 'Balístico'], ['fogo', 'Fogo'], ['frio', 'Frio'], ['eletricidade', 'Eletricidade'], ['quimico', 'Químico'], ['mental', 'Mental'],
   ['sangue', 'Sangue'], ['morte', 'Morte'], ['conhecimento', 'Conhecimento'], ['energia', 'Energia'], ['medo', 'Medo']];
 const nomeTipoDano = id => TIPOS_DANO_MACRO.find(([v]) => v === id)?.[1] || '';
-function textoPasso(f, p, k) {
+const periciaAtaqueLivre = p => Object.hasOwn(PERICIA, p.alvo) ? p.alvo : p.alcanceAtaque === 'distancia' ? 'pontaria' : 'luta';
+const tituloAtaqueLivre = p => p.alcanceAtaque === 'distancia' ? 'Ataque à distância' : 'Ataque corpo a corpo';
+const formulaAtaque = p => (p.tipo === 'ataque' ? p.danoArma : p.formula).trim();
+const novoPassoMacro = f => derivar(f).ataques.length ? { tipo: 'ataque' } : { tipo: 'acerto', formula: '1d6' };
+function textoPasso(d, p, k) {
   if (p.tipo === 'pericia') return `Teste de ${PERICIA[p.alvo]?.nome || '(escolha a perícia)'}`;
-  if (p.tipo === 'ataque') return `Ataque e dano: ${f.armas.find(a => a.uid === p.alvo)?.nome || '(escolha a arma)'}`;
-  if (p.tipo === 'acerto') return `Ataque com ${PERICIA[p.alvo]?.nome || '(perícia)'}, dano ${p.formula || '(dados)'}${p.tipoDano ? ` de ${nomeTipoDano(p.tipoDano)}` : ''}`;
+  if (p.tipo === 'ataque') {
+    const a = d.ataques.find(x => x.uid === p.alvo);
+    if (!a) return 'Ataque com arma (escolha a arma)';
+    return `${a.nome} · ${PERICIA[p.pericia || a.pericia].nome} · ${formulaAtaque(p) || a.formula}`;
+  }
+  if (p.tipo === 'acerto') return [p.rotulo || tituloAtaqueLivre(p), PERICIA[periciaAtaqueLivre(p)]?.nome, formulaAtaque(p)].filter(Boolean).join(' · ');
   if (p.tipo === 'gasto') return `Gastar ${p.valor} ${k}`;
   return `Rolar ${p.formula || '(escreva a fórmula)'}${p.rotulo ? ` · ${p.rotulo}` : ''}`;
 }
 function abaMacros(f, d) {
   const k = d.pd ? 'PD' : 'PE';
-  const editorPasso = (m, i, p, j) => {
+  const gruposArmas = USOS_ARMA_MACRO.map(([uso, nome]) => [nome, d.ataques.filter(a => a.uso === uso)]).filter(([, armas]) => armas.length);
+  const selTipoDano = (campo, atual, padrao) => `<label class="mini"><span>Tipo ou elemento</span><select data-campo="${campo}"><option value="">${padrao}</option>${TIPOS_DANO_MACRO.map(([v, n]) => `<option value="${v}" ${atual === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>`;
+  const editorPasso = (i, p, j) => {
     const base = `macros.${i}.passos.${j}`;
-    const selPericia = `<select data-campo="${base}.alvo" aria-label="Perícia"><option value="">— perícia —</option>${PERICIAS.map(x => `<option value="${x.id}" ${p.alvo === x.id ? 'selected' : ''}>${esc(x.nome)}</option>`).join('')}</select>`;
-    const alvo = p.tipo === 'pericia' ? selPericia
-      : p.tipo === 'acerto'
-        ? `<label class="mini"><span>Acerto com</span>${selPericia}</label>
-           <label class="mini"><span>Dados de dano</span><input data-campo="${base}.formula" value="${esc(p.formula)}" placeholder="ex.: 2d6+3" aria-label="Dados de dano"></label>
-           <label class="mini"><span>Elemento / tipo</span><select data-campo="${base}.tipoDano" aria-label="Elemento ou tipo de dano"><option value="">—</option>${TIPOS_DANO_MACRO.map(([v, n]) => `<option value="${v}" ${p.tipoDano === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
-           <label class="mini"><span>Crítico</span><span class="linha" style="gap:4px"><input type="number" min="2" max="20" data-campo="${base}.margem" data-tipo="int" value="${p.margem}" aria-label="Margem de ameaça" style="width:58px"><small>×</small><input type="number" min="2" max="6" data-campo="${base}.mult" data-tipo="int" value="${p.mult}" aria-label="Multiplicador" style="width:52px"></span></label>`
-      : p.tipo === 'ataque'
-        ? `<select data-campo="${base}.alvo" aria-label="Arma"><option value="">— arma —</option>${f.armas.map(a => `<option value="${esc(a.uid)}" ${p.alvo === a.uid ? 'selected' : ''}>${esc(a.nome)}</option>`).join('')}</select>${f.armas.length ? '' : '<small class="apagado">Sem armas: adicione na aba Inventário.</small>'}`
+    const comArma = p.tipo === 'ataque';
+    const arma = comArma ? d.ataques.find(a => a.uid === p.alvo) : null;
+    const selPericia = (campo, padrao) => `<label class="mini"><span>Perícia</span><select data-campo="${base}.${campo}"><option value="">${esc(padrao)}</option>${PERICIAS.map(x => `<option value="${x.id}" ${p[campo] === x.id ? 'selected' : ''}>${esc(x.nome)}</option>`).join('')}</select></label>`;
+    const editorAtaque = () => {
+      const campoDano = comArma ? 'danoArma' : 'formula';
+      const campoTipo = comArma ? 'tipoDanoArma' : 'tipoDano';
+      return `${comArma
+        ? `<label class="mini"><span>Arma</span><select data-campo="${base}.alvo"><option value="">Escolha a arma</option>${gruposArmas.map(([grupo, armas]) => `<optgroup label="${grupo}">${armas.map(a => `<option value="${esc(a.uid)}" ${p.alvo === a.uid ? 'selected' : ''}>${esc(a.nome)}</option>`).join('')}</optgroup>`).join('')}</select></label>`
+        : `<label class="mini"><span>Alcance</span><select data-campo="${base}.alcanceAtaque"><option value="corpo">Corpo a corpo</option><option value="distancia" ${p.alcanceAtaque === 'distancia' ? 'selected' : ''}>À distância</option></select></label>
+           <label class="mini"><span>Nome do ataque (opcional)</span><input data-campo="${base}.rotulo" maxlength="40" value="${esc(p.rotulo)}" placeholder="Ex.: Tiro oculto"></label>`}
+      ${comArma ? selPericia('pericia', arma ? `Da arma (${arma.periciaNome})` : 'Padrão da arma') : selPericia('alvo', p.alcanceAtaque === 'distancia' ? 'Padrão (Pontaria)' : 'Padrão (Luta)')}
+      <label class="mini"><span>Dano base</span><input data-campo="${base}.${campoDano}" list="macro-dados-dano" maxlength="40" value="${esc(p[campoDano])}" placeholder="${esc(arma ? `Da arma: ${arma.formula}` : 'Ex.: 2d6+3')}"></label>
+      ${selTipoDano(`${base}.${campoTipo}`, p[campoTipo], comArma ? 'Padrão da arma' : 'Sem tipo definido')}
+      ${comArma ? `<label class="check macro-critico"><input type="checkbox" data-campo="${base}.criticoProprio" data-tipo="bool" ${p.criticoProprio ? 'checked' : ''}>
+        <span>Personalizar crítico${arma ? ` (da arma: ${arma.margem}+ ×${arma.mult})` : ''}</span></label>` : ''}
+      ${!comArma || p.criticoProprio ? `<label class="mini"><span>Margem de crítico</span><input type="number" min="2" max="20" data-campo="${base}.margem" data-tipo="int" value="${p.margem}"></label>
+        <label class="mini"><span>Multiplicador de crítico</span><input type="number" min="2" max="6" data-campo="${base}.mult" data-tipo="int" value="${p.mult}"></label>` : ''}
+      ${comArma && !d.ataques.length ? '<small class="apagado macro-dica">Adicione uma arma na aba Inventário para vinculá-la.</small>' : ''}
+      <div class="macro-danos-extras">
+        ${p.danosExtras.map((extra, n) => {
+          const campo = `${base}.danosExtras.${n}`;
+          return `<div class="macro-dano-extra">
+            <label class="mini"><span>Dano extra ${n + 1}</span><input data-campo="${campo}.formula" list="macro-dados-dano" maxlength="40" value="${esc(extra.formula)}" placeholder="Ex.: 1d6 ou 3"></label>
+            ${selTipoDano(`${campo}.tipo`, extra.tipo, 'Sem tipo definido')}
+            <button class="icone-btn" data-acao="macro-dano-remover" data-i="${i}" data-j="${j}" data-n="${n}" aria-label="Remover dano extra ${n + 1}">✕</button>
+          </div>`;
+        }).join('')}
+        <button class="btn pequeno" data-acao="macro-dano-add" data-i="${i}" data-j="${j}" ${p.danosExtras.length >= LIMITE_DANOS_EXTRAS_MACRO ? 'disabled' : ''}>+ Dano extra</button>
+      </div>`;
+    };
+    const alvo = p.tipo === 'pericia' ? selPericia('alvo', 'Escolha a perícia')
+      : p.tipo === 'acerto' || comArma ? editorAtaque()
         : p.tipo === 'gasto'
-          ? `<input type="number" min="0" max="99" data-campo="${base}.valor" data-tipo="int" value="${p.valor}" aria-label="Quanto gastar"> <small class="apagado">${k}</small>`
+          ? `<label class="mini"><span>Quanto gastar (${k})</span><input type="number" min="0" max="99" data-campo="${base}.valor" data-tipo="int" value="${p.valor}"></label>`
           : `<input data-campo="${base}.formula" value="${esc(p.formula)}" placeholder="ex.: 2d6+3" aria-label="Fórmula"><input data-campo="${base}.rotulo" value="${esc(p.rotulo)}" placeholder="nome (opcional)" aria-label="Nome da rolagem">`;
     return `<div class="macro-passo"><span class="macro-num">${j + 1}</span><select data-campo="${base}.tipo" aria-label="Tipo do passo">${TIPOS_PASSO.map(([v, n]) => `<option value="${v}" ${p.tipo === v ? 'selected' : ''}>${n}</option>`).join('')}</select>
-      <span class="macro-alvo">${alvo}</span><button class="icone-btn" data-acao="macro-passo-remover" data-i="${i}" data-j="${j}" aria-label="Tirar o passo ${j + 1}">✕</button></div>`;
+      <button class="icone-btn" data-acao="macro-passo-remover" data-i="${i}" data-j="${j}" aria-label="Tirar o passo ${j + 1}">✕</button><div class="macro-alvo">${alvo}</div></div>`;
   };
   const cartao = (m, i) => `<details class="ritual ritual-compacto macro-cartao" data-item-uid="${esc(m.uid)}" ${ITENS_ABERTOS.has(m.uid) ? 'open' : ''}>
     <summary><span class="cab"><b>${esc(m.nome)}</b><span class="etiqueta">${m.passos.length} passo(s)</span>${m.usaPd && m.pd ? `<span class="etiqueta">${m.pd} ${k}</span>` : ''}</span>
-      <small class="apagado">${m.passos.map(p => esc(textoPasso(f, p, k))).join(' → ') || 'Sem passos ainda.'}</small>
+      <small class="apagado">${m.passos.map(p => esc(textoPasso(d, p, k))).join(' → ') || 'Sem passos ainda.'}</small>
       <span class="linha" style="margin-top:6px"><button class="btn pequeno sangue" data-acao="macro-executar" data-i="${i}" ${m.passos.length ? '' : 'disabled'}>▶ Executar</button></span></summary>
     <div class="detalhes-rit">
       <div class="grade-mini"><label class="campo"><span>Nome</span><input data-campo="macros.${i}.nome" id="mac-n-${i}" value="${esc(m.nome)}"></label>
         <label class="campo"><span>Nota (aparece no resultado)</span><input data-campo="macros.${i}.nota" id="mac-o-${i}" value="${esc(m.nota)}" placeholder="ex.: só com a arma empunhada"></label></div>
       <label class="check macro-gasto"><input type="checkbox" data-campo="macros.${i}.usaPd" data-tipo="bool" ${m.usaPd ? 'checked' : ''}><span><b>Gastar ${k} ao executar</b></span>
         <input type="number" min="0" max="99" data-campo="macros.${i}.pd" data-tipo="int" value="${m.pd}" aria-label="Quantos ${k} gastar" ${m.usaPd ? '' : 'disabled'}><small class="apagado">${k}</small></label>
-      <div class="macro-passos">${m.passos.map((p, j) => editorPasso(m, i, p, j)).join('')}</div>
+      <div class="macro-passos">${m.passos.map((p, j) => editorPasso(i, p, j)).join('')}</div>
       <div class="linha" style="margin-top:8px"><button class="btn pequeno" data-acao="macro-passo-add" data-i="${i}" ${m.passos.length >= 8 ? 'disabled' : ''}>+ Passo</button><span class="espaco"></span><button class="btn pequeno perigo" data-acao="macro-remover" data-i="${i}">Remover macro</button></div>
     </div></details>`;
   return `<section class="painel"><div class="titulo-secao"><h2 class="faixa sangue">Macros</h2><button class="btn pequeno sangue" data-acao="macro-nova">+ Nova macro</button></div>
-    <p class="apagado" style="font-size:.9rem">Uma macro faz várias rolagens seguidas com um clique: teste de perícia, ataque com dano, rolagem livre e gasto de ${k}. No fim aparece o resumo, e tudo vai para o histórico de rolagens.</p>
-    ${(f.macros || []).length ? `<div class="lista-macros">${(f.macros || []).map(cartao).join('')}</div>` : '<p class="vazio">Nenhuma macro. Exemplo: “Golpe” = Ataque e dano com a faca; “Ritual” = gastar 1 PE + rolar 2d8+2.</p>'}
+    <p class="apagado" style="font-size:.9rem">Escolha a perícia do ataque. Em <b>+ Dano extra</b>, adicione dados (1d6) ou valores fixos (3) e escolha o tipo ou elemento de cada parcela. O crítico se aplica só aos dados do dano base.</p>
+    <datalist id="macro-dados-dano">${[4, 6, 8, 10, 12, 20, 100].map(lados => `<option value="1d${lados}"></option>`).join('')}<option value="2d6"></option><option value="2d8"></option></datalist>
+    ${f.macros.length ? `<div class="lista-macros">${f.macros.map(cartao).join('')}</div>` : '<p class="vazio">Nenhuma macro. Crie uma para rolar ataque e dano com um clique.</p>'}
   </section>`;
 }
 
@@ -1208,6 +1243,7 @@ function consumirProximas(ctx) {
 
 // ---------- Ações da ficha ----------
 export function acoesFicha(ctx) {
+  let macroExecutando = false;
   const f = () => ctx.fichaAtual();
   const salvar = (render = true) => { ctx.salvarFicha(f()); if (render) ctx.render(); };
   const quem = () => f().nome || 'Agente';
@@ -1414,62 +1450,122 @@ export function acoesFicha(ctx) {
       const ficha = f(); if (!ficha) return;
       const d = derivar(ficha), k = d.pd ? 'PD' : 'PE', macros = ficha.macros || [];
       abrirModal('Macros', `${macros.length ? `<div class="lista-hab">${macros.map((m, i) => `<div class="hab macro-linha"><span class="meta"><button class="btn pequeno sangue" data-acao="macro-executar" data-i="${i}" ${m.passos.length ? '' : 'disabled'}>▶ Executar</button></span>
-          <b>${esc(m.nome)}</b><p class="apagado" style="font-size:.88rem">${m.passos.map(p => esc(textoPasso(ficha, p, k))).join(' → ') || 'Sem passos ainda.'}</p></div>`).join('')}</div>`
+          <b>${esc(m.nome)}</b><p class="apagado" style="font-size:.88rem">${m.passos.map(p => esc(textoPasso(d, p, k))).join(' → ') || 'Sem passos ainda.'}</p></div>`).join('')}</div>`
         : '<p class="vazio">Nenhuma macro ainda. Crie uma: ela faz várias rolagens seguidas com um clique.</p>'}`,
         '<button class="btn" data-acao="macros-editar">Criar ou editar macros</button><span class="espaco"></span><button class="btn sangue" data-acao="fechar-modal">Fechar</button>');
     },
     'macros-editar': () => { fecharModal(); ctx.estado.ui.aba = 'macros'; if (!(f().macros || []).length) return acoesFicha(ctx)['macro-nova'](); ctx.render(); },
     'poder-escolha': el => { const ficha = f(), p = ficha.poderes[Number(el.dataset.i)]; if (!p || !PODER[p.id]) return;
       escolhaDoPoder(ctx, ficha, PODER[p.id], escolha => { const fx = f(), px = fx.poderes.find(x => x.uid === p.uid); if (px) px.escolha = escolha || ''; ctx.salvarFicha(normalizar(fx)); Object.assign(fx, normalizar(fx)); fecharModal(); ctx.render(); }); },
-    'macro-nova': () => { const ficha = f(); const m = { uid: uid(), nome: 'Nova macro', nota: '', passos: [{ tipo: 'pericia', alvo: '', valor: 1, formula: '', rotulo: '' }] }; ficha.macros = [...(ficha.macros || []), m]; ITENS_ABERTOS.add(m.uid); ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render(); },
+    'macro-nova': () => {
+      const ficha = f();
+      if (ficha.macros.length >= 30) return ctx.avisar('Limite de 30 macros por ficha.', true);
+      const m = { uid: uid(), nome: 'Nova macro', passos: [novoPassoMacro(ficha)] };
+      ficha.macros.push(m);
+      ITENS_ABERTOS.add(m.uid);
+      ctx.salvarFicha(normalizar(ficha)); ctx.render();
+    },
     'macro-remover': el => { const ficha = f(), m = ficha.macros[Number(el.dataset.i)]; if (!m || !confirm(`Remover a macro "${m.nome}"?`)) return; ficha.macros.splice(Number(el.dataset.i), 1); salvar(); },
-    'macro-passo-add': el => { const ficha = f(), m = ficha.macros[Number(el.dataset.i)]; if (!m || m.passos.length >= 8) return; m.passos.push({ tipo: 'acerto', alvo: 'luta', valor: 1, formula: '1d6', rotulo: '', tipoDano: '', margem: 20, mult: 2 }); salvar(); },
+    'macro-passo-add': el => {
+      const ficha = f(), m = ficha.macros[Number(el.dataset.i)];
+      if (!m || m.passos.length >= 8) return;
+      m.passos.push(novoPassoMacro(ficha));
+      ctx.salvarFicha(normalizar(ficha)); ctx.render();
+    },
     'macro-passo-remover': el => { const m = f().macros[Number(el.dataset.i)]; if (!m) return; m.passos.splice(Number(el.dataset.j), 1); salvar(); },
+    'macro-dano-add': el => {
+      const passo = f().macros[Number(el.dataset.i)]?.passos[Number(el.dataset.j)];
+      if (!passo || passo.danosExtras.length >= LIMITE_DANOS_EXTRAS_MACRO) return;
+      passo.danosExtras.push({ formula: '', tipo: '' });
+      salvar();
+    },
+    'macro-dano-remover': el => {
+      const passo = f().macros[Number(el.dataset.i)]?.passos[Number(el.dataset.j)];
+      const n = Number(el.dataset.n);
+      if (!passo?.danosExtras[n]) return;
+      passo.danosExtras.splice(n, 1);
+      salvar();
+    },
     'macro-executar': async el => {
-      const m = f().macros[Number(el.dataset.i)];
+      if (macroExecutando) return;
+      const ficha = f(), m = ficha.macros[Number(el.dataset.i)];
       if (!m?.passos.length) return ctx.avisar('Esta macro ainda não tem passos.', true);
-      const linhas = [];
-      if (m.usaPd && m.pd > 0) {
-        const fx = f(), dx = derivar(fx), K = dx.pd ? 'PD' : 'PE';
-        if (!gastar(fx, dx, m.pd)) return ctx.avisar(`${K} insuficiente para a macro (precisa de ${m.pd}).`, true);
-        ctx.salvarFicha(fx); linhas.push([`Gastou ${m.pd} ${K}`, '']);
-      }
-      for (const p of m.passos) {
-        const fx = f(), dx = derivar(fx), K = dx.pd ? 'PD' : 'PE';
-        if (p.tipo === 'pericia') {
-          const per = dx.PER[p.alvo];
-          if (!per) { linhas.push(['Perícia não escolhida', '—']); continue; }
-          const r = await testar({ titulo: `${m.nome} · ${per.nome}`, quem: quem(), dados: per.dados, bonus: per.bonus }, per.atrUsado);
-          linhas.push([per.nome, r.total, r.critico ? 'crítico' : '']);
-        } else if (p.tipo === 'ataque') {
-          const a = dx.ataques.find(x => x.uid === p.alvo);
-          if (!a) { linhas.push(['Arma não escolhida', '—']); continue; }
-          const r = await testar({ titulo: `${m.nome} · Ataque ${a.nome}`, quem: quem(), dados: a.dados, bonus: a.bonus, margem: a.margem, mult: a.mult, gruposCritico: a.gruposCritico, tipo: 'ataque' }, dx.PER[a.pericia]?.atrUsado);
-          linhas.push([`Ataque · ${a.nome}`, r.total, r.critico ? 'crítico' : '']);
-          const dano = await rolarDanoUI({ titulo: `${m.nome} · Dano ${a.nome}`, quem: quem(), formula: a.formula, multiplicador: r.critico ? a.mult : 1, gruposCritico: a.gruposCritico });
-          if (dano) linhas.push([`Dano · ${a.nome}`, dano.total, r.critico ? `crítico ×${a.mult}` : '']);
-        } else if (p.tipo === 'acerto') {
-          const per = dx.PER[p.alvo];
-          if (!per) { linhas.push(['Ataque: perícia não escolhida', '—']); continue; }
-          const tipoNome = nomeTipoDano(p.tipoDano);
-          const r = await testar({ titulo: `${m.nome} · Ataque (${per.nome})`, quem: quem(), dados: per.dados, bonus: per.bonus, margem: p.margem, mult: p.mult, tipo: 'ataque' }, per.atrUsado);
-          linhas.push([`Ataque · ${per.nome}`, r.total, r.critico ? 'crítico' : '']);
-          if (p.formula) {
-            const dano = await rolarDanoUI({ titulo: `${m.nome} · Dano${tipoNome ? ` de ${tipoNome}` : ''}`, quem: quem(), formula: p.formula, multiplicador: r.critico ? p.mult : 1, rotulo: tipoNome ? `DANO DE ${tipoNome.toUpperCase()}` : 'DANO' });
-            if (dano) linhas.push([`Dano${tipoNome ? ` de ${tipoNome}` : ''}`, dano.total, r.critico ? `crítico ×${p.mult}` : '']);
+      const passos = m.passos.map(p => ({ ...p, danosExtras: p.danosExtras.map(e => ({ ...e, formula: e.formula.trim() })) }));
+      for (const [j, p] of passos.entries()) {
+        if (p.tipo !== 'ataque' && p.tipo !== 'acerto') continue;
+        const formula = formulaAtaque(p);
+        const partes = p.danosExtras.map((e, n) => [`dano extra ${n + 1}`, e.formula]);
+        if (formula) partes.unshift(['dados de dano', formula]);
+        for (const [campo, expressao] of partes) {
+          try { analisar(expressao); } catch (e) {
+            return ctx.avisar(`Passo ${j + 1}, ${campo}: ${e.message}`, true);
           }
-        } else if (p.tipo === 'gasto') {
-          if (!gastar(fx, dx, p.valor)) { linhas.push([`Gastar ${p.valor} ${K}`, `sem ${K} suficiente`]); break; }
-          ctx.salvarFicha(fx); linhas.push([`Gastou ${p.valor} ${K}`, '']);
-        } else {
-          if (!p.formula) { linhas.push(['Fórmula vazia', '—']); continue; }
-          const r = await rolarDanoUI({ titulo: `${m.nome} · ${p.rotulo || p.formula}`, quem: quem(), formula: p.formula, rotulo: (p.rotulo || 'Rolagem').toUpperCase() });
-          if (r) linhas.push([p.rotulo || p.formula, r.total, '']);
         }
       }
-      ctx.render();
-      abrirModal(`Macro · ${m.nome}`, `<div class="macro-resultado">${linhas.map(([n, t, x]) => `<div class="def-linha"><span>${esc(n)}${x ? `<small class="apagado">${esc(x)}</small>` : ''}</span><b>${esc(String(t))}</b></div>`).join('')}</div>${m.nota ? `<p class="apagado" style="margin-top:8px">${esc(m.nota)}</p>` : ''}`,
-        '<button class="btn sangue" data-acao="fechar-modal">Fechar</button>');
+      macroExecutando = true;
+      try {
+        const linhas = [], autor = ficha.nome || 'Agente';
+        if (m.usaPd && m.pd > 0) {
+          const dx = derivar(ficha), K = dx.pd ? 'PD' : 'PE';
+          if (!gastar(ficha, dx, m.pd)) return ctx.avisar(`${K} insuficiente para a macro (precisa de ${m.pd}).`, true);
+          ctx.salvarFicha(ficha); linhas.push([`Gastou ${m.pd} ${K}`, '']);
+        }
+        for (const p of passos) {
+          const comArma = p.tipo === 'ataque';
+          const dx = derivar(ficha, comArma ? { armaUid: p.alvo, periciaAtaque: p.pericia } : undefined);
+          const K = dx.pd ? 'PD' : 'PE';
+          if (p.tipo === 'pericia') {
+            const per = Object.hasOwn(dx.PER, p.alvo) ? dx.PER[p.alvo] : null;
+            if (!per) { linhas.push(['Perícia não escolhida', '—']); continue; }
+            const r = await testar({ titulo: `${m.nome} · ${per.nome}`, quem: autor, dados: per.dados, bonus: per.bonus }, per.atrUsado, ficha);
+            linhas.push([per.nome, r.total, r.critico ? 'crítico' : '']);
+          } else if (comArma || p.tipo === 'acerto') {
+            const arma = comArma ? dx.ataques.find(a => a.uid === p.alvo) : null;
+            if (comArma && !arma) { linhas.push(['Arma não escolhida ou removida do inventário', '—']); continue; }
+            const pericia = arma?.pericia || periciaAtaqueLivre(p);
+            const per = Object.hasOwn(dx.PER, pericia) ? dx.PER[pericia] : null;
+            if (!per) { linhas.push(['Ataque: perícia não escolhida', '—']); continue; }
+            const acerto = arma || per;
+            const nome = arma?.nome || p.rotulo || tituloAtaqueLivre(p);
+            const ataque = `${nome} (${per.nome})`;
+            const margem = arma && !p.criticoProprio ? arma.margem : p.margem;
+            const mult = arma && !p.criticoProprio ? arma.mult : p.mult;
+            const danoProprio = formulaAtaque(p);
+            const formula = danoProprio || arma?.formula;
+            const gruposCritico = danoProprio ? 1 : arma?.gruposCritico;
+            const tipoPadrao = arma && Object.hasOwn(TIPOS_DANO, arma.tipo) ? TIPOS_DANO[arma.tipo] : '';
+            const tipoBase = nomeTipoDano(arma ? p.tipoDanoArma : p.tipoDano) || tipoPadrao;
+            const r = await testar({ titulo: `${m.nome} · ${ataque}`, quem: autor, dados: acerto.dados, bonus: acerto.bonus, margem, mult, gruposCritico, tipo: 'ataque' }, per.atrUsado, ficha);
+            linhas.push([ataque, r.total, r.critico ? 'crítico' : '']);
+            const danos = p.danosExtras.map(extra => ({ formula: extra.formula, tipo: nomeTipoDano(extra.tipo), multiplicador: 1, titulo: 'Dano extra' }));
+            if (formula) danos.unshift({ formula, tipo: tipoBase, multiplicador: r.critico && /d/i.test(formula) ? mult : 1, gruposCritico, titulo: 'Dano' });
+            let totalDano = 0;
+            for (const parte of danos) {
+              const tituloDano = `${parte.titulo} · ${nome}${parte.tipo ? ` (${parte.tipo})` : ''}`;
+              const dano = await rolarDanoUI({ titulo: `${m.nome} · ${tituloDano}`, quem: autor, formula: parte.formula, multiplicador: parte.multiplicador, gruposCritico: parte.gruposCritico, rotulo: parte.tipo ? `DANO DE ${parte.tipo.toUpperCase()}` : 'DANO' });
+              if (!dano) continue;
+              totalDano += dano.total;
+              linhas.push([tituloDano, dano.total, parte.multiplicador > 1 ? `crítico ×${parte.multiplicador}` : '']);
+            }
+            if (danos.length > 1) linhas.push([`Dano total · ${nome}`, totalDano]);
+          } else if (p.tipo === 'gasto') {
+            if (!gastar(ficha, dx, p.valor)) { linhas.push([`Gastar ${p.valor} ${K}`, `sem ${K} suficiente`]); break; }
+            ctx.salvarFicha(ficha); linhas.push([`Gastou ${p.valor} ${K}`, '']);
+          } else {
+            if (!p.formula) { linhas.push(['Fórmula vazia', '—']); continue; }
+            const r = await rolarDanoUI({ titulo: `${m.nome} · ${p.rotulo || p.formula}`, quem: autor, formula: p.formula, rotulo: (p.rotulo || 'Rolagem').toUpperCase() });
+            if (r) linhas.push([p.rotulo || p.formula, r.total, '']);
+          }
+        }
+        ctx.render();
+        abrirModal(`Macro · ${m.nome}`, `<div class="macro-resultado">${linhas.map(([n, t, x]) => `<div class="def-linha"><span>${esc(n)}${x ? `<small class="apagado">${esc(x)}</small>` : ''}</span><b>${esc(String(t))}</b></div>`).join('')}</div>${m.nota ? `<p class="apagado" style="margin-top:8px">${esc(m.nota)}</p>` : ''}`,
+          '<button class="btn sangue" data-acao="fechar-modal">Fechar</button>');
+      } catch (e) {
+        console.error(e);
+        ctx.avisar('Erro ao executar a macro: ' + e.message, true);
+      } finally {
+        macroExecutando = false;
+      }
     },
     'rol-formula': async () => { const v = (document.getElementById('rol-formula')?.value || '').trim(); if (!v) return ctx.avisar('Escreva uma fórmula, como 2d6+3.', true); await rolarDanoUI({ titulo: `Rolagem ${v}`, quem: quem(), formula: v, rotulo: 'ROLAGEM' }); },
     'rol-teste': async () => {

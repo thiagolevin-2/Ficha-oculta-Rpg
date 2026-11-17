@@ -1,7 +1,7 @@
-import { condicoesEfetivas } from './combate.js?v=0.40.0';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.40.0';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.0';
-import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.40.0';
+import { condicoesEfetivas } from './combate.js?v=0.40.2';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.40.2';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.2';
+import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.40.2';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -146,6 +146,7 @@ export function parametrosFabricacao({ categoria, consumivel, improvisado, kit, 
 
 
 export const VERSAO_FICHA = 1;
+export const LIMITE_DANOS_EXTRAS_MACRO = 12;
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
 const txt = (v, max = 200) => (typeof v === 'string' ? v : v == null ? '' : String(v)).slice(0, max);
 const int = (v, min, max, padrao = 0) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : padrao; };
@@ -272,7 +273,10 @@ export function normalizar(f) {
     macros: lista(f.macros, 30).map(m => ({ uid: txt(m?.uid, 60) || uid(), nome: txt(m?.nome, 60) || 'Macro', nota: txt(m?.nota, 300),
       usaPd: !!m?.usaPd, pd: int(m?.pd, 0, 99, 1), // gastar PE/PD ao executar (o jogador marca e escolhe quanto)
       passos: lista(m?.passos, 8).map(p => ({ tipo: ['pericia', 'ataque', 'acerto', 'formula', 'gasto'].includes(p?.tipo) ? p.tipo : 'formula', alvo: txt(p?.alvo, 60), formula: txt(p?.formula, 40), rotulo: txt(p?.rotulo, 40), valor: int(p?.valor, 0, 99, 1),
-        tipoDano: txt(p?.tipoDano, 20), margem: int(p?.margem, 2, 20, 20), mult: int(p?.mult, 2, 6, 2) })) })),
+        pericia: PERICIAS.some(x => x.id === p?.pericia) ? p.pericia : '', alcanceAtaque: p?.alcanceAtaque === 'distancia' ? 'distancia' : 'corpo',
+        danoArma: txt(p?.danoArma, 40).trim(), tipoDanoArma: txt(p?.tipoDanoArma, 20), tipoDano: txt(p?.tipoDano, 20),
+        danosExtras: lista(p?.danosExtras, LIMITE_DANOS_EXTRAS_MACRO).map(e => ({ formula: txt(e?.formula, 40).trim(), tipo: txt(e?.tipo, 20) })),
+        criticoProprio: !!p?.criticoProprio, margem: int(p?.margem, 2, 20, 20), mult: int(p?.mult, 2, 6, 2) })) })),
     rolagensSalvas: lista(f.rolagensSalvas, 40).filter(r => r && txt(r.formula, 40) && /d/i.test(r.formula) && FORMULA.test(txt(r.formula, 40))).map(r => ({ uid: txt(r.uid, 60) || uid(), nome: txt(r.nome, 60) || 'Rolagem', formula: txt(r.formula, 40).replace(/\s+/g, '') })),
     efeitos: lista(f.efeitos, 30).map(e => ({ uid: txt(e?.uid, 60) || uid(), nome: txt(e?.nome, 80) || 'Efeito', dura: ['cena', 'rodada', 'proxima'].includes(e?.dura) ? e.dura : 'cena', nota: txt(e?.nota, 200), ef: limparEf(e?.ef) })),
     usosCena: Object.fromEntries(Object.entries(f.usosCena || {}).slice(0, 40).map(([k, v]) => [txt(k, 60), int(v, 0, 99, 0)])),
@@ -395,7 +399,7 @@ export function dadosDoTeste(valorAtributo, ajusteDados = 0) {
 }
 
 // ---------- DERIVAR ----------
-export function derivar(f) {
+export function derivar(f, { armaUid, periciaAtaque } = {}) {
   const cls = CLASSES[f.classe];
   const faixa = faixaEtaria(f);
   const crianca = faixa?.id === 'crianca', pequeno = crianca || temPeso(f, 'recurvado');
@@ -613,7 +617,8 @@ export function derivar(f) {
   // Artista Marcial: ataque desarmado automático (1d6, 1d8 em NEX 35%, 1d10 em NEX 70%)
   if (temPoder('artista-marcial')) armasCalc.unshift({ uid: 'desarmado', nome: 'Desarmado (Artista Marcial)', prof: 'simples', uso: 'corpo', categoria: 0, dano: neq >= 14 ? '1d10' : neq >= 7 ? '1d8' : '1d6', margem: 20, mult: 2, alcance: '—', tipo: 'I', espacos: 0, bonusAtaque: 0, bonusDano: 0, automatica: true });
   const ataques = armasCalc.map(a => {
-    const pericia = a.uso === 'corpo' ? 'luta' : 'pontaria';
+    const periciaPadrao = a.uso === 'corpo' ? 'luta' : 'pontaria';
+    const pericia = a.uid === armaUid && Object.hasOwn(PER, periciaAtaque) ? periciaAtaque : periciaPadrao;
     const pe = PER[pericia];
     const profEspecial = (a.uso === 'fogo' && temPoder('balistica-avancada'))
       || (['corpo', 'disparo'].includes(a.uso) && temPoder('ninja-urbano'));
