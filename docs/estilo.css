@@ -1167,3 +1167,16 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 .painel-afinidade { border-left: 4px solid var(--el); }
 .painel-afinidade.ativa { background: linear-gradient(105deg, var(--el-fundo), transparent 60%), var(--painel); }
 .painel-afinidade h2 .sigilo { width: 26px; height: 26px; vertical-align: middle; margin-right: 6px; }
+
+/* v0.29 — Defesa e Esquiva por partes */
+.bloco-defesa { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 12px; margin-top: 14px; }
+.def-cartao { border: 1px solid var(--linha); border-radius: var(--raio); padding: 12px 14px; background: var(--campo); }
+.def-total { display: flex; align-items: baseline; gap: 10px; border-bottom: 1px solid var(--linha); padding-bottom: 8px; margin-bottom: 6px; }
+.def-total b { font: 700 2rem var(--fonte-titulo); color: var(--tinta); }
+.def-total span { font: .75rem var(--fonte-dossie); letter-spacing: .08em; text-transform: uppercase; color: var(--apagado); }
+.def-linha { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px dashed var(--linha); }
+.def-linha:last-child { border-bottom: 0; }
+.def-linha > span, .def-linha > label { display: grid; gap: 1px; }
+.def-linha small { font-size: .78rem; line-height: 1.3; }
+.def-linha > b { font-family: var(--fonte-titulo); font-size: 1.1rem; white-space: nowrap; }
+.def-outros input { width: 76px; text-align: center; }

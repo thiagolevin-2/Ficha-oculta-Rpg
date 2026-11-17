@@ -1,7 +1,7 @@
-import { condicoesEfetivas } from './combate.js?v=0.28.0';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.28.0';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.28.0';
-import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.28.0';
+import { condicoesEfetivas } from './combate.js?v=0.29.0';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.29.0';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.29.0';
+import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.29.0';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -275,7 +275,7 @@ export function normalizar(f) {
     mochilaUtilidades: txt(f.mochilaUtilidades, 60), // uid do item guardado na Mochila de Utilidades
     aumentos: lista(f.aumentos, 10).filter(a => ['agi', 'for', 'int', 'pre', 'vig'].includes(a)),
     grausAplicados: int(f.grausAplicados, 0, 10, 0),
-    bonus: Object.fromEntries(['defesa', 'pv', 'pe', 'san', 'pd', 'desl', 'carga', 'rd', 'resistencia', 'iniciativaDados', 'paranormais', 'rituais'].map(k => [k, int(f.bonus?.[k], -99, 999, 0)])),
+    bonus: Object.fromEntries(['defesa', 'esquiva', 'pv', 'pe', 'san', 'pd', 'desl', 'carga', 'rd', 'resistencia', 'iniciativaDados', 'paranormais', 'rituais'].map(k => [k, int(f.bonus?.[k], -99, 999, 0)])),
     elementoAfinidade: txt(f.elementoAfinidade, 20),
     // Livro de Regras p. 124: em NEX 50% o personagem se CONECTA a um elemento; a AFINIDADE só se desenvolve no próximo Transcender.
     // Fichas antigas (sem o campo) que já tinham elemento continuam com afinidade.
@@ -527,6 +527,22 @@ export function derivar(f) {
   if (sangueFervente) { ajusteDados[f.escolhas.sangueFervente] += sangueFervente; if (f.escolhas.sangueFervente === 'agi') ativo.defesa += sangueFervente; else ativo.dano += sangueFervente; }
   const sentidoTatico = 0, combateDefensivo = ativo.ataqueDados < 0;
   let defesa = 10 + (crianca ? 2 : 0) + at.agi + defProt + soma('defesa') + f.bonus.defesa + ajusteDados.defesa - (sobrecarregado ? 5 : 0) + ativo.defesa;
+  // Defesa por partes (para a ficha mostrar de onde vem cada ponto); a soma das partes é a Defesa
+  const efsItens = [...passivosDeItens(f), ...passivosComuns(f)].filter(e => e.defesa);
+  const defItensEf = efsItens.reduce((s, e) => s + Number(e.defesa), 0);
+  const defesaPartes = {
+    base: 10 + (crianca ? 2 : 0), agilidade: at.agi,
+    itens: defProt + defItensEf,
+    itensFontes: [...vestidas.map(p => `${p.nome} +${p.defesa + modsP(p).reduce((x, e) => x + (e.defesa || 0), 0) + (p.peso === 'pesada' && tem('tanque') ? 2 : 0)}`), ...efsItens.map(e => `${e.fonte} ${e.defesa > 0 ? '+' : ''}${e.defesa}`)],
+    habilidades: soma('defesa') - defItensEf,
+    habilidadesFontes: efs.filter(e => e.defesa && !efsItens.some(x => x.fonte === e.fonte)).map(e => `${e.fonte} ${e.defesa > 0 ? '+' : ''}${e.defesa}`),
+    efeitos: ativo.defesa,
+    efeitosFontes: [...f.efeitos.filter(e => e.ef?.defesa).map(e => e.nome), ...(sangueFervente && f.escolhas.sangueFervente === 'agi' ? ['Sangue Fervente'] : [])],
+    penalidades: ajusteDados.defesa - (sobrecarregado ? 5 : 0),
+    penalidadesFontes: (() => { const conds = [...efeitosCondicao].filter(c => EFEITO_CONDICAO[c]?.defesa);
+      return [...(sobrecarregado ? ['Sobrecarregado −5'] : []), ...conds.map(c => `${c[0].toUpperCase() + c.slice(1)} −${-EFEITO_CONDICAO[c].defesa}`), ...(conds.length > 1 ? ['condições não acumulam: vale a maior'] : [])]; })(),
+    outros: f.bonus.defesa,
+  };
   rd += ativo.rd;
   if (efeitosCondicao.has('petrificado')) rd = Math.max(10, rd);
   let desl = (crianca ? 6 : DESLOCAMENTO_BASE) - (temPeso(f, 'devagar') ? 3 : 0) + soma('desl') + f.bonus.desl - (sobrecarregado ? 3 : 0) + ativo.desl;
@@ -738,7 +754,8 @@ export function derivar(f) {
   const bloqueio = PER.fortitude.grau >= 1 ? PER.fortitude.bonus + (f.trilha === 'tropa' && trilhaLiberada(f, 2) ? at.vig : 0) + soma('bloqueio') : null;
   let rdMental = (tem('rdMentalInt') ? at.int : 0) + ativo.rdMental;
   if (f.trilha === 'intuitivo' && trilhaLiberada(f, 13)) rdMental = Math.max(rdMental, 10);
-  const esquiva = PER.reflexos.grau >= 1 ? PER.reflexos.bonus : null;
+  const esquiva = PER.reflexos.grau >= 1 ? PER.reflexos.bonus : null; // bônus de Reflexos somado à Defesa ao esquivar (LR p. 88)
+  const esquivaTotal = esquiva == null ? null : defesa + esquiva + f.bonus.esquiva;
 
   // --- PENDÊNCIAS: o que falta fazer na ficha ---
   const transcenderLivres = (transcenderSeparado ? transcenderNexLivre : Math.max(0, slotsPoder + (versatilidade ? 1 : 0) - poderesEscolhidos)) + transcenderTrilhaLivre;
@@ -768,7 +785,7 @@ export function derivar(f) {
     defesa, rd, desl, cargaMax, cargaUsada, sobrecarregado, itemMochila: itemMochila?.uid || '', temMochilaUtil, penalCarga, prof, pericias, PER, ataques, habilidades, trilha, trilhaHabs,
     poderesEscolhidos, expansao, forcaSaber, slotsPoder, slotsAtributo, slotsGrau, versatilidade, trilhaEm, transcenderes, limiteTranscender, transcenderSeparado, transcenderNexLivre, transcenderTrilhaLivre, pontosPossessao, possuido: tem('possuido'), limiteParanormais, paranormaisUsados, paranormalDaOrigem, porElemento, ativo, sangueFervente,
     limiteAcao: limitePE + soma('limiteAcao'), circuloMax, vagasRituais, vagasEspecificas, dtRitual, rituais, patente, usoCategoria,
-    iniciativa, bloqueio, esquiva, rdMental, sentidoTatico, combateDefensivo, avisos: [...new Set(avisos)], efs, ajusteDados,
+    iniciativa, bloqueio, esquiva, esquivaTotal, defesaPartes, rdMental, sentidoTatico, combateDefensivo, avisos: [...new Set(avisos)], efs, ajusteDados,
     progressao: progressaoTexto(f, n),
   };
 }

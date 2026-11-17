@@ -1,19 +1,19 @@
-import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.28.0';
-import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.28.0';
-import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM } from './regras.js?v=0.28.0';
-import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar } from './combate.js?v=0.28.0';
-import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.28.0';
-import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.28.0';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.28.0';
-import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.28.0';
+import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.29.0';
+import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.29.0';
+import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM } from './regras.js?v=0.29.0';
+import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar } from './combate.js?v=0.29.0';
+import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.29.0';
+import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.29.0';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.29.0';
+import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.29.0';
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.28.0', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.28.0', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.29.0', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.29.0', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
   // Os textos do Sobrevivendo ao Horror foram conferidos com o PDF e estão em dados/textos.json (v0.23).
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
@@ -124,8 +124,9 @@ function abaAgente(f, d) {
       <div class="chave"><b>${d.limitePE}</b><span>Limite ${d.pd ? 'PD' : 'PE'}/turno</span></div>
       <div class="chave"><b>${d.rd || 0}</b><span>RD</span></div>
       ${d.bloqueio != null ? `<div class="chave"><b>${d.bloqueio}</b><span>Bloqueio (RD)</span></div>` : ''}
-      ${d.esquiva != null ? `<div class="chave"><b>+${d.esquiva}</b><span>Esquiva</span></div>` : ''}
+      ${d.esquiva != null ? `<div class="chave"><b>${d.esquivaTotal}</b><span>Esquiva</span></div>` : ''}
     </div>
+    ${blocoDefesa(f, d)}
     <div class="grade c2" style="margin-top:12px">${nivelCampo}
       ${ehSobrevivente(f) || temOpcional(f, 'patentes') ? '' : `<label class="campo"><span>Patente (PP: ${f.pp})</span><input type="number" min="0" data-campo="pp" data-tipo="int" id="f-pp2" value="${f.pp}" aria-label="Pontos de prestígio"></label>`}
     </div>${botoesExposicao}
@@ -797,6 +798,31 @@ function cartaoItem(f, d, itemSalvo, i) {
       <label class="campo" style="margin-top:6px"><span>Anotação</span><input data-campo="itens.${i}.nota" id="it-o-${i}" value="${esc(it.nota)}" placeholder="anotação" aria-label="Anotação"></label>
       <div class="linha fim" style="margin-top:6px"><button class="btn pequeno perigo" data-acao="remover" data-lista="itens" data-i="${i}" aria-label="Remover ${esc(it.nome)}">Remover item</button></div>
     </div></details>`;
+}
+
+// ---------- Defesa e Esquiva por partes ----------
+// Base, itens equipados, habilidades/poderes e efeitos ativos são calculados; "Outros" é o ajuste do jogador
+// (rituais e fontes que o site não calcula sozinho).
+function blocoDefesa(f, d) {
+  const p = d.defesaPartes, sinal = n => (n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : '0');
+  const fontes = l => (l?.length ? `<small class="apagado">${l.map(esc).join(' · ')}</small>` : '');
+  const linha = (rot, v, l, sempre = true) => (sempre || v ? `<div class="def-linha"><span>${rot}${fontes(l)}</span><b>${sinal(v)}</b></div>` : '');
+  const outros = (campo, id, valor) => `<div class="def-linha def-outros"><label for="${id}">Outros <small class="apagado">rituais e outras fontes que você soma à mão</small></label><input type="number" id="${id}" data-campo="bonus.${campo}" data-tipo="int" value="${valor}" aria-label="Outros (${campo === 'defesa' ? 'Defesa' : 'Esquiva'})"></div>`;
+  const defesa = `<div class="def-cartao"><div class="def-total"><b>${d.defesa}</b><span>Defesa</span></div>
+      <div class="def-linha"><span>Base<small class="apagado">10${p.base > 10 ? ` + ${p.base - 10} (criança)` : ''} + Agilidade ${p.agilidade}</small></span><b>${p.base + p.agilidade}</b></div>
+      ${linha('Itens equipados', p.itens, p.itensFontes)}
+      ${linha('Habilidades e poderes', p.habilidades, p.habilidadesFontes)}
+      ${linha('Rituais e efeitos ativos', p.efeitos, p.efeitosFontes, false)}
+      ${linha('Penalidades', p.penalidades, p.penalidadesFontes, false)}
+      ${outros('defesa', 'def-outros', p.outros)}</div>`;
+  const esquiva = d.esquiva == null
+    ? `<div class="def-cartao def-sem"><div class="def-total"><b>—</b><span>Esquiva</span></div><p class="apagado">Esquivar é uma reação de quem é treinado em Reflexos: soma o bônus de Reflexos na Defesa contra aquele ataque (Livro de Regras p. 88).</p></div>`
+    : `<div class="def-cartao"><div class="def-total"><b>${d.esquivaTotal}</b><span>Esquiva</span></div>
+      <div class="def-linha"><span>Defesa<small class="apagado">o total ao lado</small></span><b>${d.defesa}</b></div>
+      ${linha('Reflexos', d.esquiva, ['bônus da perícia, somado ao esquivar (reação)'])}
+      ${outros('esquiva', 'esq-outros', f.bonus.esquiva)}
+      ${f.paranormais.some(x => x.id === 'campo-protetor') ? '<p class="apagado" style="font-size:.85rem;margin-top:6px">Campo Protetor: ao esquivar, 1 PE para +5 na Defesa (botão Usar na aba Poderes; entra em "Rituais e efeitos ativos").</p>' : ''}</div>`;
+  return `<div class="bloco-defesa">${defesa}${esquiva}</div>`;
 }
 
 // ---------- Aba INVENTÁRIO ----------
