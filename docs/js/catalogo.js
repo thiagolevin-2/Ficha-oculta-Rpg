@@ -1,5 +1,5 @@
-import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.40.3';
-import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.40.3';
+import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.40.5';
+import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.40.5';
 // ═══════════ catalogo ═══════════
 // catalogo.js — as regras do sistema escritas como DADOS.
 // Tudo aqui são números e nomes das regras + resumos curtos, escritos com outras palavras.
@@ -1222,7 +1222,7 @@ export const MODIFICACOES = [
   { id: 'reforcada', nome: 'Reforçada', para: ['leve', 'pesada', 'escudo'], resumo: '+2 na Defesa e ocupa +1 espaço.', ef: { defesa: 2, espacos: 1 } },
   // Sobrevivendo ao Horror p. 39 (só com a regra opcional de contagem de munição)
   { id: 'rapido', nome: 'Carregador Rápido', para: ['fogo', 'disparo'], fonte: 'SaH', resumo: 'Com contagem de munição: recarrega a arma de fogo como ação livre uma vez por rodada; em bestas e balestras, até cinco recargas como ação livre com uma mão.' },
-  // Maldições do Livro de Regras (p. 145–147): cada uma conta como modificação (+1 categoria). Preço: perde 2 SAN ao falhar em testes do atributo do elemento.
+  // Maldições do Livro de Regras (p. 145–147): a primeira aumenta a categoria em II, as seguintes em I. Preço: perde 2 SAN ao falhar em testes do atributo do elemento.
   { id: 'mal-antielemento', maldicao: 'conhecimento', nome: 'Antielemento', para: ['corpo', 'disparo', 'arremesso', 'fogo'], resumo: 'Contra criaturas de um elemento (role 1d4 ou escolha): 2 PE ao atacar; se acertar, +4d8 de dano.' },
   { id: 'mal-ritualistica', maldicao: 'conhecimento', nome: 'Ritualística', para: ['corpo', 'disparo', 'arremesso', 'fogo'], resumo: 'Guarda um ritual (pago ao armazenar) e o descarrega como ação livre ao acertar, centrado no ser atingido.' },
   { id: 'mal-senciente', maldicao: 'conhecimento', nome: 'Senciente', para: ['corpo', 'disparo', 'arremesso', 'fogo'], resumo: 'Movimento e 2 PE: a arma flutua e ataca sozinha uma vez por rodada em alcance curto; 1 PE por turno para manter.' },
@@ -1236,14 +1236,14 @@ export const MODIFICACOES = [
   { id: 'mal-predadora', maldicao: 'sangue', nome: 'Predadora', para: ['corpo', 'disparo', 'arremesso', 'fogo'], resumo: 'Ignora camuflagem e cobertura leves; à distância, +1 categoria de alcance; a margem de ameaça dobra (antes de outros aumentos).', ef: { margemDobro: true } },
   { id: 'mal-sanguinaria', maldicao: 'sangue', nome: 'Sanguinária', para: ['corpo', 'disparo', 'arremesso', 'fogo'], resumo: 'Quem é atingido fica sangrando (cumulativo); no crítico, o alvo fica fraco e você ganha 2d10 PV temporários.' },
   { id: 'mal-abascanta', maldicao: 'conhecimento', nome: 'Abascanta', para: ['leve', 'pesada', 'escudo'], resumo: '+5 em resistências contra rituais; uma vez por cena, reação e PE igual ao custo para refletir um ritual no conjurador.' },
-  { id: 'mal-profetica', maldicao: 'conhecimento', nome: 'Profética', para: ['leve', 'pesada', 'escudo'], resumo: 'Resistência a Conhecimento 10; 2 PE para rolar de novo um teste de resistência.' },
+  { id: 'mal-profetica', maldicao: 'conhecimento', nome: 'Profética', para: ['leve', 'pesada', 'escudo'], resumo: 'Resistência a Conhecimento 10; 2 PE para rolar de novo um teste de resistência.', ef: { rdElemento: { conhecimento: 10 } } },
   { id: 'mal-sombria', maldicao: 'conhecimento', nome: 'Sombria', para: ['leve', 'pesada', 'escudo'], resumo: '+5 em Furtividade e ignora a penalidade de carga nela; movimento e 1 PE para parecer roupa comum.' },
   { id: 'mal-cinetica', maldicao: 'energia', nome: 'Cinética', para: ['leve', 'pesada', 'escudo'], resumo: '+2 na Defesa e RD 2 (leve ou escudo) ou 5 (pesada). O site soma a Defesa; anote a RD.', ef: { defesa: 2 }, rdCinetica: true },
   { id: 'mal-lepida', maldicao: 'energia', nome: 'Lépida', para: ['leve', 'pesada', 'escudo'], resumo: '+10 em Atletismo e +3m de deslocamento; 2 PE: ignora terreno difícil, escala e cai até 9m sem dano até o fim do turno.' },
-  { id: 'mal-voltaica', maldicao: 'energia', nome: 'Voltaica', para: ['leve', 'pesada', 'escudo'], resumo: 'Resistência a Energia 10; movimento e 2 PE: até o fim da cena, 2d6 de Energia nos seres adjacentes no fim dos seus turnos.' },
+  { id: 'mal-voltaica', maldicao: 'energia', nome: 'Voltaica', para: ['leve', 'pesada', 'escudo'], resumo: 'Resistência a Energia 10; movimento e 2 PE: até o fim da cena, 2d6 de Energia nos seres adjacentes no fim dos seus turnos.', ef: { rdElemento: { energia: 10 } } },
   { id: 'mal-letargica', maldicao: 'morte', nome: 'Letárgica', para: ['leve', 'pesada', 'escudo'], resumo: '+2 na Defesa; 25% (leve/escudo) ou 50% (pesada) de ignorar o dano extra de críticos e ataques furtivos.', ef: { defesa: 2 } },
-  { id: 'mal-repulsiva', maldicao: 'morte', nome: 'Repulsiva', para: ['leve', 'pesada', 'escudo'], resumo: 'Resistência a Morte 10; movimento e 2 PE: quem o ataca corpo a corpo sofre 2d8 de Morte até o fim da cena.' },
-  { id: 'mal-regenerativa', maldicao: 'sangue', nome: 'Regenerativa', para: ['leve', 'pesada', 'escudo'], resumo: 'Resistência a Sangue 10; movimento e 1 PE para recuperar 1d12 PV.' },
+  { id: 'mal-repulsiva', maldicao: 'morte', nome: 'Repulsiva', para: ['leve', 'pesada', 'escudo'], resumo: 'Resistência a Morte 10; movimento e 2 PE: quem o ataca corpo a corpo sofre 2d8 de Morte até o fim da cena.', ef: { rdElemento: { morte: 10 } } },
+  { id: 'mal-regenerativa', maldicao: 'sangue', nome: 'Regenerativa', para: ['leve', 'pesada', 'escudo'], resumo: 'Resistência a Sangue 10; movimento e 1 PE para recuperar 1d12 PV.', ef: { rdElemento: { sangue: 10 } } },
   { id: 'mal-sadica', maldicao: 'sangue', nome: 'Sádica', para: ['leve', 'pesada', 'escudo'], resumo: 'No início do turno, +1 em ataque e dano para cada 10 de dano sofrido desde o seu último turno.' },
 ];
 export const MODIFICACAO = Object.fromEntries(MODIFICACOES.map(m => [m.id, m]));

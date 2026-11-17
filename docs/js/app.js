@@ -1,19 +1,19 @@
-import { registrarMaldições } from './amaldicoados.js?v=0.40.3';
-import { LIVROS_DIGITALIZADOS, NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.40.3';
-import { aplicarContaminacao } from './contaminacao.js?v=0.40.3';
-import { ELEMENTOS_VISUAIS, aplicarElemento, aplicarAnimacoes, sistemaReduzMovimento, $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.40.3';
-import { normalizar, derivar } from './regras.js?v=0.40.3';
-import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, carregarAnimacoes, salvarAnimacoes, espacoUsado } from './armazenamento.js?v=0.40.3';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.40.3';
-import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.40.3';
-import { telaMestre, acoesMestre, campoMestre, htmlFeed } from './mestre.js?v=0.40.3';
-import { mesa, quandoMesaMudar, quandoMostrar, quandoComando, quandoPedirFicha, enviarFicha, resumoFicha, rolagemNaMesa, entrarMesa, sairDaMesa, voltarSeEstavaNaMesa, normalizarCodigo, abrirMesa, codigoGuardadoDoMestre } from './mesa.js?v=0.40.3';
-import { sofrerDano, recuperar, adicionarCondicao } from './combate.js?v=0.40.3';
-import { definirRaizModal, abrirModal, fecharModal, htmlHistorico, ouvintesRolagem, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.40.3';
+import { registrarMaldições } from './amaldicoados.js?v=0.40.5';
+import { LIVROS_DIGITALIZADOS, NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.40.5';
+import { aplicarContaminacao } from './contaminacao.js?v=0.40.5';
+import { ELEMENTOS_VISUAIS, aplicarElemento, aplicarAnimacoes, sistemaReduzMovimento, $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.40.5';
+import { normalizar, derivar } from './regras.js?v=0.40.5';
+import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, carregarAnimacoes, salvarAnimacoes, espacoUsado } from './armazenamento.js?v=0.40.5';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.40.5';
+import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.40.5';
+import { telaMestre, acoesMestre, campoMestre, htmlFeed } from './mestre.js?v=0.40.5';
+import { mesa, quandoMesaMudar, quandoMostrar, quandoComando, quandoPedirFicha, enviarFicha, resumoFicha, acessoDoMestre, rolagemNaMesa, entrarMesa, sairDaMesa, voltarSeEstavaNaMesa, normalizarCodigo, abrirMesa, codigoGuardadoDoMestre } from './mesa.js?v=0.40.5';
+import { sofrerDano, recuperar, adicionarCondicao } from './combate.js?v=0.40.5';
+import { definirRaizModal, abrirModal, fecharModal, htmlHistorico, ouvintesRolagem, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.40.5';
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
 
-export const VERSAO = '0.40.3';
+export const VERSAO = '0.40.5';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -33,7 +33,7 @@ let buscaLivroDigital = '';
 async function abrirLivroDigital(id, pagina=1) {
   if (!LIVROS_DIGITALIZADOS.some(v=>v.id===id)) return;
   try {
-    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.40.3', {cache:'no-cache'});
+    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.40.5', {cache:'no-cache'});
     if (!resp.ok) throw new Error('Não foi possível carregar esta transcrição.');
     livroDigital = await resp.json(); paginaDigital = Math.min(Math.max(1, Number(pagina)||1),livroDigital.paginas.length); buscaLivroDigital = '';
     render();
@@ -44,11 +44,11 @@ async function abrirLivroDigital(id, pagina=1) {
 }
 
 async function carregarSuplementos(){
-  try { const r=await fetch('dados/suplementos.json?v=0.40.3'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
+  try { const r=await fetch('dados/suplementos.json?v=0.40.5'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
 }
 async function carregarReferenciasSAH(){
   try {
-    const r = await fetch('dados/sah_referencias.json?v=0.40.3', {cache:'no-cache'});
+    const r = await fetch('dados/sah_referencias.json?v=0.40.5', {cache:'no-cache'});
     if(r.ok) SAH_REF = await r.json();
   } catch(e){ console.warn('Índice do Sobrevivendo ao Horror não disponível', e); }
 }
@@ -61,7 +61,20 @@ const ctx = {
   render: () => render(),
   fichas: () => estado.fichas,
   fichaAtual: () => estado.fichas.find(f => f.id === estado.rota.id),
-  salvarFicha(f) { if (mesa.papel === 'jogador' && f.id === mesa.fichaId) setTimeout(() => enviarFicha(resumoFicha(f, derivar(f))), 0); f.atualizadoEm = new Date().toISOString(); const i = estado.fichas.findIndex(x => x.id === f.id); if (i >= 0) estado.fichas[i] = f; if (!salvarFichas(estado.fichas)) avisar('Não consegui salvar: o armazenamento do navegador está cheio. Exporte as fichas e remova retratos grandes.', true); },
+  salvarFicha(f) {
+    f.atualizadoEm = new Date().toISOString();
+    const i = estado.fichas.findIndex(x => x.id === f.id);
+    if (i >= 0) estado.fichas[i] = f;
+    if (!salvarFichas(estado.fichas)) avisar('Não consegui salvar: o armazenamento do navegador está cheio. Exporte as fichas e remova retratos grandes.', true);
+    if (mesa.papel === 'jogador' && f.id === mesa.fichaId) {
+      const codigo = mesa.codigo;
+      setTimeout(() => {
+        if (mesa.papel !== 'jogador' || mesa.codigo !== codigo || mesa.fichaId !== f.id) return;
+        const atual = estado.fichas.find(x => x.id === f.id);
+        if (atual) enviarFicha(resumoFicha(atual, derivar(atual)));
+      }, 0);
+    }
+  },
   adicionarFicha(f) { estado.fichas.unshift(f); salvarFichas(estado.fichas); },
   apagarFicha(id) { estado.fichas = estado.fichas.filter(f => f.id !== id); salvarFichas(estado.fichas); },
 };
@@ -130,7 +143,7 @@ function telaEntrarMesa(codigo) {
   return `<div class="pagina"><section class="painel"><h1 class="faixa sangue">Entrar na mesa</h1>
     ${codigo ? `<div class="codigo-mesa"><span>Código</span><b>${esc(codigo)}</b></div>` : `<p class="aviso-ocr">Código inválido. Peça ao mestre o código no formato OCULTA-XXXX.</p>`}
     ${mesa.erro ? `<p class="aviso-ocr">${esc(mesa.erro)}</p>` : ''}
-    ${codigo ? (fs.length ? `<p>Escolha a ficha que vai usar na mesa. O mestre verá PV, ${'PE/PD'}, Sanidade, Defesa e condições dela, e poderá aplicar dano, cura e condições.</p>
+    ${codigo ? (fs.length ? `<p>Escolha a ficha que vai usar na mesa. O mestre verá PV, ${'PE/PD'}, Sanidade, Defesa e condições dela, do agente. Você pode liberar edição de recursos e condições no painel Mesa.</p>
       <div class="cartoes">${fs.map(f => { const d = derivar(f); return `<button class="cartao" data-acao="mesa-entrar" data-id="${esc(f.id)}" data-codigo="${esc(codigo)}"><b>${esc(f.nome || 'Sem nome')}</b><small>${esc(CLASSES[f.classe]?.nome || '')} · NEX ${d.nexAtual ?? f.nex}% · PV ${d.atual.pv}/${d.pv}</small></button>`; }).join('')}</div>`
       : '<p class="vazio">Você ainda não tem fichas neste navegador. Crie uma em Agentes e volte por este link.</p><a class="btn sangue" href="#/novo" data-acao="novo-agente">+ Novo agente</a>') : ''}
   </section></div>`;
@@ -143,6 +156,10 @@ function painelMesa() {
   return `<aside class="painel-mesa" aria-label="Mesa online"><div class="titulo-secao"><h3 style="margin:0">Mesa ${esc(mesa.codigo)}</h3><button class="icone-btn" data-acao="mesa-painel" aria-label="Fechar">✕</button></div>
     <p class="apagado" style="font-size:.85rem;margin:2px 0 8px">${esc(status)}${ficha ? ` · jogando com <b>${esc(ficha.nome || 'Agente')}</b>` : mesa.papel === 'mestre' ? ' · você é o mestre' : ''}</p>
     ${mesa.erro ? `<p class="aviso-ocr">${esc(mesa.erro)}</p>` : ''}
+    ${ficha ? `<label class="campo" style="margin-bottom:8px"><span>Acesso do mestre nesta mesa</span><select data-mesa-permissao aria-label="Acesso do mestre nesta mesa">
+      <option value="consulta" ${acessoDoMestre(ficha, mesa.codigo) === 'consulta' ? 'selected' : ''}>Consultar resumo e rolagens</option>
+      <option value="editar" ${acessoDoMestre(ficha, mesa.codigo) === 'editar' ? 'selected' : ''}>Editar recursos e condições</option>
+    </select></label>` : ''}
     <h4 class="titulo-vermelho" style="margin:6px 0 2px">${ini?.encontro ? `⚔ ${esc(ini.encontro)} · ` : ''}Iniciativa${ini ? ` · rodada ${ini.rodada}` : ''}</h4>
     ${ini?.ordem?.length ? `<ol class="ini-mesa">${ini.ordem.map((p, i) => `<li class="${ini.ativo && i === ini.vez ? 'vez' : ''}">${esc(p.nome)}${p.tipo === 'ameaca' ? ' <small class="apagado">ameaça</small>' : ''}</li>`).join('')}</ol>` : '<p class="apagado">Sem combate agora.</p>'}
     ${mesa.mostrados?.length ? `<h4 class="titulo-vermelho" style="margin:6px 0 2px">O mestre mostrou</h4>${mesa.mostrados.map((x, i) => i === 0
@@ -153,11 +170,19 @@ function painelMesa() {
 }
 // Comandos que o mestre manda para a ficha deste jogador
 function aplicarComandoDoMestre(cmd) {
-  const f = estado.fichas.find(x => x.id === mesa.fichaId); if (!f) return;
-  const d = derivar(f), v = Math.max(0, Math.floor(Number(cmd.valor) || 0));
+  const f = estado.fichas.find(x => x.id === mesa.fichaId);
+  if (mesa.papel !== 'jogador' || mesa.status !== 'conectada' || !f || (cmd.fichaId && cmd.fichaId !== f.id) || acessoDoMestre(f, mesa.codigo) !== 'editar') return;
+  const d = derivar(f), v = inteiro(cmd.valor, 0, 99999, 0);
   let msg = '';
   if (cmd.acao === 'dano' && v) { const r = sofrerDano(f, d, v, { tipo: cmd.tipo === 'mental' ? 'mental' : 'pv', rd: cmd.tipo === 'mental' ? d.rdMental : d.rd }); msg = `${r?.total ?? v} de dano${cmd.tipo === 'mental' ? ' mental' : ''}`; }
   else if (cmd.acao === 'cura' && v) { recuperar(f, d, ['pv', 'pe', 'san', 'pd'].includes(cmd.recurso) ? cmd.recurso : 'pv', v); msg = `+${v} ${String(cmd.recurso || 'pv').toUpperCase()}`; }
+  else if (cmd.acao === 'recursos' && cmd.recursos && typeof cmd.recursos === 'object') {
+    const campos = d.pd ? ['pv', 'pd'] : ['pv', 'pe', 'san'];
+    const alterados = campos.filter(k => Number.isInteger(cmd.recursos[k]));
+    if (!alterados.length) return;
+    for (const k of alterados) f.recursos[k] = inteiro(cmd.recursos[k], -999, 9999, d.atual[k]);
+    msg = alterados.map(k => `${k.toUpperCase()} = ${f.recursos[k]}`).join(' · ');
+  }
   else if (cmd.acao === 'condicoes' && Array.isArray(cmd.lista)) { f.condicoes = []; for (const c of cmd.lista.slice(0, 40)) if (typeof c === 'string') adicionarCondicao(f, c); msg = cmd.lista.length ? 'condições atualizadas' : 'condições removidas'; }
   else return;
   ctx.salvarFicha(normalizar(f)); Object.assign(f, normalizar(f)); render();
@@ -337,6 +362,28 @@ function aoEditar(ev, final) {
   }
   if (el.dataset.prox) { proxima[el.dataset.prox] = el.dataset.prox === 'dt' ? el.value : inteiro(el.value, -50, 50, 0); return; }
   if (el.dataset.ritFiltro) { estado.ui.ritFiltro[el.dataset.ritFiltro] = el.value; if (final || el.type === 'search') render(); return; }
+  if ('mesaPermissao' in el.dataset) {
+    if (!final || mesa.papel !== 'jogador' || !['consulta', 'editar'].includes(el.value)) return;
+    const ficha = estado.fichas.find(f => f.id === mesa.fichaId);
+    if (!ficha) return;
+    ficha.permissoesMesa ||= {};
+    ficha.permissoesMesa[mesa.codigo] = el.value;
+    ctx.salvarFicha(normalizar(ficha));
+    render();
+    return;
+  }
+  if (el.dataset.filtroItens) {
+    const valor = campo => document.querySelector(`.modal [data-filtro-itens="${campo}"]`)?.value || '';
+    const busca = valor('busca').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    const fonte = valor('fonte'), grupo = valor('grupo');
+    let encontrados = 0;
+    document.querySelectorAll('.modal [data-fonte][data-grupo][data-busca]').forEach(cartao => {
+      cartao.hidden = (fonte && cartao.dataset.fonte !== fonte) || (grupo && cartao.dataset.grupo !== grupo) || !cartao.dataset.busca.includes(busca);
+      if (!cartao.hidden) encontrados++;
+    });
+    document.getElementById('catalogo-itens-vazio').hidden = encontrados > 0;
+    return;
+  }
   if ('filtroModal' in el.dataset) { const q = el.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); document.querySelectorAll('.modal [data-busca]').forEach(b => { b.hidden = q && !b.dataset.busca.includes(q); }); return; }
   const m = campoMestre(el, ctx, final);
   if (m) { if (final && m === 'cheio') render(); return; }

@@ -1,7 +1,7 @@
-import { condicoesEfetivas } from './combate.js?v=0.40.3';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.40.3';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.3';
-import { passivosDeItens, AMALDICOADOS } from './amaldicoados.js?v=0.40.3';
+import { condicoesEfetivas } from './combate.js?v=0.40.5';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.40.5';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.5';
+import { passivosDeItens, passivoAmaldicoado, AMALDICOADOS, CONJURACAO, ELEMENTOS_MALDICAO } from './amaldicoados.js?v=0.40.5';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -147,6 +147,15 @@ export function parametrosFabricacao({ categoria, consumivel, improvisado, kit, 
 
 export const VERSAO_FICHA = 1;
 export const LIMITE_DANOS_EXTRAS_MACRO = 12;
+export function quantidadeMaldicoes(item) {
+  return item.maldicoes?.length ?? (item.mods || []).filter(id => MODIFICACAO[id]?.maldicao).length;
+}
+export function categoriaEquipamento(item, reducao = 0) {
+  const maldicoes = quantidadeMaldicoes(item);
+  const extras = (item.mods || []).length + (item.maldicoes?.length || 0);
+  return Math.min(4, Math.max(0, item.categoria + extras + Number(maldicoes > 0) - reducao));
+}
+const modsEquipamento = mods => (Array.isArray(mods) ? mods : []).filter(m => typeof m === 'string' && Object.hasOwn(MODIFICACAO, m));
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
 const txt = (v, max = 200) => (typeof v === 'string' ? v : v == null ? '' : String(v)).slice(0, max);
 const int = (v, min, max, padrao = 0) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : padrao; };
@@ -211,6 +220,8 @@ export function normalizar(f) {
     limitesItens: Array.isArray(f.limitesItens) && f.limitesItens.length === 4 ? f.limitesItens.map(v => int(v, 0, 20, 0)) : null,
     creditoManual: ['Baixo', 'Médio', 'Alto', 'Ilimitado'].includes(f.creditoManual) ? f.creditoManual : '',
     pericias, bonusPericia,
+    atributosPericias: Object.fromEntries(PERICIAS.flatMap(p => ATRIBUTOS.some(a => a.id === f.atributosPericias?.[p.id]) ? [[p.id, f.atributosPericias[p.id]]] : [])),
+    permissoesMesa: Object.fromEntries(Object.entries(f.permissoesMesa || {}).filter(([codigo, acesso]) => /^OCULTA-[A-Z0-9]{4}$/.test(codigo) && ['consulta', 'editar'].includes(acesso)).slice(-100)),
     turnoManualIniciado: !!f.turnoManualIniciado,
     profissao: txt(f.profissao, 40),
     poderes: lista(f.poderes, 60).map(p => ({ id: PODER[p?.id] ? p.id : 'proprio', nome: txt(p?.nome, 80), resumo: txt(p?.resumo, 1000), escolha: txt(p?.escolha, 60), via: txt(p?.via, 60), deVersatilidade: !!p?.deVersatilidade && !TRILHA[f.escolhas?.versatilidade], uid: txt(p?.uid, 60) || uid() }))
@@ -219,11 +230,14 @@ export function normalizar(f) {
     notasHabilidade: Object.fromEntries(Object.entries(f.notasHabilidade || {}).slice(0, 120).map(([k, v]) => [txt(k, 80), txt(v, 1500)])),
     // Campos vazios (ritual aprendido em versão antiga, por exemplo) são completados com os dados do catálogo.
     rituais: lista(f.rituais, 80).map(x => { const c = ritualDoCatalogo(x?.nome) || {}; const vazio = (v, max, alt) => txt(v, max) || txt(alt, max); return ({
+      formulasAvancadas: Object.fromEntries(['discente', 'verdadeiro'].map(id => [id, txt(x?.formulasAvancadas?.[id], 40).trim()])),
+      custosAvancados: { discente: int(x?.custosAvancados?.discente, 0, 30, 2), verdadeiro: int(x?.custosAvancados?.verdadeiro, 0, 30, 5) },
+      tipoDados: x?.tipoDados === 'cura' || x?.tipoDados === 'dano' ? x.tipoDados : c.tipoDados || 'dano',
       rolagemExtra: FORMULA.test(txt(x?.rolagemExtra, 40)) ? txt(x?.rolagemExtra, 40) : '',
       elementos: c.elementos || [], idCatalogo: c.id || '', proprio: !c.id || !!x?.proprio,
       uid: txt(x?.uid, 60) || uid(), nome: txt(x?.nome, 80) || 'Ritual', elemento: txt(x?.elemento, 20) || 'conhecimento', circulo: int(x?.circulo ?? c.circulo, 1, 4, 1),
       execucao: vazio(x?.execucao, 40, c.execucao), alcance: vazio(x?.alcance, 40, c.alcance), alvo: vazio(x?.alvo, 80, c.alvo || c.area || c.efeitoArea), duracao: vazio(x?.duracao, 40, c.duracao), resistencia: vazio(x?.resistencia, 60, c.resistencia),
-      efeito: vazio(x?.efeito, 3000, c.resumo), formula: FORMULA.test(txt(x?.formula, 40)) && txt(x?.formula, 40) ? txt(x?.formula, 40) : (FORMULA.test(txt(c.dados, 40)) ? txt(c.dados, 40) : ''), discente: txt(x?.discente, 400), verdadeiro: txt(x?.verdadeiro, 400),
+      efeito: vazio(x?.efeito, 3000, c.resumo), formula: txt(x?.formula, 40).trim() || (FORMULA.test(txt(c.dados, 40)) ? txt(c.dados, 40) : ''), discente: txt(x?.discente, 400), verdadeiro: txt(x?.verdadeiro, 400),
     }); }),
     armas: lista(f.armas, 40).map(a => ({
       uid: txt(a?.uid, 60) || uid(), nome: txt(a?.nome, 60) || 'Arma', prof: ['simples', 'taticas', 'pesadas'].includes(a?.prof) ? a.prof : 'simples',
@@ -233,9 +247,9 @@ export function normalizar(f) {
       capacidade: int(a?.capacidade ?? CAPACIDADE_ARMAS[a?.nome], 0, 200), carregada: int(a?.carregada, 0, 200), reserva: int(a?.reserva, 0, 9999),
       bonusAtaque: int(a?.bonusAtaque, -20, 30, 0), bonusDano: int(a?.bonusDano, -20, 50, 0), maos: int(a?.maos, 1, 2, 1), municao: txt(a?.municao, 40), nota: txt(a?.nota, 400),
       favorita: !!a?.favorita, ferramenta: !!a?.ferramenta, balasLongas: !!a?.balasLongas, extraMultiplica: !!a?.extraMultiplica,
-      mods: lista(a?.mods, 8).filter(m => MODIFICACAO[m]), maldicao: { tipo: txt(a?.maldicao?.tipo, 20), elemento: txt(a?.maldicao?.elemento, 20), dados: FORMULA.test(txt(a?.maldicao?.dados, 20)) ? txt(a?.maldicao?.dados, 20) : '', texto: txt(a?.maldicao?.texto, 600) },
+      mods: modsEquipamento(a?.mods), maldicao: { tipo: txt(a?.maldicao?.tipo, 20), elemento: txt(a?.maldicao?.elemento, 20), dados: FORMULA.test(txt(a?.maldicao?.dados, 20)) ? txt(a?.maldicao?.dados, 20) : '', texto: txt(a?.maldicao?.texto, 600) },
     })),
-    protecoes: lista(f.protecoes, 10).map(p => ({ uid: txt(p?.uid, 60) || uid(), nome: txt(p?.nome, 60) || 'Proteção', peso: ['leve', 'pesada', 'escudo'].includes(p?.peso) ? p.peso : 'leve', defesa: int(p?.defesa, 0, 20, 5), rd: int(p?.rd, 0, 20, 0), categoria: int(p?.categoria, 0, 4, 1), espacos: Number.isFinite(+p?.espacos) ? Math.min(20, Math.max(0, +p.espacos)) : 2, vestida: p?.vestida !== false, mods: lista(p?.mods, 6).filter(m => MODIFICACAO[m]), nota: txt(p?.nota, 400) })),
+    protecoes: lista(f.protecoes, 10).map(p => ({ uid: txt(p?.uid, 60) || uid(), nome: txt(p?.nome, 60) || 'Proteção', peso: ['leve', 'pesada', 'escudo'].includes(p?.peso) ? p.peso : 'leve', defesa: int(p?.defesa, 0, 20, 5), rd: int(p?.rd, 0, 20, 0), categoria: int(p?.categoria, 0, 4, 1), espacos: Number.isFinite(+p?.espacos) ? Math.min(20, Math.max(0, +p.espacos)) : 2, vestida: p?.vestida !== false, mods: modsEquipamento(p?.mods), nota: txt(p?.nota, 400) })),
     penalidadeSanPermanente: int(f.penalidadeSanPermanente, 0, 999),
     projetosFabricacao: lista(f.projetosFabricacao, 20).filter(p => p?.nome).map(p => ({
       uid: txt(p.uid, 60) || uid(), nome: txt(p.nome, 80), categoria: int(p.categoria, 0, 4), espacos: int(p.espacos, 0, 20, 1),
@@ -246,18 +260,27 @@ export function normalizar(f) {
       descanso: int(f.interludio?.descanso, 0, 3, 1),
       acoes: lista(f.interludio?.acoes, 2).filter(a => ['dormir', 'relaxar', 'revisar', 'manutencao', 'alimentar', 'exercitar', 'ler'].includes(a)),
     },
-    itens: lista(f.itens, 120).map(i => ({
+    itens: lista(f.itens, 120).map(i => {
+      const maldicoes = (Array.isArray(i?.maldicoes) ? i.maldicoes : []).flatMap((nome, k) => {
+        if (typeof nome !== 'string' || !nome.startsWith('Acessório amaldiçoado: ') || !Object.hasOwn(AMALDICOADOS, nome)) return [];
+        const el = i.elementosMaldicoes?.[k];
+        return [{ nome, el: ELEMENTOS_MALDICAO.includes(el) ? el : '' }];
+      });
+      return {
       expiraCena: !!i?.expiraCena, diasVestido: int(i?.diasVestido, 0, 999, 0), ativo: !!i?.ativo, carga: int(i?.carga, 0, 999, 0), usosDia: int(i?.usosDia, 0, 99, 0),
+      ritualConjuracao: (i?.nome === CONJURACAO || maldicoes.some(m => m.nome === CONJURACAO)) && RITUAIS.some(r => r.circulo === 1 && r.id === i?.ritualConjuracao) ? i.ritualConjuracao : '',
       ritualSelo: RITUAIS.some(r => r.id === i?.ritualSelo) ? i.ritualSelo : '',
       poderDedo: PODER_PARANORMAL[i?.poderDedo] ? i.poderDedo : '',
       periciaKit: PERICIA[i?.periciaKit] ? i.periciaKit : '',
       escrito: !!i?.escrito, pericia: PERICIA[i?.pericia] ? i.pericia : '', periciaExtra: PERICIA[i?.periciaExtra] ? i.periciaExtra : '',
       mods: [...new Set(lista(i?.mods, 6))].filter(id => MOD_ACESSORIOS.some(m => m[0] === id)),
       elemento: ['sangue', 'morte', 'conhecimento', 'energia'].includes(i?.elemento) ? i.elemento : '', // componentes ritualísticos
-      maldicoes: [...new Set(lista(i?.maldicoes, 4))].filter(n => typeof n === 'string' && n.startsWith('Acessório amaldiçoado: ') && AMALDICOADOS[n]), // maldições de acessório aplicadas no item
+      maldicoes: maldicoes.map(m => m.nome), elementosMaldicoes: maldicoes.map(m => m.el),
+      elementoMaldicao: ELEMENTOS_MALDICAO.includes(i?.elementoMaldicao) ? i.elementoMaldicao : '',
       efeitos: lista(i?.efeitos, 6).map(e => ({ tipo: TIPOS_EFEITO_ITEM.includes(e?.tipo) ? e.tipo : '', alvo: txt(e?.alvo, 30), valor: int(e?.valor, -20, 20, 0) }))
         .filter(e => e.tipo && e.valor && (e.tipo === 'pericia' ? !!PERICIA[e.alvo] : e.tipo === 'atributo' ? ['agi', 'for', 'int', 'pre', 'vig'].includes(e.alvo) : true)),
-       uid: txt(i?.uid, 60) || uid(), nome: txt(i?.nome, 80) || 'Item', categoria: int(i?.categoria, 0, 4, 0), espacos: Number.isFinite(+i?.espacos) ? Math.min(20, Math.max(0, +i.espacos)) : 1, qtd: int(i?.qtd, 0, 999, 1), nota: txt(i?.nota, 600) })),
+       uid: txt(i?.uid, 60) || uid(), nome: txt(i?.nome, 80) || 'Item', categoria: int(i?.categoria, 0, 4, 0), espacos: Number.isFinite(+i?.espacos) ? Math.min(20, Math.max(0, +i.espacos)) : 1, qtd: int(i?.qtd, 0, 999, 1), nota: txt(i?.nota, 600) };
+    }),
     recursos: { pv: r.pv == null ? null : int(r.pv, -999, 9999), pe: r.pe == null ? null : int(r.pe, -999, 9999), san: r.san == null ? null : int(r.san, -999, 9999), pd: r.pd == null ? null : int(r.pd, -999, 9999), pvTemp: int(r.pvTemp, 0, 999), peTemp: int(r.peTemp, 0, 999), morrendo: int(r.morrendo, 0, 3), enlouquecendo: int(r.enlouquecendo, 0, 3) },
     morto: !!f.morto,
     maldicoesAceitas: Object.fromEntries(Object.entries(f.maldicoesAceitas || {}).slice(0, 800).filter(([k, el]) =>
@@ -269,11 +292,12 @@ export function normalizar(f) {
     paranormais: lista(f.paranormais, 40).filter(p => PODER_PARANORMAL[p?.id]).map(p => ({ uid: txt(p.uid, 60) || uid(), id: p.id, trocaRitualUsada: !!p.trocaRitualUsada, transcenderUid: txt(p.transcenderUid, 60), circuloAprender: int(p.circuloAprender, 0, 3), escolha: txt(p.escolha, 40), afinidade: !!p.afinidade, fonte: ['transcender', 'origem', 'outro'].includes(p.fonte) ? p.fonte : 'outro' })),
     medos: lista(f.medos, 20).filter(x => x && Number.isInteger(x.n) && x.n >= 2 && x.n <= 20).map(x => ({ uid: txt(x.uid, 60) || uid(), n: x.n })),
     insanidades: lista(f.insanidades, 20).filter(x => x && Number.isInteger(x.n) && x.n >= 1 && x.n <= 20).map(x => ({ uid: txt(x.uid, 60) || uid(), n: x.n, missao: !!x.missao })),
-    // Macros: sequências de rolagens com um clique (aba Macros)
+    // Macros: sequências reutilizadas na aba Combate.
     macros: lista(f.macros, 30).map(m => ({ uid: txt(m?.uid, 60) || uid(), nome: txt(m?.nome, 60) || 'Macro', nota: txt(m?.nota, 300),
-      usaPd: !!m?.usaPd, pd: int(m?.pd, 0, 99, 1), // gastar PE/PD ao executar (o jogador marca e escolhe quanto)
+      noCombate: !!m?.noCombate, usaPd: !!m?.usaPd, pd: int(m?.pd, 0, 99, 1), // gastar PE/PD ao executar (o jogador marca e escolhe quanto)
       passos: lista(m?.passos, 8).map(p => ({ tipo: ['pericia', 'ataque', 'acerto', 'formula', 'gasto'].includes(p?.tipo) ? p.tipo : 'formula', alvo: txt(p?.alvo, 60), formula: txt(p?.formula, 40), rotulo: txt(p?.rotulo, 40), valor: int(p?.valor, 0, 99, 1),
         pericia: PERICIAS.some(x => x.id === p?.pericia) ? p.pericia : '', alcanceAtaque: p?.alcanceAtaque === 'distancia' ? 'distancia' : 'corpo',
+        atributoDano: p?.atributoDano === 'nenhum' || ATRIBUTOS.some(a => a.id === p?.atributoDano) ? p.atributoDano : '',
         danoArma: txt(p?.danoArma, 40).trim(), tipoDanoArma: txt(p?.tipoDanoArma, 20), tipoDano: txt(p?.tipoDano, 20),
         danosExtras: lista(p?.danosExtras, LIMITE_DANOS_EXTRAS_MACRO).map(e => ({
           formula: txt(e?.formula, 40).trim(), tipo: txt(e?.tipo, 20), multiplicaCritico: e?.multiplicaCritico === true,
@@ -338,7 +362,7 @@ export function textoNivel(f) {
 }
 
 // Efeitos de origem + trilha + poderes já obtidos
-function efeitosAtivos(f, nivel) {
+function efeitosAtivos(f, passivosItens) {
   const efs = [];
   const o = ORIGEM[f.origem];
   if (o?.ef && origemAtiva(f)) efs.push({ fonte: o.poder, ...o.ef });
@@ -353,9 +377,7 @@ function efeitosAtivos(f, nivel) {
       && item.poderDedo && !poderesParanormais.some(p => p.id === item.poderDedo)) poderesParanormais.push({ id: item.poderDedo });
   }
   for (const p of poderesParanormais) { const d = PODER_PARANORMAL[p.id]; if (!d) continue; if (p.afinidade) { if (d.efAfinidade) efs.push({ fonte: d.nome + ' (afinidade)', ...d.efAfinidade }); } else if (d.ef) efs.push({ fonte: d.nome, ...d.ef }); }
-  for (const e of passivosDeItens(f)) efs.push(e); // itens amaldiçoados ligados na aba Combate
-  for (const e of passivosComuns(f)) efs.push(e); // itens comuns com efeito fixo (Mochila militar etc.)
-  return efs;
+  return efs.concat(passivosItens);
 }
 // Efeitos de itens comuns EQUIPADOS (campo "ativo"): os fixos da tabela PASSIVOS_ITENS (equipamentos.js, cada nome
 // conta uma vez) e os que o jogador escolheu no próprio item (perícia, atributo, Defesa… para somar ou diminuir).
@@ -365,7 +387,10 @@ export function passivosComuns(f) {
   for (const it of f.itens || []) {
     if (!(it.qtd > 0) || AMALDICOADOS[it.nome]) continue;
     // maldições de acessório aplicadas no item (Amaldiçoar): valem com o acessório equipado
-    if (it.escrito || it.ativo) for (const n of it.maldicoes || []) if (AMALDICOADOS[n]?.passivo) out.push({ fonte: `${it.nome} (${n.replace('Acessório amaldiçoado: ', '')})`, ...AMALDICOADOS[n].passivo });
+    if (it.escrito || it.ativo) for (const [k, n] of (it.maldicoes || []).entries()) {
+      const passivo = passivoAmaldicoado(it, n, it.elementosMaldicoes?.[k]);
+      if (passivo) out.push({ fonte: `${it.nome} (${n.replace('Acessório amaldiçoado: ', '')})`, ...passivo });
+    }
     if (!it.ativo) continue;
     const def = PASSIVOS_ITENS[it.nome];
     if (def && !vistos.has(it.nome)) {
@@ -401,24 +426,25 @@ export function dadosDoTeste(valorAtributo, ajusteDados = 0) {
 }
 
 // ---------- DERIVAR ----------
-export function derivar(f, { armaUid, periciaAtaque } = {}) {
+export function derivar(f, { armaUid, periciaAtaque, atributoDano, ritualExtra } = {}) {
   const cls = CLASSES[f.classe];
   const faixa = faixaEtaria(f);
   const crianca = faixa?.id === 'crianca', pequeno = crianca || temPeso(f, 'recurvado');
   const efeitosCondicao = condicoesEfetivas(f.condicoes);
   const at = { ...f.atributos };
-  for (const e of [...passivosDeItens(f), ...passivosComuns(f)]) for (const [k, v] of Object.entries(e.atr || {})) if (k in at) at[k] += v;
+  const passivosItens = [...passivosDeItens(f), ...passivosComuns(f)];
+  for (const e of passivosItens) for (const [k, v] of Object.entries(e.atr || {})) if (k in at) at[k] += v;
   const forcaSaber = f.trilha === 'bibliotecario' && trilhaLiberada(f, 20);
   if (forcaSaber) at.int += 1;
   const n = nivelProgressao(f);
   const neq = nivelEquivalente(f);
-  const efs = efeitosAtivos(f, n);
+  const efs = efeitosAtivos(f, passivosItens);
   const soma = k => efs.reduce((s, e) => s + (Number(e[k]) || 0), 0);
   const tem = k => efs.some(e => e[k]);
   const avisos = [];
   const pd = usaPD(f), patentes = temOpcional(f, 'patentes');
   const racional = tem('racional');
-  const atrPE = racional ? at.int : at.pre;
+  const atrPE = racional ? at.int : at.pre - soma('semPE');
 
   // --- PV ---
   let pv;
@@ -528,7 +554,7 @@ export function derivar(f, { armaUid, periciaAtaque } = {}) {
     if (k === 'pericia' || k === 'dadosPericia') for (const [p, x] of Object.entries(v)) ativo[k][p] = (ativo[k][p] || 0) + valor(x);
     else if (k === 'arma') ativo.arma = true; else ativo[k] += valor(v);
   }
-  for (const e of passivosDeItens(f)) {
+  for (const e of passivosItens) {
     for (const k of ['rdMental', 'dtRitual', 'ataque', 'dano', 'todasPericias', 'dadosTodas']) if (e[k]) ativo[k] += e[k];
     for (const [p, x] of Object.entries(e.dadosPericia || {})) ativo.dadosPericia[p] = (ativo.dadosPericia[p] || 0) + x;
   }
@@ -540,7 +566,7 @@ export function derivar(f, { armaUid, periciaAtaque } = {}) {
   const sentidoTatico = 0, combateDefensivo = ativo.ataqueDados < 0;
   let defesa = 10 + (crianca ? 2 : 0) + at.agi + defProt + soma('defesa') + f.bonus.defesa + ajusteDados.defesa - (sobrecarregado ? 5 : 0) + ativo.defesa;
   // Defesa por partes (para a ficha mostrar de onde vem cada ponto); a soma das partes é a Defesa
-  const efsItens = [...passivosDeItens(f), ...passivosComuns(f)].filter(e => e.defesa);
+  const efsItens = passivosItens.filter(e => e.defesa);
   const defItensEf = efsItens.reduce((s, e) => s + Number(e.defesa), 0);
   const defesaPartes = {
     base: 10 + (crianca ? 2 : 0), agilidade: at.agi,
@@ -582,6 +608,7 @@ export function derivar(f, { armaUid, periciaAtaque } = {}) {
     if (p.id === 'intimidacao' && f.poderes.some(x => x.id === 'valentao') && at.for > at.pre) atr = 'for';
     if (p.id === 'ocultismo' && f.poderes.some(x => x.id === 'olhar-sinistro') && at.pre > at.int) atr = 'pre';
     if (forcaSaber && f.escolhas.forcaSaber === p.id) atr = 'int';
+    atr = f.atributosPericias?.[p.id] || atr;
     if (p.id === 'intuicao' && tem('intEmIntuicao')) extra += at.int;
     if (p.carga) extra -= penalCarga;
     if (['fortitude', 'reflexos', 'vontade'].includes(p.id)) extra += resist;
@@ -631,8 +658,9 @@ export function derivar(f, { armaUid, periciaAtaque } = {}) {
     const notas = [];
     if (efeitosCondicao.has('agarrado') || efeitosCondicao.has('enredado')) ajuste -= 1;
     if (a.uso === 'corpo' && efeitosCondicao.has('caido')) ajuste -= 2;
-    if (a.uso === 'corpo' || a.uso === 'arremesso') danoExtra += at.for;
-    if ((a.uso === 'disparo' || a.uso === 'fogo') && tem('agiDisparo')) danoExtra += at.agi;
+    const atrDanoPadrao = ['corpo', 'arremesso'].includes(a.uso) ? 'for' : tem('agiDisparo') ? 'agi' : '';
+    const atrDano = a.uid === armaUid && atributoDano ? atributoDano : atrDanoPadrao;
+    danoExtra += at[atrDano] || 0;
     if (a.uso === 'corpo') { danoExtra += soma('danoCorpo'); dadosExtras += soma('dadoCorpo'); }
     if (a.uso === 'fogo') danoExtra += soma('danoFogo');
     if (temPoder('ninja-urbano') && (a.uso === 'corpo' || a.uso === 'disparo')) { danoExtra += 2; notas.push('Ninja Urbano +2'); }
@@ -651,7 +679,7 @@ export function derivar(f, { armaUid, periciaAtaque } = {}) {
     const dadoBase = `${(qtd || 1) + dadosExtras}d${lados}`;
     const resto = a.dano.replace(/^\s*\d*d\d+/, '');
     const formula = dadoBase + dadosDeCritico.map(x => '+' + x).join('') + resto + extrasDados.map(x => '+' + x).join('') + (danoExtra ? (danoExtra > 0 ? `+${danoExtra}` : `${danoExtra}`) : '');
-    return { ...a, mult, gruposCritico: 1 + dadosDeCritico.length + (a.extraMultiplica ? (resto.match(/\d*d\d+/g) || []).length : 0), bloqueadaTamanho: pequeno && a.maos === 2, pericia, periciaNome: pe.nome, dados: dadosDoTeste(at[pe.atrUsado], ajuste), bonus: pe.bonus + bonusAtaque, formula, margem: Math.max(2, margem), temProf, notas, categoriaEfetiva: Math.min(4, Math.max(0, a.categoria + (a.mods || []).length - (a.favorita ? favoritaReducao : 0))) };
+    return { ...a, mult, gruposCritico: 1 + dadosDeCritico.length + (a.extraMultiplica ? (resto.match(/\d*d\d+/g) || []).length : 0), bloqueadaTamanho: pequeno && a.maos === 2, pericia, periciaNome: pe.nome, dados: dadosDoTeste(at[pe.atrUsado], ajuste), bonus: pe.bonus + bonusAtaque, formula, margem: Math.max(2, margem), temProf, notas, categoriaEfetiva: categoriaEquipamento(a, a.favorita ? favoritaReducao : 0) };
   });
 
   // --- habilidades liberadas ---
@@ -706,21 +734,22 @@ export function derivar(f, { armaUid, periciaAtaque } = {}) {
   const circulosAprender = f.paranormais.filter(p => p.id === 'aprender-ritual').slice(0, Math.max(0, at.int))
     .map(p => p.circuloAprender || circuloDeAprender(nexAtual));
   const circuloMax = Math.max(circuloClasse, ...circulosAprender);
-  const dtRitual = 10 + limitePE + at.pre;
+  const dtRitual = 10 + limitePE + at.pre + ativo.dtRitual;
   const elementosEsp = f.poderes.filter(p => p.id === 'especialista-em-elemento').map(p => semAcento(p.escolha));
   const elementosMestre = f.poderes.filter(p => p.id === 'mestre-em-elemento').map(p => semAcento(p.escolha));
   const prediletos = f.poderes.filter(p => p.id === 'ritual-predileto').map(p => semAcento(p.escolha));
   const eficientes = f.trilha === 'graduado' && trilhaLiberada(f, 13) ? 5 : 0;
-  const rituais = f.rituais.map(r => {
+  const rituais = (ritualExtra ? [...f.rituais, ritualExtra] : f.rituais).map(r => {
     const elementos = r.elementos?.length ? r.elementos : [semAcento(r.elemento)], notas = [];
-    let custo = CIRCULOS[r.circulo - 1].custo, dt = dtRitual + eficientes + ativo.dtRitual;
+    let custo = CIRCULOS[r.circulo - 1].custo, dt = dtRitual + eficientes;
     if (eficientes) notas.push('Rituais Eficientes +5 DT');
     if (elementos.some(el => elementosEsp.includes(el))) { dt += 2; notas.push('Especialista em Elemento +2 DT'); }
     if (elementos.some(el => elementosMestre.includes(el))) { custo -= 1; notas.push('Mestre em Elemento −1'); }
     if (prediletos.includes(semAcento(r.nome))) { custo -= 1; notas.push('Ritual Predileto −1'); }
-    let formula = r.formula;
-    if (formula && temPoder('ritual-potente')) { formula += `+${at.int}`; notas.push('Ritual Potente +Int'); }
-    return { ...r, custo: Math.max(1, custo), dt, formulaFinal: formula, notas };
+    const bonusFormula = temPoder('ritual-potente') ? at.int : 0;
+    const formulaFinal = r.formula && bonusFormula ? r.formula + `+${bonusFormula}` : r.formula;
+    if (bonusFormula && (r.formula || Object.values(r.formulasAvancadas || {}).some(Boolean))) notas.push('Ritual Potente +Int');
+    return { ...r, custo: Math.max(1, custo), dt, formulaFinal, bonusFormula, notas };
   });
 
   // --- quantos rituais pode conhecer ---
@@ -751,8 +780,8 @@ export function derivar(f, { armaUid, periciaAtaque } = {}) {
   const patente = { ...patBase, itens: f.classe === 'mundano' ? [1, 0, 0, 0] : f.limitesItens || patBase.itens, credito: f.creditoManual || patBase.credito, itensEditados: !!f.limitesItens, creditoEditado: !!f.creditoManual };
   const usoCategoria = [0, 0, 0, 0, 0];
   for (const a of ataques) if (!a.automatica) usoCategoria[a.categoriaEfetiva]++;
-  for (const p of f.protecoes) usoCategoria[Math.min(4, p.categoria + p.mods.length + Number(p.mods.some(m => MODIFICACAO[m]?.maldicao)))]++;
-  for (const i of f.itens) if (i.qtd > 0) usoCategoria[Math.max(0, Math.min(4, i.categoria + (i.mods || []).length + (i.maldicoes || []).length) - (i === itemMochila ? 1 : 0))]++;
+  for (const p of f.protecoes) usoCategoria[categoriaEquipamento(p)]++;
+  for (const i of f.itens) if (i.qtd > 0) usoCategoria[Math.max(0, categoriaEquipamento(i) - (i === itemMochila ? 1 : 0))]++;
   if (!ehSobrevivente(f)) for (let c = 1; c <= 4; c++) if (usoCategoria[c] > patente.itens[c - 1]) avisos.push(`Itens de categoria ${'I'.repeat(c).replace('IIII', 'IV')}: ${usoCategoria[c]} de ${patente.itens[c - 1]} permitidos pela patente.`);
 
   // --- recursos atuais (null = cheio) ---
@@ -766,6 +795,9 @@ export function derivar(f, { armaUid, periciaAtaque } = {}) {
   const iniciativa = PER.iniciativa;
   const bloqueio = PER.fortitude.grau >= 1 ? PER.fortitude.bonus + (f.trilha === 'tropa' && trilhaLiberada(f, 2) ? at.vig : 0) + soma('bloqueio') : null;
   let rdMental = (tem('rdMentalInt') ? at.int : 0) + ativo.rdMental;
+  const rdElemento = {};
+  const fontesRD = [...passivosItens, ...vestidas.flatMap(modsP)];
+  for (const e of fontesRD) for (const [el, valor] of Object.entries(e.rdElemento || {})) rdElemento[el] = Math.max(rdElemento[el] || 0, valor);
   if (f.trilha === 'intuitivo' && trilhaLiberada(f, 13)) rdMental = Math.max(rdMental, 10);
   const esquiva = PER.reflexos.grau >= 1 ? PER.reflexos.bonus : null; // bônus de Reflexos somado à Defesa ao esquivar (LR p. 88)
   const esquivaTotal = esquiva == null ? null : defesa + esquiva + f.bonus.esquiva;
@@ -798,7 +830,7 @@ export function derivar(f, { armaUid, periciaAtaque } = {}) {
     defesa, rd, desl, cargaMax, cargaUsada, sobrecarregado, itemMochila: itemMochila?.uid || '', temMochilaUtil, penalCarga, prof, pericias, PER, ataques, habilidades, trilha, trilhaHabs,
     poderesEscolhidos, expansao, forcaSaber, slotsPoder, slotsAtributo, slotsGrau, versatilidade, trilhaEm, transcenderes, limiteTranscender, transcenderSeparado, transcenderNexLivre, transcenderTrilhaLivre, pontosPossessao, possuido: tem('possuido'), limiteParanormais, paranormaisUsados, paranormalDaOrigem, porElemento, ativo, sangueFervente,
     limiteAcao: limitePE + soma('limiteAcao'), circuloMax, vagasRituais, vagasEspecificas, dtRitual, rituais, patente, usoCategoria,
-    iniciativa, bloqueio, esquiva, esquivaTotal, defesaPartes, rdMental, sentidoTatico, combateDefensivo, avisos: [...new Set(avisos)], efs, ajusteDados,
+    iniciativa, bloqueio, esquiva, esquivaTotal, defesaPartes, rdMental, rdElemento, sentidoTatico, combateDefensivo, avisos: [...new Set(avisos)], efs, ajusteDados,
     progressao: progressaoTexto(f, n),
   };
 }

@@ -1,4 +1,6 @@
-import { MODIFICACAO, PODER_PARANORMAL, RITUAIS } from './catalogo.js?v=0.40.3';
+import { MODIFICACAO, PODER_PARANORMAL, RITUAIS } from './catalogo.js?v=0.40.5';
+export const ELEMENTOS_MALDICAO = ['conhecimento', 'energia', 'morte', 'sangue', 'medo'];
+export const PROTECAO_ELEMENTAL = 'Acessório amaldiçoado: Proteção Elemental';
 // ═══════════ amaldicoados ═══════════
 // amaldicoados.js — efeitos dos itens amaldiçoados e paranormais para a aba Combate › Itens amaldiçoados.
 // Fontes: Livro de Regras (p. 147–151 impressas), Sobrevivendo ao Horror (p. 57–61) e Arquivos Secretos.
@@ -23,6 +25,7 @@ import { MODIFICACAO, PODER_PARANORMAL, RITUAIS } from './catalogo.js?v=0.40.3';
 
 const FIS = { acrobacia: 5, crime: 5, furtividade: 5, iniciativa: 5, pilotagem: 5, pontaria: 5, reflexos: 5, atletismo: 5, luta: 5, fortitude: 5 };
 
+export const CONJURACAO = 'Acessório amaldiçoado: Conjuração';
 export const AMALDICOADOS = {
   // ───────── Livro de Regras · Sangue ─────────
   'Pérola de Sangue': { el: 'sangue', usos: [
@@ -115,21 +118,21 @@ export const AMALDICOADOS = {
   'Dedo Decepado': { el: 'variavel', vestir: 'Vestido', nota: 'Após 7 dias contínuos, concede o poder vinculado. Dormir e relaxar resolvem o risco no Interlúdio. Se for visto, aplique −10 em Diplomacia.' },
 
   // ───────── Acessórios amaldiçoados (Livro de Regras p. 147) ─────────
-  'Acessório amaldiçoado: Carisma': { el: 'conhecimento', vestir: 'Vestido', passivo: { atr: { pre: 1 } }, nota: 'Não dá PE. Preço: perde 2 SAN ao falhar em testes de Intelecto.' },
+  'Acessório amaldiçoado: Carisma': { el: 'conhecimento', vestir: 'Vestido', passivo: { atr: { pre: 1 }, semPE: 1 }, nota: 'Não dá PE. Preço: perde 2 SAN ao falhar em testes de Intelecto.' },
   'Acessório amaldiçoado: Sagacidade': { el: 'conhecimento', vestir: 'Vestido', passivo: { atr: { int: 1 } }, nota: 'Não dá perícias nem graus. Preço: perde 2 SAN ao falhar em testes de Intelecto.' },
   'Acessório amaldiçoado: Escudo Mental': { el: 'conhecimento', vestir: 'Vestido', passivo: { rdMental: 10 }, nota: 'Preço: perde 2 SAN ao falhar em testes de Intelecto.' },
-  'Acessório amaldiçoado: Conjuração': { el: 'conhecimento', vestir: 'Empunhado', nota: 'Guarda um ritual de 1º círculo (conjura como se conhecesse; se já conhece, –1 PE). Preço: perde 2 SAN ao falhar em testes de Intelecto.' },
+  [CONJURACAO]: { el: 'conhecimento', vestir: 'Empunhado', nota: 'Guarda um ritual de 1º círculo (conjura como se conhecesse; se já conhece, –1 PE). Preço: perde 2 SAN ao falhar em testes de Intelecto.' },
   'Acessório amaldiçoado: Reflexão': { el: 'conhecimento', vestir: 'Vestido', nota: 'Preço: perde 2 SAN ao falhar em testes de Intelecto.', usos: [
     { nome: 'Refletir um ritual', acao: 'reação', custoPergunta: 'PE igual ao custo do ritual', nota: 'Uma vez por rodada.' },
   ] },
   'Acessório amaldiçoado: Defesa': { el: 'energia', vestir: 'Vestido', passivo: { defesa: 5 }, nota: 'Preço: perde 2 SAN ao falhar em testes de Agilidade.' },
   'Acessório amaldiçoado: Destreza': { el: 'energia', vestir: 'Vestido', passivo: { atr: { agi: 1 } }, nota: 'Preço: perde 2 SAN ao falhar em testes de Agilidade.' },
   'Acessório amaldiçoado: Potência': { el: 'energia', vestir: 'Vestido', passivo: { dtRitual: 1 }, nota: '+1 na DT de habilidades, poderes e rituais (o site soma nos rituais). Preço: perde 2 SAN ao falhar em testes de Agilidade.' },
-  'Acessório amaldiçoado: Esforço Adicional': { el: 'morte', vestir: 'Vestido há 1 dia', passivo: { pe: 5 }, nota: 'Preço: perde 2 SAN ao falhar em testes de Presença.' },
+  'Acessório amaldiçoado: Esforço Adicional': { el: 'morte', vestir: 'Vestido há 1 dia', diasMinimos: 1, passivo: { pe: 5 }, nota: 'Preço: perde 2 SAN ao falhar em testes de Presença.' },
   'Acessório amaldiçoado: Disposição': { el: 'sangue', vestir: 'Vestido', passivo: { atr: { vig: 1 } }, nota: 'Preço: perde 2 SAN ao falhar em testes de Vigor.' },
   'Acessório amaldiçoado: Pujança': { el: 'sangue', vestir: 'Vestido', passivo: { atr: { for: 1 } }, nota: 'Preço: perde 2 SAN ao falhar em testes de Vigor.' },
-  'Acessório amaldiçoado: Vitalidade': { el: 'sangue', vestir: 'Vestido há 1 dia', passivo: { pv: 15 }, nota: 'Preço: perde 2 SAN ao falhar em testes de Vigor.' },
-  'Acessório amaldiçoado: Proteção Elemental': { el: 'variavel', vestir: 'Vestido', nota: 'Resistência 10 contra o elemento escolhido. Preço: perde 2 SAN ao falhar em testes do atributo do elemento.' },
+  'Acessório amaldiçoado: Vitalidade': { el: 'sangue', vestir: 'Vestido há 1 dia', diasMinimos: 1, passivo: { pv: 15 }, nota: 'Preço: perde 2 SAN ao falhar em testes de Vigor.' },
+  [PROTECAO_ELEMENTAL]: { el: 'variavel', vestir: 'Vestido', nota: 'Resistência 10 contra o elemento escolhido. Preço: perde 2 SAN ao falhar em testes do atributo do elemento.' },
 
   // ───────── Sobrevivendo ao Horror (p. 57–61) ─────────
   'Conector de membros': { el: 'sangue', usos: [
@@ -259,15 +262,23 @@ export const AMALDICOADOS = {
 // lista de nomes, para o botão "Adicionar item amaldiçoado"
 export const NOMES_AMALDICOADOS = Object.keys(AMALDICOADOS);
 
+export function passivoAmaldicoado(item, nome, elemento) {
+  const def = AMALDICOADOS[nome];
+  if (def?.diasMinimos && (item.diasVestido || 0) < def.diasMinimos) return null;
+  if (nome === PROTECAO_ELEMENTAL && ELEMENTOS_MALDICAO.includes(elemento)) return { rdElemento: { [elemento]: 10 } };
+  return def?.passivo;
+}
+
 // efeito passivo dos itens marcados (ativo) — usado pelo motor de regras
 export function passivosDeItens(ficha) {
   const out = [];
   const vistos = new Set();
   for (const it of ficha.itens || []) {
-    const def = AMALDICOADOS[it.nome];
-    if (!it.ativo || !it.qtd || !def?.passivo || vistos.has(it.nome)) continue;
+    if (!it.ativo || !it.qtd || vistos.has(it.nome)) continue;
+    const passivo = passivoAmaldicoado(it, it.nome, it.elementoMaldicao);
+    if (!passivo) continue;
     vistos.add(it.nome);
-    out.push({ fonte: it.nome, ...def.passivo });
+    out.push({ fonte: it.nome, ...passivo });
   }
   return out;
 }
@@ -275,21 +286,35 @@ export function passivosDeItens(ficha) {
 // ═══════════ preco-maldicao ═══════════
 export function registrarMaldições(ficha, itemUsado) {
   const registrar = (chave, el) => {
-    if (['conhecimento', 'energia', 'morte', 'sangue', 'medo'].includes(el)) ficha.maldicoesAceitas[chave] ??= el;
+    if (ELEMENTOS_MALDICAO.includes(el)) ficha.maldicoesAceitas[chave] ??= el;
+  };
+  const registrarCopias = (prefixo, entradas) => {
+    const contagem = new Map();
+    for (const [id, el] of entradas) {
+      if (!ELEMENTOS_MALDICAO.includes(el)) continue;
+      const chave = prefixo + id, n = (contagem.get(chave) || 0) + 1;
+      contagem.set(chave, n);
+      registrar(n === 1 ? chave : `${chave}:${n}`, el);
+    }
   };
   for (const i of ficha.itens) {
-    if (i.qtd && (i.escrito || i.ativo)) for (const n of i.maldicoes || []) registrar('item:' + i.uid + ':' + n.replace('Acessório amaldiçoado: ', '').replace(/\s+/g, '-'), AMALDICOADOS[n]?.el);
+    if (i.qtd && (i.escrito || i.ativo)) registrarCopias('item:' + i.uid + ':', (i.maldicoes || []).map((n, k) => {
+      const nome = n.replace('Acessório amaldiçoado: ', '').replace(/\s+/g, '-');
+      const el = n === PROTECAO_ELEMENTAL ? i.elementosMaldicoes?.[k] : AMALDICOADOS[n]?.el;
+      return [n === PROTECAO_ELEMENTAL ? `${nome}:${el}` : nome, el];
+    }));
     if (!i.qtd || (!i.ativo && i !== itemUsado)) continue;
     const el = AMALDICOADOS[i.nome]?.el;
+    if (i.nome === PROTECAO_ELEMENTAL) { registrar(`item:${i.uid}:${i.elementoMaldicao}`, i.elementoMaldicao); continue; }
     registrar('item:' + i.uid, el === 'variavel' || !el
       ? PODER_PARANORMAL[i.poderDedo]?.elemento || RITUAIS.find(r => r.id === i.ritualSelo)?.elemento
       : el);
   }
   for (const p of ficha.protecoes.filter(p => p.vestida)) {
-    for (const m of p.mods) registrar('protecao:' + p.uid + ':' + m, MODIFICACAO[m]?.maldicao);
+    registrarCopias('protecao:' + p.uid + ':', p.mods.map(m => [m, MODIFICACAO[m]?.maldicao]));
   }
   if (itemUsado && ficha.armas.some(a => a.uid === itemUsado.uid)) {
-    for (const m of itemUsado.mods) registrar('arma:' + itemUsado.uid + ':' + m, MODIFICACAO[m]?.maldicao);
+    registrarCopias('arma:' + itemUsado.uid + ':', (itemUsado.mods || []).map(m => [m, MODIFICACAO[m]?.maldicao]));
     if (itemUsado.maldicao?.tipo === 'propria') registrar('arma:' + itemUsado.uid + ':propria', itemUsado.maldicao.elemento);
   }
 }

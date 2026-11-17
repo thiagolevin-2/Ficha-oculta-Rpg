@@ -1,19 +1,20 @@
-import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS } from './amaldicoados.js?v=0.40.3';
-import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.40.3';
-import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO } from './regras.js?v=0.40.3';
-import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, analisar } from './combate.js?v=0.40.3';
-import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.40.3';
-import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.3';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.40.3';
-import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.40.3';
+import { carregarModelosItens, salvarModelosItens } from './armazenamento.js?v=0.40.5';
+import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS, CONJURACAO, PROTECAO_ELEMENTAL, ELEMENTOS_MALDICAO, passivoAmaldicoado } from './amaldicoados.js?v=0.40.5';
+import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.40.5';
+import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO, quantidadeMaldicoes, categoriaEquipamento } from './regras.js?v=0.40.5';
+import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, analisar } from './combate.js?v=0.40.5';
+import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.40.5';
+import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.5';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.40.5';
+import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.40.5';
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.40.3', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.40.3', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.40.5', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.40.5', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
   // Os textos do Sobrevivendo ao Horror foram conferidos com o PDF e estão em dados/textos.json (v0.23).
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
@@ -46,7 +47,7 @@ export function telaFicha(f, ui) {
   const d = derivar(f);
   dAtual = d;
   const aba = ui.aba || 'agente';
-  const corpo = ({ agente: abaAgente, combate: abaCombate, rolagens: abaRolagens, macros: abaMacros, habilidades: abaHabilidades, poderes: abaPoderes, rituais: abaRituais, inventario: abaInventario, notas: abaNotas }[aba] || abaAgente)(f, d, ui);
+  const corpo = ({ agente: abaAgente, combate: abaCombate, rolagens: abaRolagens, macros: (fx, dx) => abaMacros(fx, dx), habilidades: abaHabilidades, poderes: abaPoderes, rituais: abaRituais, inventario: abaInventario, notas: abaNotas }[aba] || abaAgente)(f, d, ui);
   return `<div class="pagina pagina-ficha">
   ${f.morto ? '<p class="etiqueta alerta" role="status">Agente morto</p>' : ''}
   <div class="ficha-identificador"><span>DOSSIÊ DE AGENTE / REGISTRO INDIVIDUAL</span><span class="selo">CONFIDENCIAL</span></div>
@@ -97,6 +98,10 @@ function caixaTemp(f, d) {
   return `<div class="linha" style="margin-top:8px"><span class="rotulo">${k} temporários</span><input type="number" min="0" style="width:72px;min-height:32px" data-campo="recursos.peTemp" data-tipo="int" id="rec-petemp" value="${f.recursos.peTemp}" aria-label="${k} temporários"><small class="apagado">gastos primeiro; somem no fim da cena</small></div>`;
 }
 
+function opcoesAtributos(atual) {
+  return ATRIBUTOS.map(a => `<option value="${a.id}" ${atual === a.id ? 'selected' : ''}>${a.id.toUpperCase()}</option>`).join('');
+}
+
 function abaAgente(f, d) {
   const efeitos = painelEfeitos(f, d);
   const recursos = [recurso('PV', 'Vida', 'var(--pv)', d.atual.pv, d.pv, 'pv', d.machucado ? '<small class="etiqueta alerta" style="margin-top:6px">Machucado</small>' : '')];
@@ -143,7 +148,7 @@ function abaAgente(f, d) {
       <div class="pericia-linha pericia-cabeca" role="row"><span role="columnheader">Perícia</span><span role="columnheader">Atr.</span><span role="columnheader">Grau</span><span role="columnheader" class="esconde-celular">Outros</span><span role="columnheader">Rolar</span></div>
     ${d.pericias.map(p => { const g = f.pericias[p.id] || 0; return `<div class="pericia-linha grau-${g}${p.bloqueada ? ' pericia-bloq' : ''}" role="row">
       <span class="pericia-nome" role="cell">${esc(p.nome)}${p.id === 'profissao' && f.profissao ? ` <small>(${esc(f.profissao)})</small>` : ''}${p.treinada ? ' <small title="Só treinada">*</small>' : ''}${p.carga ? ' <small title="Penalidade de carga">+</small>' : ''}</span>
-      <span class="pericia-atr" role="cell">${p.atrUsado.toUpperCase()}</span>
+      <span class="pericia-atr" role="cell"><select data-campo="atributosPericias.${p.id}" aria-label="Atributo padrão de ${esc(p.nome)}"><option value="">Auto${f.atributosPericias[p.id] ? '' : ` · ${p.atrUsado.toUpperCase()}`}</option>${opcoesAtributos(f.atributosPericias[p.id])}</select></span>
       <span role="cell"><select class="pericia-grau" data-campo="pericias.${p.id}" data-tipo="int" aria-label="Grau em ${esc(p.nome)}">${GRAUS.map(x => `<option value="${x.id}" ${g === x.id ? 'selected' : ''}>${x.nome}</option>`).join('')}</select></span>
       <span class="esconde-celular" role="cell"><input type="number" class="pericia-outros" data-campo="bonusPericia.${p.id}" data-tipo="int" id="bp-${p.id}" value="${f.bonusPericia[p.id] || ''}" placeholder="0" aria-label="Bônus extra em ${esc(p.nome)}"></span>
       <span class="pericia-rolar" role="cell"><button class="rolavel rolar-d20" data-acao="rolar-pericia" data-id="${p.id}" title="${p.bloqueada ? 'Só pode ser usada se treinado. ' : ''}Rolar ${esc(p.nome)}" aria-label="Rolar ${esc(p.nome)}: ${textoTeste(p.dados, p.bonus)}">${ICONE_D20}<span class="d">${textoTeste(p.dados, p.bonus)}</span></button><button class="btn pequeno fantasma" data-acao="pericia-atributo" data-id="${p.id}" aria-label="Escolher atributo de ${esc(p.nome)}" title="Escolher atributo para esta rolagem">Atributo</button></span>
@@ -173,6 +178,7 @@ function descreverPassivo(p) {
   if (p.defesa) partes.push(`${comSinal(p.defesa)} Defesa`); if (p.desl) partes.push(`${comSinal(p.desl)} m desloc.`);
   if (p.carga) partes.push(`${comSinal(p.carga)} espaços de carga`); if (p.bloqueio) partes.push(`${comSinal(p.bloqueio)} no Bloqueio`); if (p.resistencia) partes.push(`${comSinal(p.resistencia)} em resistências`);
   if (p.rd) partes.push(`RD ${p.rd}`); if (p.rdMental) partes.push(`RD mental ${p.rdMental}`); if (p.dtRitual) partes.push(`${comSinal(p.dtRitual)} DT de rituais`);
+  for (const [el, valor] of Object.entries(p.rdElemento || {})) partes.push(`RD ${valor} a ${NOME_EL[el]}`);
   if (p.ataque) partes.push(`${comSinal(p.ataque)} ataque`); if (p.dano) partes.push(`${comSinal(p.dano)} dano`);
   for (const [k, v] of Object.entries(p.pericia || {})) partes.push(`${comSinal(v)} ${PERICIA[k]?.nome || k}`);
   for (const [k, v] of Object.entries(p.dadosPericia || {})) partes.push(`${v > 0 ? '+' : '−'}${Math.abs(v)}d20 ${PERICIA[k]?.nome || k}`);
@@ -186,10 +192,13 @@ function custoDoUso(u, it) {
 }
 function abaAmaldicoados(f, d) {
   const lista = f.itens.map((it, i) => [it, i]).filter(([it]) => AMALDICOADOS[it.nome]);
+  const aplicadas = f.itens.filter(it => !AMALDICOADOS[it.nome] && it.maldicoes?.length && it.qtd).map(it =>
+    `<div class="hab"><b>${esc(it.nome)}</b><p>${esc(efeitoDoItem(it))}</p>${botoesUsosMaldicoes(it)}${botoesConjuracao(it)}</div>`);
   const outros = f.itens.filter(it => !AMALDICOADOS[it.nome] && /amaldiço|paranormal/i.test(ITEM_INFO[it.nome]?.grupo || ''));
   const cartao = ([it, i]) => {
     const def = AMALDICOADOS[it.nome], el = COR_EL[def.el] || 'variavel', info = ITEM_INFO[it.nome];
-    const passivo = def.passivo ? descreverPassivo(def.passivo) : '';
+    const ef = passivoAmaldicoado(it, it.nome, it.elementoMaldicao);
+    const passivo = ef ? descreverPassivo(ef) : '';
     const usos = (def.usos || []).map((u, k) => {
       const c = custoDoUso(u, it), dtExtra = u.teste?.porUso ? u.teste.porUso * it.usosDia : 0;
       const det = [u.acao, c, u.teste ? `${PERICIA[u.teste.pericia]?.nome} DT ${u.teste.dt + dtExtra}` : '', u.rolar ? u.rolar.f : ''].filter(Boolean).join(' · ');
@@ -202,15 +211,18 @@ function abaAmaldicoados(f, d) {
       ${def.nota ? `<p class="apagado" style="font-size:.88rem">${esc(def.nota)}</p>` : ''}
       ${def.vestir || def.passivo ? `<label class="check" style="margin-top:6px"><input type="checkbox" data-campo="itens.${i}.ativo" data-tipo="bool" ${it.ativo ? 'checked' : ''}> <span><b>${esc(def.vestir || 'Em uso')}</b>${passivo ? ` <small>— aplica ${esc(passivo)}</small>` : ''}</span></label>` : ''}
       ${it.nome === 'Dedo Decepado' ? `<button class="btn pequeno" data-acao="dias-dedo" data-uid="${esc(it.uid)}">Dias de uso: ${it.diasVestido}</button> <button class="btn pequeno" data-acao="vincular-item" data-i="${i}">Vincular poder</button>` : ''}
+      ${def.diasMinimos ? botaoDiasMaldicao(it) : ''}
+      ${it.nome === PROTECAO_ELEMENTAL ? botaoElementoMaldicao(it, i) : ''}
       ${usos ? `<div class="linha" style="margin-top:8px;flex-wrap:wrap">${usos}</div>` : ''}
+      ${botoesConjuracao(it)}
       ${it.usosDia || it.carga ? `<div class="linha" style="margin-top:6px">${it.usosDia ? `<button class="btn pequeno fantasma" data-acao="zerar-usos-amaldicoado" data-uid="${esc(it.uid)}">Novo dia (zerar usos)</button>` : ''}</div>` : ''}
     </div>`;
   };
   return `<section class="painel"><div class="titulo-secao"><h2 class="faixa sangue">Itens amaldiçoados</h2><button class="btn pequeno" data-acao="add-amaldicoado-lista">+ Item amaldiçoado</button></div>
-    <p class="apagado" style="font-size:.88rem">Marque a caixinha quando o item estiver vestido ou empunhado: o efeito passivo entra na ficha. Os botões cobram PE, fazem os testes (a DT sobe com os usos do dia), rolam os dados e aplicam cura, dano, condições e efeitos ativos. Resistências por tipo de dano ficam na nota de cada item.</p>
+    <p class="apagado" style="font-size:.88rem">Equipe o item para ativar seus efeitos passivos. Quando disponível, o botão do efeito cobra o custo e resolve as rolagens.</p>
     <div class="linha"><button class="btn pequeno" data-acao="preco-maldicao">Registrar falha na mesa</button>
       <button class="btn pequeno" data-acao="fim-maldicao">Rever maldições entre missões</button></div>
-    ${lista.length ? `<div class="lista-hab">${lista.map(cartao).join('')}</div>` : '<p class="vazio">Nenhum item amaldiçoado no inventário. Use "+ Item amaldiçoado" ou adicione pela aba Inventário.</p>'}
+    ${lista.length || aplicadas.length ? `<div class="lista-hab">${lista.map(cartao).join('')}${aplicadas.join('')}</div>` : '<p class="vazio">Nenhum item amaldiçoado no inventário. Use "+ Item amaldiçoado" ou adicione pela aba Inventário.</p>'}
     ${outros.length ? `<p class="apagado" style="margin-top:10px">Outros itens paranormais no inventário (sem automação): ${outros.map(it => esc(it.nome)).join(', ')}.</p>` : ''}
   </section>
   ${painelEfeitos(f, d)}`;
@@ -227,6 +239,7 @@ function abaCombateArmas(f, d) {
     <p class="apagado">Controle ações e reações na mesa. Resolva manobras, testes opostos e ataques concedidos com o outro jogador.</p>
     <p class="apagado" style="font-size:.88rem">Corpo a corpo e arremesso somam Força no dano. No crítico, os dados da arma são multiplicados (bônus fixos não).${CLASSES[f.classe].nome === 'Combatente' ? ' Ataque Especial: gaste PE para +5 no ataque ou dano (use a bandeja de dados para somar o bônus).' : ''}</p>
   </section>
+  ${abaMacros(f, d, true)}
   <div class="grade c2" style="margin-top:14px">
   <section class="painel"><div class="titulo-secao"><h2 class="faixa">Proteção</h2><button class="btn pequeno" data-acao="add-protecao">+ Proteção</button></div>
     ${f.protecoes.length ? f.protecoes.map((p, i) => `<div class="linha" style="padding:6px 0;border-bottom:1px solid var(--linha)"><label class="check"><input type="checkbox" data-campo="protecoes.${i}.vestida" data-tipo="bool" ${p.vestida ? 'checked' : ''}> <span><b>${esc(p.nome)}</b> <small>Defesa +${p.defesa}${p.rd ? `, RD ${p.rd}` : ''} · cat. ${cat(p.categoria)} · ${p.espacos} esp.</small></span></label><span class="espaco"></span><button class="icone-btn" data-acao="remover" data-lista="protecoes" data-i="${i}" aria-label="Remover ${esc(p.nome)}">✕</button></div>`).join('') : '<p class="apagado">Sem proteção.</p>'}
@@ -334,11 +347,18 @@ function botoesDados(nome, texto) {
   }).join('');
 }
 // Dado de dano/cura de um ritual na forma escolhida (discente/verdadeira lidas do texto do ritual).
-function formulaDaForma(nome, forma, base, final) {
-  if (nome === 'Capturar Momento') return '';
+function formaRitual(r, cat, id) {
+  if (cat[id]) return cat[id];
+  if (r.proprio && (r.formulasAvancadas?.[id] || r[id]?.trim())) return { custo: r.custosAvancados[id] };
+  return null;
+}
+function formulaDaForma(r, cat, forma) {
+  const { nome, formula: base, formulaFinal: final } = r;
+  const escolhida = forma === 'basica' ? (base && (r.proprio || base !== (cat.dados || '')) ? base : '') : r.formulasAvancadas?.[forma];
+  if (escolhida) return escolhida + (r.bonusFormula ? `+${r.bonusFormula}` : '');
+  if (nome === 'Capturar Momento' || (forma !== 'basica' && r.proprio && !cat[forma])) return '';
   let f = final || base || '';
-  const id = RITUAIS.find(r => r.nome === nome)?.id;
-  const perfil = perfilRitual(id, forma);
+  const perfil = perfilRitual(cat.id, forma);
   if (perfil?.formula) {
     const extra = final && base && final.startsWith(base) ? final.slice(base.length) : '';
     return perfil.formula + (perfil.cura ? '' : extra);
@@ -664,28 +684,34 @@ function cartaoRitual(f, d, r, i) {
   const especial = cat.id === 'capturar-momento'
     ? '<button class="btn pequeno" data-acao="capturar-explodir" data-forma="discente">Explodir símbolo discente · 4d8</button><button class="btn pequeno" data-acao="capturar-explodir" data-forma="verdadeiro">Explodir símbolo verdadeiro · 8d8</button>'
     : cat.id === 'presenca-do-medo' ? '<button class="btn pequeno" data-acao="presenca-dano">Rolar os dois danos da área</button>' : '';
-  const formula = especial ? '' : calc.formulaFinal || r.formula;
+  const formula = especial ? '' : formulaDaForma(calc, cat, 'basica');
   const texto = textoCompleto('rituais', r.nome);
   const ocr = !texto ? textoOcr('rituais', r.nome) : null;
   return `<details class="ritual ritual-compacto el-${r.elemento}">
     <summary><span class="cab">${sigilo(r.elemento, 'var(--el)')}<b>${esc(r.nome)}</b></span>
-      <span class="linha resumo-rit"><span class="etiqueta">${custo} ${k}</span>${formula ? `<span class="etiqueta">${cat.tipoDados === 'cura' ? 'cura' : 'dano'} ${esc(formula)}</span>` : ''}<span class="etiqueta">DT ${calc.dt ?? d.dtRitual}</span></span>
+      <span class="linha resumo-rit"><span class="etiqueta">${custo} ${k}</span>${formula ? `<span class="etiqueta">${r.tipoDados === 'cura' ? 'cura' : 'dano'} ${esc(formula)}</span>` : ''}<span class="etiqueta">DT ${calc.dt ?? d.dtRitual}</span></span>
       <small class="apagado">${texto ? 'Descrição disponível abaixo' : ocr ? 'Texto do OCR abaixo (conferir no livro)' : 'Transcrição ainda não revisada'}</small>
       <span class="linha" style="margin-top:6px"><button class="btn pequeno sangue" data-acao="conjurar" data-i="${i}">Conjurar</button>${/sustentad/i.test(r.duracao) ? `<button class="btn pequeno" data-acao="sustentar-ritual" data-i="${i}">Sustentar</button>` : ''}${formula ? `<button class="btn pequeno" data-acao="rolar-ritual" data-i="${i}">Rolar ${esc(formula)}</button>` : ''}</span></summary>
     <div class="detalhes-rit">
       ${especial}
       ${!texto && !ocr ? `<p class="apagado">Descrição integral pendente de conferência: compare os dados com o PDF original.</p>${abrirPaginaSah('rituais',r.nome)}` : ''}
       <div class="grade-mini">
+        ${r.proprio ? campo('nome', 'Nome') : ''}
         <label class="campo"><span>Elemento</span><select data-campo="rituais.${i}.elemento">${ELEMENTOS.map(x => `<option value="${x.id}" ${r.elemento === x.id ? 'selected' : ''}>${x.nome}</option>`).join('')}</select></label>
         <label class="campo"><span>Círculo</span><select data-campo="rituais.${i}.circulo" data-tipo="int">${CIRCULOS.map(c => `<option value="${c.n}" ${r.circulo === c.n ? 'selected' : ''}>${c.n}º</option>`).join('')}</select></label>
         ${campo('execucao', 'Execução')}${campo('alcance', 'Alcance')}${campo('alvo', 'Alvo/Área')}${campo('duracao', 'Duração')}${campo('resistencia', 'Resistência')}
-        <label class="campo"><span>Dano/cura</span><input data-campo="rituais.${i}.formula" id="rit-${i}-formula" value="${esc(r.formula)}" placeholder="ex.: 3d6+3"></label>
+        ${!especial ? `<label class="campo"><span>Fórmula básica</span><input data-campo="rituais.${i}.formula" maxlength="40" id="rit-${i}-formula" value="${esc(r.formula)}" placeholder="ex.: 3d6+3"></label>
+        ${[['discente', 'discente'], ['verdadeiro', 'verdadeira']].filter(([id]) => r.proprio || cat[id]).map(([id, rotulo]) => `
+          <label class="campo"><span>Fórmula ${rotulo}</span><input data-campo="rituais.${i}.formulasAvancadas.${id}" maxlength="40" value="${esc(r.formulasAvancadas?.[id] || '')}" placeholder="ex.: 5d6+5"></label>
+          ${!cat[id] ? `<label class="campo"><span>Custo extra da forma ${rotulo} (${k})</span><input type="number" min="0" max="30" data-campo="rituais.${i}.custosAvancados.${id}" data-tipo="int" value="${r.custosAvancados[id]}"></label>` : ''}`).join('')}
+        ${r.proprio ? `<label class="campo"><span>Tipo de resultado</span><select data-campo="rituais.${i}.tipoDados"><option value="dano">Dano</option><option value="cura" ${r.tipoDados === 'cura' ? 'selected' : ''}>Cura</option></select></label>` : ''}` : ''}
         <label class="campo"><span>Outra rolagem após conjurar</span><input data-campo="rituais.${i}.rolagemExtra" value="${esc(r.rolagemExtra)}" placeholder="ex.: 1d4"></label>
       </div>
       <p class="linha" style="margin-top:8px">${forma(cat.discente, 'Discente')}${forma(cat.verdadeiro, 'Verdadeiro')}</p>
       ${calc.notas?.length ? `<p class="apagado" style="font-size:.85rem">${calc.notas.map(esc).join(' · ')}</p>` : ''}
       ${texto ? `<div class="texto-completo">${esc(texto)}</div>` : ocr ? blocoOcr(ocr) : '<p class="apagado">O texto completo deste ritual ainda não está disponível nos livros anexados.</p>'}
       <label class="campo" style="margin-top:8px"><span>Efeito / anotações (cole aqui o texto do seu livro, se quiser)</span><textarea data-campo="rituais.${i}.efeito" id="rit-${i}-efeito">${esc(r.efeito)}</textarea></label>
+      ${r.proprio ? `<div class="grade-mini">${[['discente', 'discente'], ['verdadeiro', 'verdadeira']].map(([id, rotulo]) => `<label class="campo"><span>Efeito da forma ${rotulo}</span><textarea data-campo="rituais.${i}.${id}" maxlength="400">${esc(r[id])}</textarea></label>`).join('')}</div>` : ''}
       <div class="linha fim" style="margin-top:6px"><button class="btn pequeno perigo" data-acao="esquecer-ritual" data-i="${i}">Esquecer ritual</button></div>
     </div></details>`;
 }
@@ -695,12 +721,18 @@ const MALDICOES_ACESSORIO = Object.keys(AMALDICOADOS).filter(n => n.startsWith('
 const NOME_EL_MALDICAO = { conhecimento: 'Conhecimento', energia: 'Energia', morte: 'Morte', sangue: 'Sangue', variavel: 'Elemento à escolha' };
 const alvoMod = (f, tipo, i) => (tipo === 'arma' ? f.armas[i] : tipo === 'protecao' ? f.protecoes[i] : f.itens[i]);
 const campoMod = (tipo, modo) => (tipo === 'item' && modo === 'amaldicoar' ? 'maldicoes' : 'mods');
+const itemEspecial = it => Object.hasOwn(AMALDICOADOS, it.nome) || /^Itens amaldiçoados/i.test(ITEM_INFO[it.nome]?.grupo || '');
+const botaoDiasMaldicao = it => `<button class="btn pequeno" data-acao="dias-maldicao" data-uid="${esc(it.uid)}">Dias de uso: ${it.diasVestido || 0}</button>`;
+const botaoElementoMaldicao = (it, i, k = -1) => {
+  const el = k < 0 ? it.elementoMaldicao : it.elementosMaldicoes?.[k];
+  return `<button class="btn pequeno" data-acao="elemento-maldicao" data-i="${i}" data-k="${k}">${el ? `Elemento: ${NOME_EL[el]}` : 'Escolher elemento'}</button>`;
+};
 // Opções da janela: modificações comuns ou maldições (arma pelo tipo de ataque, proteção pelo peso, acessório: maldições de acessório)
 function opcoesMod(f, tipo, alvo, modo) {
   if (tipo === 'item') return modo === 'amaldicoar'
-    ? MALDICOES_ACESSORIO.map(n => ({ id: n, nome: n.replace('Acessório amaldiçoado: ', ''), el: AMALDICOADOS[n].el, resumo: ITEM_INFO[n]?.resumo || AMALDICOADOS[n].nota || '' }))
+    && !itemEspecial(alvo) ? MALDICOES_ACESSORIO.map(n => ({ id: n, nome: n.replace('Acessório amaldiçoado: ', ''), el: AMALDICOADOS[n].el, resumo: ITEM_INFO[n]?.resumo || AMALDICOADOS[n].nota || '' }))
     : [];
-  const chave = tipo === 'arma' ? alvo.uso : alvo.peso;
+  const chave = tipo === 'arma' ? (modo === 'amaldicoar' ? 'corpo' : alvo.uso) : alvo.peso;
   return MODIFICACOES.filter(m => m.para.includes(chave) && (modo === 'amaldicoar' ? !!m.maldicao : !m.maldicao) && (m.fonte !== 'SaH' || f.modo === 'sah'))
     .sort((x, y) => x.nome.localeCompare(y.nome, 'pt'))
     .map(m => ({ id: m.id, nome: m.nome, el: m.maldicao, resumo: m.resumo, fonte: m.fonte, espacos: m.ef?.espacos || 0 }));
@@ -709,25 +741,30 @@ function opcoesMod(f, tipo, alvo, modo) {
 function numerosAlvo(d, tipo, alvo) {
   const mods = alvo.mods || [];
   const espMods = mods.reduce((x, m) => x + (MODIFICACAO[m]?.ef?.espacos || 0), 0);
-  if (tipo === 'arma') return { cat: d.ataques.find(x => x.uid === alvo.uid)?.categoriaEfetiva ?? Math.min(4, alvo.categoria + mods.length), esp: Math.max(0, alvo.espacos + espMods) };
-  if (tipo === 'protecao') return { cat: Math.min(4, alvo.categoria + mods.length + Number(mods.some(m => MODIFICACAO[m]?.maldicao))), esp: Math.max(0, alvo.espacos + espMods) };
-  return { cat: Math.min(4, alvo.categoria + mods.length + (alvo.maldicoes || []).length), esp: Math.max(0, alvo.espacos - Number(mods.includes('discreto'))) };
+  const mochila = tipo === 'item' && d.itemMochila === alvo.uid ? 1 : 0;
+  const categoria = tipo === 'arma' ? d.ataques.find(x => x.uid === alvo.uid)?.categoriaEfetiva : undefined;
+  return {
+    cat: categoria ?? Math.max(0, categoriaEquipamento(alvo) - mochila),
+    esp: Math.max(0, alvo.espacos + espMods - Number(tipo === 'item' && mods.includes('discreto')) - mochila),
+  };
 }
 // Os dois cartões: Modificar e Amaldiçoar
 function cartoesMod(d, tipo, i, alvo, daJanelaEditar = false) {
   const mods = alvo.mods || [];
-  const nMal = tipo === 'item' ? (alvo.maldicoes || []).length : mods.filter(m => MODIFICACAO[m]?.maldicao).length;
+  const nMal = quantidadeMaldicoes(alvo);
   const nMod = tipo === 'item' ? mods.length : mods.length - nMal;
   const n = numerosAlvo(d, tipo, alvo);
   const plural = (k, um, varios, nada) => (k ? `${k} ${k === 1 ? um : varios}` : nada);
   return `<div class="cartoes cartoes-mod">
-      <button class="cartao" data-acao="${tipo === 'item' ? 'acessorio' : daJanelaEditar ? 'editar-para-mod' : 'janela-mod'}" data-tipo="${tipo}" data-i="${i}" data-modo="modificar"><b>Modificar</b><small>${plural(nMod, 'modificação', 'modificações', 'Nenhuma modificação')}${tipo === 'item' ? ' · perícia' : ''}</small></button>
+      ${tipo !== 'item' || ehAcessorio(alvo) ? `<button class="cartao" data-acao="${tipo === 'item' ? 'acessorio' : daJanelaEditar ? 'editar-para-mod' : 'janela-mod'}" data-tipo="${tipo}" data-i="${i}" data-modo="modificar"><b>Modificar</b><small>${plural(nMod, 'modificação', 'modificações', 'Nenhuma modificação')}${tipo === 'item' ? ' · perícia' : ''}</small></button>` : ''}
       <button class="cartao cartao-amaldicoar" data-acao="${daJanelaEditar ? 'editar-para-mod' : 'janela-mod'}" data-tipo="${tipo}" data-i="${i}" data-modo="amaldicoar"><b>Amaldiçoar</b><small>${plural(nMal, 'maldição', 'maldições', 'Sem maldição')}</small></button>
     </div><small class="apagado">Categoria ${cat(n.cat)} · ${n.esp} espaço(s)</small>`;
 }
 function janelaMod(f, tipo, i, modo) {
   const alvo = alvoMod(f, tipo, i); if (!alvo) return;
   const d = derivar(f), n = numerosAlvo(d, tipo, alvo), marcadas = alvo[campoMod(tipo, modo)] || [], ops = opcoesMod(f, tipo, alvo, modo);
+  const amaldicoar = modo === 'amaldicoar';
+  const aumentoMal = quantidadeMaldicoes(alvo) ? '+I' : '+II';
   const lim = ehSobrevivente(f) ? null : d.patente?.itens;
   const painel = `<div class="numeros-chave numeros-mod">
       <div class="chave"><b>${cat(n.cat)}</b><span>Categoria</span></div><div class="chave"><b>${n.esp}</b><span>Espaços</span></div>
@@ -735,16 +772,21 @@ function janelaMod(f, tipo, i, modo) {
       ${n.cat && lim ? `<div class="chave"><b class="${d.usoCategoria[n.cat] > lim[n.cat - 1] ? 'erro' : ''}">${d.usoCategoria[n.cat]}/${lim[n.cat - 1]}</b><span>Itens cat. ${cat(n.cat)}</span></div>` : ''}</div>`;
   const cartao = o => {
     const on = marcadas.includes(o.id), el = o.el ? (NOME_EL_MALDICAO[o.el] ? o.el : 'variavel') : '';
-    return `<button class="cartao${el ? ` el-${el}` : ''}" ${el ? 'style="border-left:4px solid var(--el)"' : ''} aria-pressed="${on}" data-acao="alternar-mod" data-tipo="${tipo}" data-i="${i}" data-modo="${modo}" data-id="${esc(o.id)}">
-      <span class="linha"><b>${esc(o.nome)}</b><span class="espaco"></span>${fonteTag(o.fonte || '')}<span class="etiqueta">${on ? '✓ aplicada' : '+1 categoria'}</span></span>
+    return `<button class="cartao${el ? ` el-${el}` : ''}" ${el ? 'style="border-left:4px solid var(--el)"' : ''} ${amaldicoar ? '' : `aria-pressed="${on}"`} data-acao="alternar-mod" data-tipo="${tipo}" data-i="${i}" data-modo="${modo}" data-id="${esc(o.id)}">
+      <span class="linha"><b>${esc(o.nome)}</b><span class="espaco"></span>${fonteTag(o.fonte || '')}<span class="etiqueta">${amaldicoar ? `Adicionar · ${aumentoMal} categoria` : on ? '✓ aplicada' : '+1 categoria'}</span></span>
       <small>${esc(o.resumo)}</small>${o.espacos ? `<small class="apagado">${o.espacos > 0 ? '+' : '−'}${Math.abs(o.espacos)} espaço</small>` : ''}</button>`;
   };
+  const aplicadas = amaldicoar ? marcadas.map((id, k) => {
+    if (tipo !== 'item' && !MODIFICACAO[id]?.maldicao) return '';
+    const nome = MODIFICACAO[id]?.nome || id.replace('Acessório amaldiçoado: ', '');
+    return `<div class="def-linha"><span>${esc(nome)}</span><span class="linha">${id === PROTECAO_ELEMENTAL ? botaoElementoMaldicao(alvo, i, k) : ''}<button class="btn pequeno" data-acao="alternar-mod" data-tipo="${tipo}" data-i="${i}" data-modo="${modo}" data-id="${esc(id)}" data-k="${k}" aria-label="Remover ${esc(nome)}">Remover</button></span></div>`;
+  }).join('') : '';
   const corpo = modo === 'amaldicoar'
-    ? `${['conhecimento', 'energia', 'morte', 'sangue', 'variavel'].map(el => { const g = ops.filter(o => o.el === el); return g.length ? `<h3 class="titulo-vermelho el-${el}">${sigilo(el, 'var(--el)')} ${NOME_EL_MALDICAO[el]}</h3><div class="cartoes">${g.map(cartao).join('')}</div>` : ''; }).join('')}
-       <p class="apagado" style="font-size:.85rem;margin-top:10px">Preço das maldições: ao falhar num teste do atributo do elemento (Int para Conhecimento, Agi para Energia, Pre para Morte, For ou Vig para Sangue), perde 2 de Sanidade por maldição desse elemento.${tipo === 'arma' ? ' O ritual Amaldiçoar Arma (dano extra do elemento) fica em Editar.' : ''}${tipo === 'item' ? ' O efeito vale com o acessório equipado.' : ''}</p>`
+    ? `${aplicadas ? `<h3 class="titulo-vermelho">Maldições aplicadas</h3>${aplicadas}` : ''}${['conhecimento', 'energia', 'morte', 'sangue', 'variavel'].map(el => { const g = ops.filter(o => o.el === el); return g.length ? `<h3 class="titulo-vermelho el-${el}">${sigilo(el, 'var(--el)')} ${NOME_EL_MALDICAO[el]}</h3><div class="cartoes">${g.map(cartao).join('')}</div>` : ''; }).join('')}
+       <p class="apagado" style="font-size:.85rem;margin-top:10px">Preço das maldições: ao falhar num teste do atributo do elemento (Int para Conhecimento, Agi para Energia, Pre para Morte, For ou Vig para Sangue), perde 2 de Sanidade por maldição desse elemento.${tipo === 'arma' ? ' O ritual Amaldiçoar Arma (dano extra do elemento) fica em Editar.' : ''}${tipo === 'item' ? ' Equipe o item para ativar os efeitos passivos.' : ''}</p>`
     : `<div class="cartoes">${ops.map(cartao).join('') || '<p class="apagado">Não há modificações para este tipo.</p>'}</div>`;
   abrirModal(`${modo === 'amaldicoar' ? 'Amaldiçoar' : 'Modificar'} · ${alvo.nome}`,
-    `<p class="apagado">Clique para aplicar ou tirar. Cada ${modo === 'amaldicoar' ? 'maldição' : 'modificação'} aumenta a categoria em +1 (máximo IV). A ficha recalcula na hora.</p>${painel}${ops.length ? corpo : '<p class="apagado">Não há opções para este item.</p>'}`,
+    `<p class="apagado">${amaldicoar ? 'A primeira maldição soma +II à categoria, e as seguintes somam +I. A categoria exibida vai até IV.' : 'Clique para aplicar ou tirar. Cada modificação soma +I à categoria, até IV.'}</p>${painel}${ops.length || aplicadas ? corpo : '<p class="apagado">Não há opções para este item.</p>'}`,
     '<button class="btn sangue" data-acao="fechar-modal">Pronto</button>', true);
 }
 
@@ -774,9 +816,25 @@ function tipoEquipar(it) {
   const am = AMALDICOADOS[it.nome];
   if (am) return am.vestir || am.passivo ? 'amaldicoado' : '';
   if (ehAcessorio(it)) return 'acessorio';
-  return PASSIVOS_ITENS[it.nome] || it.efeitos?.length ? 'comum' : '';
+  return PASSIVOS_ITENS[it.nome] || it.efeitos?.length || it.maldicoes?.length ? 'comum' : '';
 }
 const estaEquipado = it => (tipoEquipar(it) === 'acessorio' ? it.escrito : it.ativo);
+const temConjuracao = it => it && (it.nome === CONJURACAO || it.maldicoes?.includes(CONJURACAO));
+function botoesConjuracao(it) {
+  if (!temConjuracao(it)) return '';
+  const ritual = RITUAIS.find(r => r.id === it.ritualConjuracao);
+  const habilitado = it.qtd && estaEquipado(it) ? '' : 'disabled title="Equipe o item para conjurar"';
+  return `<div class="linha" style="margin-top:8px"><button class="btn pequeno" data-acao="vincular-conjuracao" data-uid="${esc(it.uid)}">${ritual ? 'Trocar ritual de Conjuração' : 'Vincular ritual de 1º círculo'}</button>
+    ${ritual ? `<button class="btn pequeno sangue" data-acao="conjurar-item" data-uid="${esc(it.uid)}" ${habilitado}>Conjurar ${esc(ritual.nome)} (empunhado)</button>` : ''}
+    ${ritual && /sustentad/i.test(ritual.duracao) ? `<button class="btn pequeno" data-acao="sustentar-ritual" data-item-uid="${esc(it.uid)}" ${habilitado}>Sustentar</button>` : ''}</div>`;
+}
+function botoesUsosMaldicoes(it) {
+  if (!it.qtd || !estaEquipado(it)) return '';
+  const usos = (it.maldicoes || []).flatMap((nome, indice) =>
+    (AMALDICOADOS[nome]?.usos || []).map((u, k) =>
+      `<button class="btn pequeno" data-acao="usar-amaldicoado" data-uid="${esc(it.uid)}" data-mal="${indice}" data-u="${k}" title="${esc(u.nota || '')}">${esc(u.nome)}</button>`));
+  return usos.length ? `<div class="linha">${usos.join(' ')}</div>` : '';
+}
 function descreverEfeitosItem(efeitos) {
   return efeitos.map(e => `${comSinal(e.valor)} ${e.tipo === 'pericia' ? PERICIA[e.alvo]?.nome : e.tipo === 'atributo' ? ATRIBUTOS.find(a => a.id === e.alvo)?.nome : ROTULO_EFEITO[e.tipo]}`).join(', ');
 }
@@ -787,14 +845,18 @@ function efeitoDoItem(it) {
     partes.push(`${mods.includes('aprimorado') ? '+5' : '+2'} ${PERICIA[it.pericia].nome}`);
     if (mods.includes('funcao') && it.periciaExtra) partes.push(`${mods.includes('aprimorado-extra') ? '+5' : '+2'} ${PERICIA[it.periciaExtra].nome}`);
   }
-  const am = AMALDICOADOS[it.nome]?.passivo;
+  const am = passivoAmaldicoado(it, it.nome, it.elementoMaldicao);
   if (am) partes.push(descreverPassivo(am));
   const def = PASSIVOS_ITENS[it.nome];
   if (def) {
     const { acessorio, exige, ...ef } = def;
     partes.push(descreverPassivo({ ...ef, pericia: { ...(ef.pericia || {}), ...(acessorio || {}) } }) + (exige ? ` (se for treinado em ${PERICIA[exige].nome})` : ''));
   }
-  for (const n of it.maldicoes || []) { const p = AMALDICOADOS[n]?.passivo; partes.push(`${n.replace('Acessório amaldiçoado: ', '')} (maldição)${p ? ': ' + descreverPassivo(p) : ''}`); }
+  for (const [k, n] of (it.maldicoes || []).entries()) {
+    const p = passivoAmaldicoado(it, n, it.elementosMaldicoes?.[k]);
+    const espera = AMALDICOADOS[n]?.diasMinimos && !p ? ' · exige 1 dia de uso' : '';
+    partes.push(`${n.replace('Acessório amaldiçoado: ', '')} (maldição)${p ? ': ' + descreverPassivo(p) : espera}`);
+  }
   if (it.efeitos?.length) partes.push(descreverEfeitosItem(it.efeitos));
   return partes.filter(Boolean).join(' · ');
 }
@@ -804,8 +866,7 @@ function cartaoItem(f, d, itemSalvo, i) {
   const pendente = tipo === 'acessorio' && !it.pericia;
   const naMochila = d.itemMochila === it.uid;
   const efeito = efeitoDoItem(it);
-  const catEf = Math.max(0, Math.min(4, it.categoria + it.mods.length + (it.maldicoes || []).length) - (naMochila ? 1 : 0));
-  const espEf = Math.max(0, it.espacos - Number(it.mods.includes('discreto')) - (naMochila ? 1 : 0));
+  const { cat: catEf, esp: espEf } = numerosAlvo(d, 'item', it);
   const linhaResumo = pendente ? 'Clique para escolher a perícia que este acessório melhora.'
     : efeito ? `Na ficha: ${efeito}${tipo && !eq ? ' (desligado enquanto estiver desequipado)' : ''}`
     : comp && !it.elemento ? 'Escolha o elemento destes componentes.' : info?.resumo || it.nota || 'Clique para ver e editar.';
@@ -824,8 +885,12 @@ function cartaoItem(f, d, itemSalvo, i) {
 
         ${it.nome.startsWith('Selo Paranormal') || it.nome === 'Dedo Decepado' ? `<button class="btn pequeno" data-acao="vincular-item" data-i="${i}">Vincular</button>` : ''}
         ${it.ritualSelo && it.qtd > 0 ? `<button class="btn pequeno sangue" data-acao="usar-selo" data-i="${i}">Ativar selo</button>` : ''}
+        ${(it.maldicoes || []).some(n => AMALDICOADOS[n]?.diasMinimos) || AMALDICOADOS[it.nome]?.diasMinimos ? botaoDiasMaldicao(it) : ''}
+        ${it.nome === PROTECAO_ELEMENTAL ? botaoElementoMaldicao(it, i) : ''}
       </div>
-      ${tipo === 'acessorio' ? cartoesMod(d, 'item', i, it) : ''}
+      ${!itemEspecial(it) || it.maldicoes?.length ? cartoesMod(d, 'item', i, it) : ''}
+      ${botoesUsosMaldicoes(it)}
+      ${botoesConjuracao(it)}
       ${d.temMochilaUtil ? `<label class="check" style="margin-top:8px"><input type="checkbox" data-acao-check="mochila-utilidades" data-uid="${esc(it.uid)}" ${naMochila ? 'checked' : ''}><span><b>Guardar na Mochila de Utilidades</b><small>Este item ocupa 1 espaço a menos e conta como uma categoria abaixo. Só um item por vez.</small></span></label>` : ''}
       <div class="grade-mini" style="margin-top:8px">
         <label class="campo"><span>Nome</span><input data-campo="itens.${i}.nome" id="it-n-${i}" value="${esc(it.nome)}" aria-label="Nome do item"></label>
@@ -834,7 +899,7 @@ function cartaoItem(f, d, itemSalvo, i) {
         <label class="campo"><span>Espaços</span><input type="number" min="0" step="0.25" data-campo="itens.${i}.espacos" data-tipo="num" id="it-e-${i}" value="${it.espacos}" aria-label="Espaços"></label>
       </div>
       <label class="campo" style="margin-top:6px"><span>Anotação</span><input data-campo="itens.${i}.nota" id="it-o-${i}" value="${esc(it.nota)}" placeholder="anotação" aria-label="Anotação"></label>
-      <div class="linha fim" style="margin-top:6px"><button class="btn pequeno perigo" data-acao="remover" data-lista="itens" data-i="${i}" aria-label="Remover ${esc(it.nome)}">Remover item</button></div>
+      <div class="linha fim" style="margin-top:6px"><button class="btn pequeno" data-acao="item-salvar-modelo" data-uid="${esc(it.uid)}">Salvar em Meus Itens</button><button class="btn pequeno perigo" data-acao="remover" data-lista="itens" data-i="${i}" aria-label="Remover ${esc(it.nome)}">Remover item</button></div>
     </div></details>`;
 }
 
@@ -903,7 +968,7 @@ function abaInventario(f, d) {
       ${!f.patenteManual && PATENTES[d.patente.n] ? `<p class="apagado" style="margin-top:6px">Próxima: ${esc(PATENTES[d.patente.n].nome)} com ${PATENTES[d.patente.n].pp} PP.</p>` : ''}`
       : '<p>Um item de categoria I e itens de categoria 0 compatíveis com a origem. Não usa patente.</p>'}
   </section></div>
-  <section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa sangue">Itens</h2><div class="linha"><button class="btn pequeno" data-acao="add-arma">+ Arma</button><button class="btn pequeno" data-acao="add-protecao">+ Proteção</button><button class="btn pequeno" data-acao="add-item-lista">+ Item da lista</button><button class="btn pequeno" data-acao="add-item">+ Item personalizado</button></div></div>
+  <section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa sangue">Itens</h2><div class="linha"><button class="btn pequeno" data-acao="add-arma">+ Arma</button><button class="btn pequeno" data-acao="add-protecao">+ Proteção</button><button class="btn pequeno" data-acao="add-item-lista">+ Item da lista</button><button class="btn pequeno" data-acao="add-item">+ Item personalizado</button><button class="btn pequeno" data-acao="item-modelos">Meus Itens</button></div></div>
     ${f.itens.length ? `<div class="lista-itens">${f.itens.map((it, i) => cartaoItem(f, d, it, i)).join('')}</div>` : '<p class="vazio">Mochila vazia.</p>'}
     ${f.armas.length || f.protecoes.length ? `<h3 class="titulo-vermelho">Armas e proteções</h3><div class="lista-hab">${f.armas.map((a, i) => `<div class="hab"><span class="meta"><button class="btn pequeno" data-acao="editar-arma" data-i="${i}">Editar</button></span><b>${esc(a.nome)}</b><p>${esc(a.dano)}${a.mods.length ? ' · ' + a.mods.map(m => MODIFICACAO[m].nome).join(', ') : ''}${a.maldicao?.tipo ? ' · Amaldiçoar Arma' : ''}</p>${cartoesMod(d, 'arma', i, a)}</div>`).join('')}
       ${f.protecoes.map((p, i) => `<div class="hab"><span class="meta"><button class="btn pequeno" data-acao="editar-protecao" data-i="${i}">Editar</button></span><b>${esc(p.nome)}</b><p>Defesa +${p.defesa}${p.mods.length ? ' · ' + p.mods.map(m => MODIFICACAO[m].nome).join(', ') : ''}</p>${cartoesMod(d, 'protecao', i, p)}</div>`).join('')}</div>` : ''}
@@ -951,7 +1016,7 @@ function textoPasso(d, p, k) {
   if (p.tipo === 'gasto') return `Gastar ${p.valor} ${k}`;
   return `Rolar ${p.formula || '(escreva a fórmula)'}${p.rotulo ? ` · ${p.rotulo}` : ''}`;
 }
-function abaMacros(f, d) {
+function abaMacros(f, d, noCombate = false) {
   const k = d.pd ? 'PD' : 'PE';
   const gruposArmas = USOS_ARMA_MACRO.map(([uso, nome]) => [nome, d.ataques.filter(a => a.uso === uso)]).filter(([, armas]) => armas.length);
   const selTipoDano = (campo, atual, padrao) => `<label class="mini"><span>Tipo ou elemento</span><select data-campo="${campo}"><option value="">${padrao}</option>${TIPOS_DANO_MACRO.map(([v, n]) => `<option value="${v}" ${atual === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>`;
@@ -969,6 +1034,7 @@ function abaMacros(f, d) {
            <label class="mini"><span>Nome do ataque (opcional)</span><input data-campo="${base}.rotulo" maxlength="40" value="${esc(p.rotulo)}" placeholder="Ex.: Tiro oculto"></label>`}
       ${comArma ? selPericia('pericia', arma ? `Da arma (${arma.periciaNome})` : 'Padrão da arma') : selPericia('alvo', p.alcanceAtaque === 'distancia' ? 'Padrão (Pontaria)' : 'Padrão (Luta)')}
       <label class="mini"><span>Dano base</span><input data-campo="${base}.${campoDano}" list="macro-dados-dano" maxlength="40" value="${esc(p[campoDano])}" placeholder="${esc(arma ? `Da arma: ${arma.formula}` : 'Ex.: 2d6+3')}"></label>
+      <label class="mini"><span>Atributo somado ao dano</span><select data-campo="${base}.atributoDano"><option value="">${comArma ? 'Padrão da arma' : 'Nenhum (padrão)'}</option><option value="nenhum" ${p.atributoDano === 'nenhum' ? 'selected' : ''}>Nenhum</option>${opcoesAtributos(p.atributoDano)}</select></label>
       ${selTipoDano(`${base}.${campoTipo}`, p[campoTipo], comArma ? 'Padrão da arma' : 'Sem tipo definido')}
       ${comArma ? `<label class="check macro-critico"><input type="checkbox" data-campo="${base}.criticoProprio" data-tipo="bool" ${p.criticoProprio ? 'checked' : ''}>
         <span>Personalizar crítico${arma ? ` (da arma: ${arma.margem}+ ×${arma.mult})` : ''}</span></label>` : ''}
@@ -999,19 +1065,21 @@ function abaMacros(f, d) {
   const cartao = (m, i) => `<details class="ritual ritual-compacto macro-cartao" data-item-uid="${esc(m.uid)}" ${ITENS_ABERTOS.has(m.uid) ? 'open' : ''}>
     <summary><span class="cab"><b>${esc(m.nome)}</b><span class="etiqueta">${m.passos.length} passo(s)</span>${m.usaPd && m.pd ? `<span class="etiqueta">${m.pd} ${k}</span>` : ''}</span>
       <small class="apagado">${m.passos.map(p => esc(textoPasso(d, p, k))).join(' → ') || 'Sem passos ainda.'}</small>
-      <span class="linha" style="margin-top:6px"><button class="btn pequeno sangue" data-acao="macro-executar" data-i="${i}" ${m.passos.length ? '' : 'disabled'}>▶ Executar</button></span></summary>
+      <span class="linha" style="margin-top:6px"><button class="btn pequeno sangue" data-acao="macro-executar" data-i="${i}" ${m.passos.length ? '' : 'disabled'}>${noCombate && m.passos.some(p => ['acerto', 'ataque'].includes(p.tipo)) ? 'Rolar ataque' : '▶ Executar'}</button></span></summary>
     <div class="detalhes-rit">
       <div class="grade-mini"><label class="campo"><span>Nome</span><input data-campo="macros.${i}.nome" id="mac-n-${i}" value="${esc(m.nome)}"></label>
         <label class="campo"><span>Nota (aparece no resultado)</span><input data-campo="macros.${i}.nota" id="mac-o-${i}" value="${esc(m.nota)}" placeholder="ex.: só com a arma empunhada"></label></div>
       <label class="check macro-gasto"><input type="checkbox" data-campo="macros.${i}.usaPd" data-tipo="bool" ${m.usaPd ? 'checked' : ''}><span><b>Gastar ${k} ao executar</b></span>
         <input type="number" min="0" max="99" data-campo="macros.${i}.pd" data-tipo="int" value="${m.pd}" aria-label="Quantos ${k} gastar" ${m.usaPd ? '' : 'disabled'}><small class="apagado">${k}</small></label>
+      <label class="check macro-gasto"><input type="checkbox" data-campo="macros.${i}.noCombate" data-tipo="bool" ${m.noCombate ? 'checked' : ''}><span>Mostrar em Combate</span></label>
       <div class="macro-passos">${m.passos.map((p, j) => editorPasso(i, p, j)).join('')}</div>
       <div class="linha" style="margin-top:8px"><button class="btn pequeno" data-acao="macro-passo-add" data-i="${i}" ${m.passos.length >= 8 ? 'disabled' : ''}>+ Passo</button><span class="espaco"></span><button class="btn pequeno perigo" data-acao="macro-remover" data-i="${i}">Remover macro</button></div>
     </div></details>`;
-  return `<section class="painel"><div class="titulo-secao"><h2 class="faixa sangue">Macros</h2><button class="btn pequeno sangue" data-acao="macro-nova">+ Nova macro</button></div>
+  const cartoes = f.macros.map((m, i) => !noCombate || (m.noCombate) ? cartao(m, i) : '').join('');
+  return `<section class="painel" ${noCombate ? 'style="margin-top:14px"' : ''}><div class="titulo-secao"><h2 class="faixa sangue">${noCombate ? 'Ataques personalizados' : 'Macros'}</h2><button class="btn pequeno sangue" data-acao="macro-nova" ${noCombate ? 'data-combate="1"' : ''}>${noCombate ? '+ Ataque personalizado' : '+ Nova macro'}</button></div>
     <p class="apagado" style="font-size:.9rem">Em <b>+ Dano extra</b>, adicione dados ou valores fixos. Marque <b>Multiplicar no crítico</b> para aplicar o multiplicador do ataque àquela parcela inteira.</p>
     <datalist id="macro-dados-dano">${[4, 6, 8, 10, 12, 20, 100].map(lados => `<option value="1d${lados}"></option>`).join('')}<option value="2d6"></option><option value="2d8"></option></datalist>
-    ${f.macros.length ? `<div class="lista-macros">${f.macros.map(cartao).join('')}</div>` : '<p class="vazio">Nenhuma macro. Crie uma para rolar ataque e dano com um clique.</p>'}
+    ${cartoes ? `<div class="lista-macros">${cartoes}</div>` : `<p class="vazio">${noCombate ? 'Crie um ataque ou marque Mostrar em Combate numa macro de ataque.' : 'Nenhuma macro. Crie uma para rolar ataque e dano com um clique.'}</p>`}
   </section>`;
 }
 
@@ -1095,14 +1163,30 @@ const ritualDeToque = (ritual, catalogo) =>
 function gastosOcultismo(f, d) {
   return opcoesGasto(f, d, { tipo: 'pericia', id: 'ocultismo' }).filter(o => !o.troca && !o.atr && !o.caos && !o.carga && typeof o.custo === 'number' && (o.bonus || o.dados || o.dadoExtra));
 }
-function janelaConjurar(ctx, f, d, i) {
-  const r = d.rituais[i], k = d.pd ? 'PD' : 'PE';
+function conjuracaoDoItem(f, itemUid) {
+  const item = f.itens.find(it => it.uid === itemUid);
+  if (!temConjuracao(item) || !item.qtd || !estaEquipado(item)) return null;
+  const cat = RITUAIS.find(r => r.id === item.ritualConjuracao && r.circulo === 1);
+  if (!cat) return null;
+  const conhecida = f.rituais.find(r => r.idCatalogo === cat.id && r.circulo === 1);
+  if (conhecida) return { cat, r: derivar(f).rituais.find(r => r.uid === conhecida.uid), desconto: 1, item };
+  const ritualExtra = normalizar({ rituais: [{ nome: cat.nome, elemento: cat.elemento, circulo: cat.circulo }] }).rituais[0];
+  return { cat, r: derivar(f, { ritualExtra }).rituais.at(-1), desconto: 0, item };
+}
+
+const custoDaForma = (r, adicional, desconto) =>
+  desconto ? Math.max(1, CIRCULOS[r.circulo - 1].custo + adicional - desconto) : r.custo + adicional;
+
+function janelaConjurar(ctx, f, d, i, origem = null) {
+  const r = origem?.r || d.rituais[i], k = d.pd ? 'PD' : 'PE';
+  if (!r) return;
+  const desconto = origem?.desconto || 0;
   const cat = RITUAIS.find(x => semAcento(x.nome) === semAcento(r.nome)) || {};
   const tem = id => f.poderes.some(p => p.id === id);
   const afinidade = (r.elementos?.length ? r.elementos : [r.elemento]).every(el => d.afinidade === el);
   const formas = [['basica', 'Forma básica', 0, true, '']];
   for (const [id, nome] of [['discente', 'Forma discente'], ['verdadeiro', 'Forma verdadeira']]) {
-    const fo = cat[id]; if (!fo) continue;
+    const fo = formaRitual(r, cat, id); if (!fo) continue;
     const okCirc = !fo.circulo || d.circuloMax >= fo.circulo, okAf = !fo.afinidade || afinidade;
     formas.push([id, nome, fo.custo, okCirc && okAf, `${fo.circulo ? `requer ${fo.circulo}º círculo` : ''}${fo.afinidade ? ' e afinidade' : ''}${!okCirc || !okAf ? ' (você ainda não pode)' : ''}`]);
   }
@@ -1113,22 +1197,24 @@ function janelaConjurar(ctx, f, d, i) {
   if (f.trilha === 'lamina' && semAcento(r.nome) === 'amaldicoar arma') op.push(['lamina', 'Lâmina Maldita: conjurar com ação de movimento', 1]);
   const flagelo = f.trilha === 'flagelador' && d.trilhaHabs.find(h => h.nome === 'Poder do Flagelo')?.liberada;
   const armadura = f.protecoes.filter(p => p.vestida).some(p => p.peso === 'pesada') ? 2 : f.protecoes.filter(p => p.vestida).some(p => p.peso === 'leve') ? 1 : 0;
-  abrirModal(`Conjurar · ${r.nome}`, `<p>${esc(cat.execucao ? `Execução ${cat.execucao} · alcance ${cat.alcance || '—'} · ${cat.alvo || cat.area || cat.efeitoArea || ''} · ${cat.duracao || ''}` : '')}</p>
-    ${ritualDeToque(r, cat) ? '<p class="apagado">Confirme o toque e aplique o efeito ao alvo na mesa. Os dados do ritual são rolados normalmente.</p>' : podeResolverRitual(cat.id, r.formula, r.resistencia) ? `<label class="campo"><span>Alvo para resolver resistência e dano</span><select id="conj-alvo"><option value="">Apenas conjurar</option>${opcoesAlvos(ctx, f).replace(' selected', '')}</select></label><label class="campo"><span>Recurso do alvo</span><select id="conj-recurso"><option value="pv">PV</option><option value="mental">Sanidade / PD</option></select></label>` : ''}
-    <h3 class="titulo-vermelho">Forma</h3><div class="lista-hab">${formas.map(([id, nome, c, ok, req], j) => `<label class="check hab"><input type="radio" name="conj-forma" value="${id}" data-custo="${c}" ${j === 0 ? 'checked' : ''} ${ok ? '' : 'disabled'}><span><b>${nome}</b> — total <b>${r.custo + c} ${k}</b>${c ? ` (${r.custo} + ${c})` : ''}${req ? ` <small class="apagado">${esc(req)}</small>` : ''}</span></label>`).join('')}</div>
+  abrirModal(`Conjurar · ${r.nome}`, `${origem ? `<p>Conjuração de ${esc(origem.item.nome)}${desconto ? ` · −1 ${k} por conhecer o ritual, com mínimo de 1 ${k}` : ''}.</p>` : ''}<p>${esc(cat.execucao ? `Execução ${cat.execucao} · alcance ${cat.alcance || '—'} · ${cat.alvo || cat.area || cat.efeitoArea || ''} · ${cat.duracao || ''}` : '')}</p>
+    ${ritualDeToque(r, cat) ? '<p class="apagado">Confirme o toque e aplique o efeito ao alvo na mesa. Os dados do ritual são rolados normalmente.</p>' : podeResolverRitual(cat.id, r.formula || Object.values(r.formulasAvancadas || {}).find(Boolean), r.resistencia) ? `<label class="campo"><span>Alvo para resolver resistência e dano</span><select id="conj-alvo"><option value="">Apenas conjurar</option>${opcoesAlvos(ctx, f).replace(' selected', '')}</select></label><label class="campo"><span>Recurso do alvo</span><select id="conj-recurso"><option value="pv">PV</option><option value="mental">Sanidade / PD</option></select></label>` : ''}
+    <h3 class="titulo-vermelho">Forma</h3><div class="lista-hab">${formas.map(([id, nome, c, ok, req], j) => `<label class="check hab"><input type="radio" name="conj-forma" value="${id}" data-custo="${c}" ${j === 0 ? 'checked' : ''} ${ok ? '' : 'disabled'}><span><b>${nome}</b> — total <b>${custoDaForma(r, c, desconto)} ${k}</b>${req ? ` <small class="apagado">${esc(req)}</small>` : ''}${r.proprio && id !== 'basica' && r[id] ? `<br><small>${esc(r[id])}</small>` : ''}</span></label>`).join('')}</div>
     ${op.length ? `<h3 class="titulo-vermelho">Extras</h3><div class="lista-hab">${op.map(([id, n, c]) => `<label class="check hab"><input type="checkbox" id="conj-${id}" data-custo="${c}"><span>${esc(n)} <b>+${c} ${k}</b></span></label>`).join('')}</div>` : ''}
     ${(() => { if (r.elemento === 'medo') return ''; const ops = gastosOcultismo(f, d); return ops.length ? `<h3 class="titulo-vermelho">Teste de Ocultismo (Custo do Paranormal)</h3><div class="lista-hab">${ops.map(o => `<label class="check hab"><input type="checkbox" id="conj-oc-${o.id}" data-gasto-oc="${o.id}"><span><b>${esc(o.nome)}</b> +${o.custo} ${k}: ${[o.bonus ? `+${o.bonus}` : '', o.dados ? `+${o.dados}d20` : '', o.dadoExtra ? `+${o.dadoExtra}` : ''].filter(Boolean).join(' ')} no teste${o.nota ? ` <small class="apagado">(${esc(o.nota)})</small>` : ''}</span></label>`).join('')}</div><p class="apagado" style="font-size:.82rem">Este gasto é à parte do custo do ritual: não muda a DT.</p>` : ''; })()}
     <div class="grade c2" style="margin-top:8px"><label class="campo"><span>Outro custo (${k})</span><input type="number" min="0" id="conj-outro" value="0"></label>
       <label class="campo"><span>Concentração: DT de Vontade (0 = sem teste)</span><input type="number" min="0" id="conj-vontade" value="0"></label></div>
     ${flagelo ? `<label class="check hab"><input type="checkbox" id="conj-flagelo"><span><b>Poder do Flagelo:</b> pagar com PV (2 PV por ${k}).</span></label>` : ''}
     <p class="apagado" style="font-size:.88rem;margin-top:8px">${r.elemento === 'medo' ? 'Rituais de Medo dispensam Ocultismo. Perca Sanidade (ou PD) igual ao custo, além de 1 a 3 pontos permanentes pela forma usada.' : `O site rola Ocultismo contra DT 20 + custo. Se falhar, você perde Sanidade igual ao custo (e 1 permanente se falhar por 5 ou mais).${armadura ? ` Proteção ${armadura === 2 ? 'pesada (−2 dados)' : 'leve (−1 dado)'} atrapalha os gestos.` : ''}`} Limite: ${d.limiteRitual} ${k}/turno.</p>`,
-    `<button class="btn fantasma" data-acao="fechar-modal">Cancelar</button><button class="btn sangue" data-acao="conjurar-confirmar" data-i="${i}">Conjurar</button>`, true);
+    `<button class="btn fantasma" data-acao="fechar-modal">Cancelar</button><button class="btn sangue" data-acao="conjurar-confirmar" data-i="${i}" ${origem ? `data-item-uid="${esc(origem.item.uid)}" data-ritual-id="${esc(origem.cat.id)}"` : ''}>Conjurar</button>`, true);
 }
 function janelaDano(d, qtd, recurso) {
   const rd = recurso === 'pv' ? d.rd : d.rdMental;
+  const resistencias = recurso === 'pv' ? Object.entries(d.rdElemento) : [];
   abrirModal(recurso === 'pv' ? 'Sofrer dano' : 'Dano mental', `<p class="apagado">Resolva as reações na mesa e informe o dano resultante.</p>
     <label class="campo"><span>Dano a registrar</span><input type="number" id="dano-qtd" min="0" value="${qtd}"></label>
-    ${rd ? `<label class="check hab"><input type="checkbox" id="dano-aplicar-rd"><span>Aplicar RD ${rd}</span></label>` : ''}`,
+    ${rd ? `<label class="check hab"><input type="checkbox" id="dano-aplicar-rd"><span>Aplicar RD ${rd}</span></label>` : ''}
+    ${resistencias.length ? `<label class="campo"><span>Resistência elemental</span><select id="dano-elemento"><option value="">Sem resistência elemental</option>${resistencias.map(([el, valor]) => `<option value="${el}">${NOME_EL[el]} · RD ${valor}</option>`).join('')}</select></label>` : ''}`,
     '<button class="btn fantasma" data-acao="fechar-modal">Cancelar</button><button class="btn sangue" data-acao="aplicar-dano" data-rec="' + recurso + '">Aplicar</button>');
 }
 
@@ -1458,10 +1544,12 @@ export function acoesFicha(ctx) {
     'macros-editar': () => { fecharModal(); ctx.estado.ui.aba = 'macros'; if (!(f().macros || []).length) return acoesFicha(ctx)['macro-nova'](); ctx.render(); },
     'poder-escolha': el => { const ficha = f(), p = ficha.poderes[Number(el.dataset.i)]; if (!p || !PODER[p.id]) return;
       escolhaDoPoder(ctx, ficha, PODER[p.id], escolha => { const fx = f(), px = fx.poderes.find(x => x.uid === p.uid); if (px) px.escolha = escolha || ''; ctx.salvarFicha(normalizar(fx)); Object.assign(fx, normalizar(fx)); fecharModal(); ctx.render(); }); },
-    'macro-nova': () => {
+    'macro-nova': el => {
       const ficha = f();
       if (ficha.macros.length >= 30) return ctx.avisar('Limite de 30 macros por ficha.', true);
-      const m = { uid: uid(), nome: 'Nova macro', passos: [novoPassoMacro(ficha)] };
+      const noCombate = el?.dataset?.combate === '1';
+      const passo = noCombate ? { tipo: 'acerto', formula: '1d6' } : novoPassoMacro(ficha);
+      const m = { uid: uid(), nome: noCombate ? 'Novo ataque' : 'Nova macro', noCombate, passos: [passo] };
       ficha.macros.push(m);
       ITENS_ABERTOS.add(m.uid);
       ctx.salvarFicha(normalizar(ficha)); ctx.render();
@@ -1513,7 +1601,7 @@ export function acoesFicha(ctx) {
         }
         for (const p of passos) {
           const comArma = p.tipo === 'ataque';
-          const dx = derivar(ficha, comArma ? { armaUid: p.alvo, periciaAtaque: p.pericia } : undefined);
+          const dx = derivar(ficha, comArma ? { armaUid: p.alvo, periciaAtaque: p.pericia, atributoDano: p.atributoDano } : undefined);
           const K = dx.pd ? 'PD' : 'PE';
           if (p.tipo === 'pericia') {
             const per = Object.hasOwn(dx.PER, p.alvo) ? dx.PER[p.alvo] : null;
@@ -1532,7 +1620,8 @@ export function acoesFicha(ctx) {
             const margem = arma && !p.criticoProprio ? arma.margem : p.margem;
             const mult = arma && !p.criticoProprio ? arma.mult : p.mult;
             const danoProprio = formulaAtaque(p);
-            const formula = danoProprio || arma?.formula;
+            const bonusAtributo = dx.atributosEfetivos[p.atributoDano] || 0;
+            const formula = (danoProprio || arma?.formula || '') + (danoProprio && bonusAtributo ? comSinal(bonusAtributo) : '');
             const gruposCritico = danoProprio ? 1 : arma?.gruposCritico;
             const tipoPadrao = arma && Object.hasOwn(TIPOS_DANO, arma.tipo) ? TIPOS_DANO[arma.tipo] : '';
             const tipoBase = nomeTipoDano(arma ? p.tipoDanoArma : p.tipoDano) || tipoPadrao;
@@ -1648,10 +1737,21 @@ export function acoesFicha(ctx) {
       if (dias == null) return;
       item.diasVestido = inteiro(dias, 0, 999, item.diasVestido); salvar();
     },
+    'dias-maldicao': el => {
+      const it = f().itens.find(i => i.uid === el.dataset.uid);
+      if (!it) return;
+      const dias = prompt('Dias de uso do item:', String(it.diasVestido || 0));
+      if (dias == null) return;
+      it.diasVestido = inteiro(dias, 0, 999, it.diasVestido || 0); salvar();
+    },
     'zerar-usos-amaldicoado': el => { const it = f().itens.find(x => x.uid === el.dataset.uid); if (!it) return; it.usosDia = 0; salvar(); ctx.avisar(`${it.nome}: usos do dia zerados.`); },
     'usar-amaldicoado': async el => {
       const ficha = f(); let d = derivar(ficha);
-      const it = ficha.itens.find(x => x.uid === el.dataset.uid), def = it && AMALDICOADOS[it.nome], u = def?.usos?.[Number(el.dataset.u)];
+      const it = ficha.itens.find(x => x.uid === el.dataset.uid);
+      const aplicada = el.dataset.mal != null;
+      if (!it || (aplicada && !estaEquipado(it))) return;
+      const def = AMALDICOADOS[aplicada ? it.maldicoes?.[Number(el.dataset.mal)] : it.nome];
+      const u = def?.usos?.[Number(el.dataset.u)];
       if (!u) return;
       if (!it.qtd) return ctx.avisar('Esse item está sem unidades.', true);
       const titulo = `${it.nome}: ${u.nome}`, k = d.pd ? 'PD' : 'PE', msgs = [];
@@ -1970,9 +2070,14 @@ export function acoesFicha(ctx) {
       const formula = el.dataset.forma === 'verdadeiro' ? '8d8' : '4d8';
       return rolarDanoUI({ titulo: 'Capturar Momento · explosão de Morte (Fortitude reduz à metade)', quem: quem(), formula, rotulo: 'DANO' });
     },
-    'rolar-ritual': el => { const i = Number(el.dataset.i), r = derivar(f()).rituais[i]; const cat = RITUAIS.find(x => semAcento(x.nome) === semAcento(r.nome)) || {}; rolarDanoUI({ titulo: r.nome, quem: quem(), formula: r.formulaFinal || r.formula, rotulo: cat.tipoDados === 'cura' ? 'CURA' : 'DANO' }); },
+    'rolar-ritual': el => {
+      const r = derivar(f()).rituais[Number(el.dataset.i)]; if (!r) return;
+      const cat = RITUAIS.find(x => x.id === r.idCatalogo) || {};
+      return rolarDanoUI({ titulo: r.nome, quem: quem(), formula: formulaDaForma(r, cat, 'basica'), rotulo: r.tipoDados === 'cura' ? 'CURA' : 'DANO' });
+    },
     'sustentar-ritual': el => {
-      const ficha = f(), d = derivar(ficha), r = d.rituais[Number(el.dataset.i)];
+      const ficha = f(), d = derivar(ficha);
+      const r = el.dataset.itemUid ? conjuracaoDoItem(ficha, el.dataset.itemUid)?.r : d.rituais[Number(el.dataset.i)];
       if (!r || !/sustentad/i.test(r.duracao)) return;
       const custo = 1 + d.custoCondicao;
       if (!gastar(ficha, d, custo, d.limiteRitual, 0)) return ctx.avisar('Sem recurso ou limite de gasto para sustentar.', true);
@@ -1983,20 +2088,31 @@ export function acoesFicha(ctx) {
       if (d.semAcoes) return ctx.avisar('As condições atuais impedem a conjuração.', true);
       janelaConjurar(ctx, f(), d, Number(el.dataset.i));
     },
+    'conjurar-item': el => {
+      const ficha = f(), d = derivar(ficha), origem = conjuracaoDoItem(ficha, el.dataset.uid);
+      if (!origem || d.semAcoes) return ctx.avisar('A conjuração pelo item está indisponível.', true);
+      janelaConjurar(ctx, ficha, d, -1, origem);
+    },
     'conjurar-confirmar': async el => {
-      const ficha = f(), d = derivar(ficha), i = Number(el.dataset.i), r = d.rituais[i], k = d.pd ? 'pd' : 'pe', K = k.toUpperCase();
+      const ficha = f(), d = derivar(ficha), i = Number(el.dataset.i), k = d.pd ? 'pd' : 'pe', K = k.toUpperCase();
+      const origem = el.dataset.itemUid ? conjuracaoDoItem(ficha, el.dataset.itemUid) : null;
+      const r = el.dataset.itemUid ? (origem?.cat.id === el.dataset.ritualId ? origem?.r : null) : d.rituais[i];
       if (!r || d.semAcoes) return ctx.avisar('A conjuração está indisponível.', true);
       const alvoMental = document.getElementById('conj-recurso')?.value === 'mental';
       const forma = document.querySelector('[name="conj-forma"]:checked');
       const catR = RITUAIS.find(x => semAcento(x.nome) === semAcento(r.nome)) || {};
       const alvoId = ritualDeToque(r, catR) ? '' : document.getElementById('conj-alvo')?.value;
       const formaId = forma?.value || 'basica';
-      const avancada = formaId !== 'basica' ? catR[formaId] : null;
+      const avancada = ['discente', 'verdadeiro'].includes(formaId) ? formaRitual(r, catR, formaId) : null;
       if (formaId !== 'basica' && (!avancada || avancada.circulo > d.circuloMax ||
         (avancada.afinidade && !(r.elementos?.length ? r.elementos : [r.elemento]).every(el => el === d.afinidade)))) {
         return ctx.avisar('Pré-requisitos da forma avançada não cumpridos.', true);
       }
-      let custo = r.custo + d.custoCondicao + (avancada?.custo || 0) + inteiro(document.getElementById('conj-outro')?.value, 0, 50, 0);
+      const formulaD = formulaDaForma(r, catR, formaId);
+      if (formulaD) {
+        try { analisar(formulaD); } catch (e) { return ctx.avisar(`Fórmula do ritual: ${e.message}`, true); }
+      }
+      let custo = custoDaForma(r, avancada?.custo || 0, origem?.desconto) + d.custoCondicao + inteiro(document.getElementById('conj-outro')?.value, 0, 50, 0);
       document.querySelectorAll('[id^="conj-"][data-custo]').forEach(c => { if (c.checked) custo += Number(c.dataset.custo); });
       const dtVontade = inteiro(document.getElementById('conj-vontade')?.value, 0, 99, 0);
       const marcadosOc = new Set([...document.querySelectorAll('[data-gasto-oc]:checked')].map(c => c.dataset.gastoOc));
@@ -2007,8 +2123,7 @@ export function acoesFicha(ctx) {
       if (gastoOc && document.getElementById('conj-flagelo')?.checked && !gastar(ficha, derivar(ficha), gastoOc)) return ctx.avisar(`${K} insuficiente para ${opsOc.map(o => o.nome).join(', ')}.`, true);
       ctx.salvarFicha(ficha); fecharModal(); ctx.render();
       const nomeForma = forma?.value === 'discente' ? ' (discente)' : forma?.value === 'verdadeiro' ? ' (verdadeira)' : '';
-      const formulaD = formulaDaForma(r.nome, forma?.value, r.formula, r.formulaFinal);
-      const rotuloD = catR.tipoDados === 'cura' ? 'CURA' : 'DANO';
+      const rotuloD = r.tipoDados === 'cura' ? 'CURA' : 'DANO';
       const rolarFormula = (alvo = '') => rolarDanoUI({
         titulo: `${r.nome}${nomeForma} · ${alvo || (rotuloD === 'CURA' ? 'cura' : 'dano')}`,
         quem: ficha.nome, formula: formulaD, rotulo: rotuloD,
@@ -2025,7 +2140,7 @@ export function acoesFicha(ctx) {
           return ctx.avisar('A forma discente de Decadência exige acertar com uma arma. Some o dano do ritual após confirmar o acerto.');
         }
         const resistencia = r.resistencia.toLowerCase();
-        if (!perfil && (formaId !== 'basica' || !/^(fortitude|reflexos|vontade) (reduz|anula|evita)/.test(resistencia))) {
+        if (!perfil && ((formaId !== 'basica' && !r.proprio) || !/^(fortitude|reflexos|vontade) (reduz|anula|evita)/.test(resistencia))) {
           if (formulaD) await rolarFormula(alvo.nome);
           return ctx.avisar('Resolva a resistência e os demais efeitos conforme a descrição desta forma.');
         }
@@ -2112,7 +2227,9 @@ export function acoesFicha(ctx) {
     'esquecer-ritual': el => { const ficha = f(); const r = ficha.rituais[Number(el.dataset.i)]; if (!confirm(`Esquecer o ritual "${r.nome}"?`)) return; ficha.rituais.splice(Number(el.dataset.i), 1); salvar(); },
     'aplicar-dano': el => {
       const ficha = f(), d = derivar(ficha), rec = el.dataset.rec; let q = inteiro(document.getElementById('dano-qtd')?.value, 0, 99999, 0);
-      const rd = document.getElementById('dano-aplicar-rd')?.checked ? (rec === 'pv' ? d.rd : d.rdMental) : 0;
+      const rdGeral = document.getElementById('dano-aplicar-rd')?.checked ? (rec === 'pv' ? d.rd : d.rdMental) : 0;
+      const elemento = document.getElementById('dano-elemento')?.value;
+      const rd = Math.max(rdGeral, rec === 'pv' ? d.rdElemento[elemento] || 0 : 0);
       q = Math.max(0, q - rd);
       const novo = sofrerDano(ficha, d, q, { tipo: rec === 'pv' ? 'pv' : 'mental' }).atual;
       ficha.recursos[rec] = novo; fecharModal(); salvar();
@@ -2124,7 +2241,7 @@ export function acoesFicha(ctx) {
       const ficha = f(), d = derivar(ficha), k = el.dataset.rec, inp = document.getElementById('qtd-' + k);
       const q = inteiro(inp?.value, 0, 9999, 0); if (!q) { inp?.focus(); return; }
       if (Number(el.dataset.sinal) < 0 && (k === 'pv' || k === 'san' || (k === 'pd' && d.rdMental))) {
-        const temReducao = k === 'pv' ? d.rd : d.rdMental;
+        const temReducao = k === 'pv' ? d.rd || Object.keys(d.rdElemento).length : d.rdMental;
         if (temReducao) return janelaDano(d, q, k);
       }
       const max = { pv: d.pv, pe: d.pe, san: d.san, pd: d.pdMax }[k];
@@ -2235,14 +2352,50 @@ export function acoesFicha(ctx) {
     },
     'salvar-protecao': el => { const ficha = f(), i = Number(el.dataset.i), p = { ...ficha.protecoes[i] }; document.querySelectorAll('[data-modal-prot]').forEach(x => { p[x.dataset.modalProt] = x.type === 'number' ? Number(x.value) : x.value; }); ficha.protecoes[i] = p; fecharModal(); ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render(); },
     'add-item': () => { const ficha = f(); ficha.itens.push({ uid: uid(), nome: 'Novo item', categoria: 0, espacos: 1, qtd: 1, nota: '' }); salvar(); },
+    'item-salvar-modelo': el => {
+      const item = f().itens.find(it => it.uid === el.dataset.uid);
+      if (!item) return;
+      const modelos = carregarModelosItens();
+      const i = modelos.findIndex(modelo => modelo.uid === item.uid);
+      if (i < 0 && modelos.length >= 120) return ctx.avisar('Meus Itens atingiu o limite de 120 modelos.', true);
+      const modelo = normalizar({ itens: [{ ...item, qtd: 1, diasVestido: 0, ativo: false, escrito: false, carga: 0, usosDia: 0, expiraCena: false }] }).itens[0];
+      if (i >= 0) modelos[i] = modelo;
+      else modelos.push(modelo);
+      if (!salvarModelosItens(modelos)) return ctx.avisar('Não foi possível salvar este modelo.', true);
+      ctx.avisar(`${item.nome} salvo em Meus Itens.`);
+    },
+    'item-modelos': () => {
+      const modelos = carregarModelosItens().sort(alfa);
+      abrirModal('Meus Itens', modelos.length ? `<input type="search" placeholder="Procurar modelo…" data-filtro-modal aria-label="Procurar modelo"><div class="lista-hab">${modelos.map(it => `<div class="hab" data-busca="${esc(semAcento(it.nome + ' ' + it.nota))}"><b>${esc(it.nome)}</b><p class="apagado">cat. ${cat(it.categoria)} · ${it.espacos} esp.</p><div class="linha"><button class="btn pequeno sangue" data-acao="item-adicionar-modelo" data-uid="${esc(it.uid)}">Adicionar à ficha</button><button class="btn pequeno perigo" data-acao="item-excluir-modelo" data-uid="${esc(it.uid)}">Excluir modelo</button></div></div>`).join('')}</div>` : '<p class="vazio">Abra um item do inventário e use Salvar em Meus Itens para reutilizá-lo em outras fichas deste navegador.</p>', '<button class="btn" data-acao="add-item-lista">Catálogo</button>', true);
+    },
+    'item-adicionar-modelo': el => {
+      const ficha = f(), item = carregarModelosItens().find(it => it.uid === el.dataset.uid);
+      if (!item) return;
+      if (ficha.itens.length >= 120) return ctx.avisar('O inventário atingiu o limite de 120 itens.', true);
+      const novo = { ...item, uid: uid() };
+      ficha.itens.push(novo);
+      ITENS_ABERTOS.add(novo.uid);
+      fecharModal(); salvar();
+    },
+    'item-excluir-modelo': el => {
+      const modelos = carregarModelosItens();
+      const item = modelos.find(it => it.uid === el.dataset.uid);
+      if (!item || !confirm(`Excluir o modelo ${item.nome} de Meus Itens?`)) return;
+      if (!salvarModelosItens(modelos.filter(it => it.uid !== item.uid))) return ctx.avisar('Não foi possível excluir este modelo.', true);
+      acoesFicha(ctx)['item-modelos']();
+    },
     'add-item-lista': () => {
       const ficha = f();
       const lista = ITENS_CATALOGO.map((it, i) => [it, i]).filter(([it]) => it.fonte !== 'SaH' || ficha.modo === 'sah');
       const grupos = [...new Set(lista.map(([it]) => it.grupo || 'Itens gerais'))];
-      const cartao = ([it, i]) => `<button class="cartao" data-acao="add-item-catalogo" data-i="${i}" data-busca="${esc(semAcento(it.nome + ' ' + (it.resumo || '')))}"><b>${esc(it.nome)}</b>${fonteTag(it.fonte || '')}<small>${it.categoria == null ? (it.notaCategoria ? 'cat.: a do acessório +1' : 'cat. e espaços: confira no livro') : `cat. ${cat(it.categoria)} · ${it.espacos} esp.`}${it.pagina ? ` · SaH p. ${it.pagina}` : ''}</small>${it.resumo ? `<small class="apagado">${esc(it.resumo)}</small>` : ''}</button>`;
-      abrirModal('Adicionar item', `<input type="search" placeholder="Procurar item…" data-filtro-modal autofocus aria-label="Procurar item" style="margin-bottom:10px">
+      const fontes = [...new Set(lista.map(([it]) => it.fonte || 'LR'))];
+      const filtro = (rotulo, campo, valores) => `<label class="campo"><span>${rotulo}</span><select data-filtro-itens="${campo}"><option value="">Todos</option>${valores.map(v => `<option>${esc(v)}</option>`).join('')}</select></label>`;
+      const cartao = ([it, i]) => `<button class="cartao" data-acao="add-item-catalogo" data-i="${i}" data-fonte="${esc(it.fonte || 'LR')}" data-grupo="${esc(it.grupo || 'Itens gerais')}" data-busca="${esc(semAcento(it.nome + ' ' + (it.resumo || '')))}"><b>${esc(it.nome)}</b>${fonteTag(it.fonte || '')}<small>${it.categoria == null ? (it.notaCategoria ? 'cat.: a do acessório +1' : 'cat. e espaços: confira no livro') : `cat. ${cat(it.categoria)} · ${it.espacos} esp.`}${it.pagina ? ` · SaH p. ${it.pagina}` : ''}</small>${it.resumo ? `<small class="apagado">${esc(it.resumo)}</small>` : ''}</button>`;
+      abrirModal('Adicionar item', `<div class="grade c2"><label class="campo"><span>Busca</span><input type="search" placeholder="Nome ou descrição" data-filtro-itens="busca" autofocus></label>
+        ${filtro('Fonte', 'fonte', fontes)}${filtro('Tipo', 'grupo', grupos)}</div>
+        <p class="vazio" id="catalogo-itens-vazio" hidden>Nenhum item com esses filtros.</p>
         ${grupos.map(g => `<section class="grupo-itens"><h3 class="titulo-vermelho">${esc(g)}</h3><div class="cartoes">${lista.filter(([it]) => (it.grupo || 'Itens gerais') === g).sort((x, y) => x[0].nome.localeCompare(y[0].nome, 'pt')).map(cartao).join('')}</div></section>`).join('')}
-`, '', true);
+`, '<button class="btn" data-acao="item-modelos">Meus Itens</button>', true);
     },
     'add-item-catalogo': el => {
       const ficha = f(); const it = ITENS_CATALOGO[Number(el.dataset.i)]; if (!it) return;
@@ -2259,7 +2412,8 @@ export function acoesFicha(ctx) {
     'item-equipar': el => {
       const ficha = f(), it = ficha.itens[Number(el.dataset.i)]; if (!it) return;
       if (tipoEquipar(it) === 'acessorio') it.escrito = !it.escrito;
-      else { it.ativo = !it.ativo; if (it.ativo) registrarMaldições(ficha); }
+      else it.ativo = !it.ativo;
+      if (estaEquipado(it)) registrarMaldições(ficha);
       salvar();
       ctx.avisar(`${it.nome} ${estaEquipado(it) ? 'equipado: o efeito vale na ficha.' : 'desequipado: o efeito saiu da ficha.'}`);
     },
@@ -2268,18 +2422,47 @@ export function acoesFicha(ctx) {
       janelaMod(f(), el.dataset.tipo, Number(el.dataset.i), el.dataset.modo);
     },
     'janela-mod': el => janelaMod(f(), el.dataset.tipo, Number(el.dataset.i), el.dataset.modo),
+    'elemento-maldicao': el => {
+      const i = Number(el.dataset.i), k = Number(el.dataset.k), item = f().itens[i];
+      if (!item || (k < 0 ? item.nome !== PROTECAO_ELEMENTAL : item.maldicoes?.[k] !== PROTECAO_ELEMENTAL)) return;
+      janelaEscolha({
+        titulo: `Proteção Elemental · ${item.nome}`, opcoes: ELEMENTOS_MALDICAO.map(id => ({ valor: id, nome: NOME_EL[id] })), busca: false,
+        aoEscolher: id => {
+          const ficha = f();
+          if (k < 0) item.elementoMaldicao = id;
+          else {
+            item.elementosMaldicoes ||= [];
+            item.elementosMaldicoes[k] = id;
+          }
+          registrarMaldições(ficha);
+          fecharModal(); salvar();
+          if (k >= 0) janelaMod(ficha, 'item', i, 'amaldicoar');
+        },
+      });
+    },
     'alternar-mod': el => {
       const ficha = f(), { tipo, modo, id } = el.dataset, i = Number(el.dataset.i), alvo = alvoMod(ficha, tipo, i); if (!alvo) return;
-      const campo = campoMod(tipo, modo), lista = [...(alvo[campo] || [])], k = lista.indexOf(id);
+      const campo = campoMod(tipo, modo), lista = [...(alvo[campo] || [])];
+      const amaldicoar = modo === 'amaldicoar';
+      const k = amaldicoar ? (el.dataset.k == null ? -1 : Number(el.dataset.k)) : lista.indexOf(id);
+      if (el.dataset.k != null && lista[k] !== id) return;
       if (k >= 0) lista.splice(k, 1);
       else {
-        if (numerosAlvo(derivar(ficha), tipo, alvo).cat >= 4) return ctx.avisar('Este item já está na categoria IV: tire uma modificação ou maldição antes.', true);
+        if (!opcoesMod(ficha, tipo, alvo, modo).some(o => o.id === id)) return;
+        if (!amaldicoar && numerosAlvo(derivar(ficha), tipo, alvo).cat >= 4) return ctx.avisar('Este item já está na categoria IV: tire uma modificação ou maldição antes.', true);
         lista.push(id);
       }
+      if (tipo === 'item' && amaldicoar) {
+        const elementos = Array.from({ length: (alvo.maldicoes || []).length }, (_, j) => alvo.elementosMaldicoes?.[j] || '');
+        if (k >= 0) elementos.splice(k, 1);
+        else elementos.push('');
+        alvo.elementosMaldicoes = elementos;
+      }
       alvo[campo] = lista;
-      if (modo === 'amaldicoar' && k < 0) registrarMaldições(ficha);
-      ctx.salvarFicha(normalizar(ficha)); Object.assign(ficha, normalizar(ficha)); ctx.render();
-      janelaMod(f(), tipo, i, modo);
+      if (amaldicoar && k < 0) registrarMaldições(ficha);
+      const atualizada = normalizar(ficha);
+      ctx.salvarFicha(atualizada); ctx.render();
+      janelaMod(atualizada, tipo, i, modo);
     },
     'item-escolher': (el, ev) => { ev?.preventDefault(); acoesFicha(ctx).acessorio(el); },
     'item-efeito': el => {
@@ -2326,7 +2509,19 @@ export function acoesFicha(ctx) {
       if (!item.mods.includes('funcao') || !item.periciaExtra || item.periciaExtra === item.pericia) item.mods = item.mods.filter(m => m !== 'aprimorado-extra');
       if (item.periciaExtra === item.pericia || !item.mods.includes('funcao')) item.periciaExtra = '';
       if (!item.mods.includes('instrumental')) item.periciaKit = '';
+      if (item.escrito) registrarMaldições(f());
       fecharModal(); salvar();
+    },
+    'vincular-conjuracao': el => {
+      const item = f().itens.find(it => it.uid === el.dataset.uid);
+      if (!temConjuracao(item)) return;
+      janelaEscolha({ titulo: `Conjuração · ${item.nome}`, intro: 'Vincule um ritual de 1º círculo. Equipe e empunhe o item para conjurá-lo.',
+        opcoes: RITUAIS.filter(r => r.circulo === 1 && (r.fonte !== 'SaH' || f().modo === 'sah')).map(r => ({ valor: r.id, nome: r.nome, desc: r.resumo })),
+        aoEscolher: id => {
+          const atual = f().itens.find(it => it.uid === el.dataset.uid);
+          if (!temConjuracao(atual)) return;
+          atual.ritualConjuracao = id; fecharModal(); salvar();
+        } });
     },
     'vincular-item': el => {
       const ficha = f(), item = ficha.itens[Number(el.dataset.i)];

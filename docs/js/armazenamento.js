@@ -1,6 +1,6 @@
 // armazenamento.js — salva tudo no navegador (localStorage). Sem servidor, sem login.
 // Chaves: fichaoculta-fichas (agentes), fichaoculta-mestre (Área do Mestre), fichaoculta-tema, fichaoculta-rolagens.
-import { normalizar } from './regras.js?v=0.40.3';
+import { normalizar } from './regras.js?v=0.40.5';
 const CHAVE_FICHAS = 'fichaoculta-fichas';
 const ler = (k, padrao) => { try { const v = localStorage.getItem(k); return v == null ? padrao : JSON.parse(v); } catch { return padrao; } };
 const gravar = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { console.warn('Não consegui salvar', e); return false; } };
@@ -10,6 +10,13 @@ export function carregarFichas() {
   return Array.isArray(lista) ? lista.slice(0, 200).map(normalizar) : [];
 }
 export function salvarFichas(fichas) { return gravar(CHAVE_FICHAS, fichas); }
+const CHAVE_MODELOS_ITENS = 'fichaoculta-modelos-itens';
+export function carregarModelosItens() {
+  const itens = ler(CHAVE_MODELOS_ITENS, []);
+  if (!Array.isArray(itens)) return [];
+  return itens.slice(0, 120).flatMap(item => item?.nome && item?.uid ? normalizar({ itens: [item] }).itens : []);
+}
+export const salvarModelosItens = itens => gravar(CHAVE_MODELOS_ITENS, itens.slice(0, 120));
 export const carregarMestre = () => ler('fichaoculta-mestre', null);
 export const salvarMestre = m => gravar('fichaoculta-mestre', m);
 // A escolha é estética, global e independente da afinidade do personagem.

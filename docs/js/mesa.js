@@ -56,6 +56,7 @@ export function normalizarCodigo(c) {
 }
 export const idDoPeer = codigo => PREFIXO + codigo.toLowerCase();
 export const linkConvite = (codigo, base = location.href) => `${base.split('#')[0]}#/mesa/${codigo}`;
+export const acessoDoMestre = (ficha, codigo) => ficha?.permissoesMesa?.[normalizarCodigo(codigo)] === 'editar' ? 'editar' : 'consulta';
 // O que o mestre vê da ficha de um jogador
 export function resumoFicha(f, d) {
   return {
@@ -64,7 +65,7 @@ export function resumoFicha(f, d) {
     pd: d.pd ? d.atual.pd : null, pdMax: d.pd ? d.pdMax : null,
     pe: d.pd ? null : d.atual.pe, peMax: d.pd ? null : d.pe,
     san: d.pd ? null : d.atual.san, sanMax: d.pd ? null : d.san,
-    defesa: d.defesa, condicoes: [...(f.condicoes || [])],
+    acesso: acessoDoMestre(f, mesa.codigo), defesa: d.defesa, condicoes: [...(f.condicoes || [])],
   };
 }
 // Rolagem no formato do feed (sem nada da ficha além do resultado)
@@ -136,8 +137,9 @@ export function mostrarAosJogadores(x) {
 // O mestre aplica dano, cura ou condição na ficha de um jogador conectado
 export function comandoParaJogador(peerId, cmd) {
   const c = conns.get(peerId);
-  if (!c?.open) return false;
-  enviar(c, { t: 'cmd', ...cmd }); return true;
+  const jogador = mesa.jogadores[peerId];
+  if (!c?.open || !jogador?.online || jogador.acesso === 'consulta') return false;
+  enviar(c, { ...cmd, t: 'cmd', fichaId: jogador.id }); return true;
 }
 
 // ---------- Jogador ----------
@@ -152,10 +154,11 @@ export async function entrarMesa(codigo, fichaId) {
   const conectar = () => {
     if (mesa.papel !== 'jogador' || !peer || peer.destroyed) return;
     clearTimeout(tentativa);
-    conn = peer.connect(idDoPeer(cod), { reliable: true, metadata: { fichaId } });
-    conn.on('open', () => { mesa.status = 'conectada'; mesa.erro = ''; mudou(); pedirFicha(); });
-    conn.on('data', receberDoMestre);
-    conn.on('close', () => { if (mesa.papel !== 'jogador') return; mesa.status = 'reconectando'; mudou(); tentativa = setTimeout(conectar, 3000); });
+    const atual = peer.connect(idDoPeer(cod), { reliable: true, metadata: { fichaId } });
+    conn = atual;
+    atual.on('open', () => { if (conn !== atual) return; mesa.status = 'conectada'; mesa.erro = ''; mudou(); pedirFicha(); });
+    atual.on('data', msg => { if (conn === atual) receberDoMestre(msg); });
+    atual.on('close', () => { if (conn !== atual || mesa.papel !== 'jogador') return; mesa.status = 'reconectando'; mudou(); tentativa = setTimeout(conectar, 3000); });
   };
   peer.on('open', conectar);
   peer.on('error', e => {
@@ -190,7 +193,9 @@ export function sairDaMesa({ manterCodigo = false } = {}) {
   clearTimeout(tentativa);
   for (const c of conns.values()) { try { c.close(); } catch {} }
   conns.clear();
-  try { conn?.close(); } catch {}
+  const conexao = conn;
+  conn = null;
+  try { conexao?.close(); } catch {}
   try { peer?.destroy(); } catch {}
   peer = null; conn = null;
   const eraJogador = mesa.papel === 'jogador';

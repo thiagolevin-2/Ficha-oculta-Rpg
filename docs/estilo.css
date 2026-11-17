@@ -1217,12 +1217,13 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 .grau-chip.grau-0 i { background: transparent; border: 1px solid var(--g); }
 .grau-chip b { color: var(--tinta); }
 .pericias-grade { display: grid; gap: 4px; }
-.pericia-linha { display: grid; grid-template-columns: minmax(130px, 1.5fr) 48px minmax(120px, 150px) 76px minmax(170px, auto); align-items: center; gap: 10px;
+.pericia-linha { display: grid; grid-template-columns: minmax(130px, 1.5fr) 85px minmax(120px, 150px) 76px minmax(170px, auto); align-items: center; gap: 10px;
   padding: 5px 10px; border-left: 4px solid var(--g); border-radius: 6px; background: linear-gradient(90deg, var(--g-fundo), transparent 60%); }
 .pericia-linha:not(.pericia-cabeca):hover { background: linear-gradient(90deg, var(--g-fundo), color-mix(in srgb, var(--g) 8%, transparent)); }
 .pericia-cabeca { border-left-color: transparent; background: none; font: 600 .7rem var(--fonte-dossie); letter-spacing: .08em; text-transform: uppercase; color: var(--apagado); padding-top: 0; padding-bottom: 2px; }
 .pericia-nome { font-weight: 600; color: var(--tinta); }
 .grau-0 .pericia-nome { font-weight: 400; color: var(--apagado); }
+.pericia-atr select { width: 100%; min-height: 32px; padding: 3px 4px; font-size: .8rem; }
 .pericia-atr { font: .78rem var(--fonte-dossie); color: var(--apagado); text-align: center; }
 .pericia-grau { min-height: 32px; padding: 3px 8px; border-color: var(--g) !important; }
 .grau-1 .pericia-grau, .grau-2 .pericia-grau, .grau-3 .pericia-grau { color: var(--g); font-weight: 700; }
@@ -1359,3 +1360,5 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 
 /* O círculo decorativo do topo passa da borda: a página não pode rolar de lado por causa dele */
 html { overflow-x: clip; }
+
+#catalogo-itens-vazio[hidden] { display: none; }

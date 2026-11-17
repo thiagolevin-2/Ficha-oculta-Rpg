@@ -1,10 +1,10 @@
-import { sofrerDano, resolverCondicoesDoTurno, iniciarTurno, encerrarTurno, fimDeCena, d as dado, rolarTeste } from './combate.js?v=0.40.3';
-import { ELEMENTOS, ATRIBUTOS, CONDICOES, EVENTOS_INVESTIGACAO, CLASSES, LIVROS_DIGITALIZADOS } from './catalogo.js?v=0.40.3';
-import { temPeso, derivar, normalizar } from './regras.js?v=0.40.3';
-import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.40.3';
-import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal, reduzirImagem } from './util.js?v=0.40.3';
-import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.40.3';
-import { mesa, abrirMesa, fecharMesa, publicarIniciativa, comandoParaJogador, linkConvite, mostrarAosJogadores, imagemValida } from './mesa.js?v=0.40.3';
+import { sofrerDano, resolverCondicoesDoTurno, iniciarTurno, encerrarTurno, fimDeCena, d as dado, rolarTeste } from './combate.js?v=0.40.5';
+import { ELEMENTOS, ATRIBUTOS, CONDICOES, EVENTOS_INVESTIGACAO, CLASSES, LIVROS_DIGITALIZADOS } from './catalogo.js?v=0.40.5';
+import { temPeso, derivar, normalizar } from './regras.js?v=0.40.5';
+import { carregarMestre, salvarMestre } from './armazenamento.js?v=0.40.5';
+import { esc, uid, inteiro, semAcento, sigilo, baixarArquivo, escolherArquivo, comSinal, reduzirImagem } from './util.js?v=0.40.5';
+import { rolarTesteUI, rolarDanoUI, abrirModal, fecharModal } from './rolagem.js?v=0.40.5';
+import { mesa, abrirMesa, fecharMesa, publicarIniciativa, comandoParaJogador, linkConvite, mostrarAosJogadores, imagemValida } from './mesa.js?v=0.40.5';
 // ═══════════ bestiario ═══════════
 // Fichas de referência. As habilidades de texto são resolvidas pelo mestre.
 export const AMEACAS_BASE = [
@@ -63,7 +63,7 @@ export function definirBestiario(lista) { BESTIARIO = lista.map(preparar); retur
 export async function carregarBestiario() {
   if (BESTIARIO) return BESTIARIO;
   let lista = [];
-  const partes = await Promise.all(ARQUIVOS_BESTIARIO.map(async n => { try { const r = await fetch(`dados/${n}.json?v=0.40.3`); return r.ok ? await r.json() : []; } catch (e) { console.warn('Bestiário indisponível', n, e); return []; } }));
+  const partes = await Promise.all(ARQUIVOS_BESTIARIO.map(async n => { try { const r = await fetch(`dados/${n}.json?v=0.40.5`); return r.ok ? await r.json() : []; } catch (e) { console.warn('Bestiário indisponível', n, e); return []; } }));
   lista = partes.flat();
   return definirBestiario(lista);
 }
@@ -239,17 +239,19 @@ export function htmlFeed(feed, { mestre: ehMestre = false } = {}) {
 const barra = (atual, max, cor) => `<span class="barra-mini" style="--cor:${cor}"><b style="width:${Math.max(0, Math.min(100, (atual / Math.max(1, max)) * 100))}%"></b></span>`;
 function cartaoJogador(peer, j, i) {
   const recurso = j.pd != null ? [['PD', j.pd, j.pdMax, 'var(--vela)']] : [['PE', j.pe, j.peMax, 'var(--vela)'], ['SAN', j.san, j.sanMax, 'var(--roxo)']];
+  const podeEditar = j.online && j.acesso !== 'consulta';
   const conds = (j.condicoes || []).map(id => CONDICOES.find(c => c.id === id)?.nome || id);
-  return `<div class="hab jogador-mesa${j.online ? '' : ' offline'}"><span class="meta"><span class="${j.online ? 'online-sim' : 'online-nao'}">${j.online ? '● online' : '○ offline'}</span></span>
+  return `<div class="hab jogador-mesa${j.online ? '' : ' offline'}"><span class="meta"><span class="${j.online ? 'online-sim' : 'online-nao'}">${j.online ? '● online' : '○ offline'}</span>${j.acesso ? ` <small>${j.acesso === 'editar' ? 'Edição liberada' : 'Só consulta'}</small>` : ''}</span>
     <b>${esc(j.nome)}</b> <small class="apagado">${esc(j.classe || '')} · NEX ${esc(String(j.nex ?? '?'))}% · Defesa ${j.defesa}</small>
     <div class="recursos-mesa"><div><span>PV ${j.pv}/${j.pvMax}${j.pvTemp ? ` (+${j.pvTemp})` : ''}</span>${barra(j.pv, j.pvMax, 'var(--sangue)')}</div>${recurso.map(([n, a, m, cor]) => `<div><span>${n} ${a}/${m}</span>${barra(a, m, cor)}</div>`).join('')}</div>
     ${conds.length ? `<p class="apagado" style="font-size:.85rem">Condições: ${conds.map(esc).join(' · ')}</p>` : ''}
-    <div class="linha" style="margin-top:6px;flex-wrap:wrap"><input type="number" min="0" style="width:76px" id="mj-q-${i}" placeholder="qtd" aria-label="Quantidade para ${esc(j.nome)}">
-      <button class="btn pequeno" data-acao="m-j-cmd" data-peer="${esc(peer)}" data-i="${i}" data-c="dano" ${j.online ? '' : 'disabled'}>Dano</button>
-      <button class="btn pequeno" data-acao="m-j-cmd" data-peer="${esc(peer)}" data-i="${i}" data-c="mental" ${j.online ? '' : 'disabled'}>Dano mental</button>
-      <button class="btn pequeno" data-acao="m-j-cmd" data-peer="${esc(peer)}" data-i="${i}" data-c="cura" ${j.online ? '' : 'disabled'}>Curar PV</button>
-      <button class="btn pequeno" data-acao="m-j-cmd" data-peer="${esc(peer)}" data-i="${i}" data-c="recupera" ${j.online ? '' : 'disabled'}>Recuperar ${j.pd != null ? 'PD' : 'PE'}</button>
-      <button class="btn pequeno" data-acao="m-j-cond" data-peer="${esc(peer)}" ${j.online ? '' : 'disabled'}>Condições</button></div></div>`;
+    <div class="linha" style="margin-top:6px;flex-wrap:wrap"><input type="number" min="0" style="width:76px" id="mj-q-${i}" placeholder="qtd" aria-label="Quantidade para ${esc(j.nome)}" ${podeEditar ? '' : 'disabled'}>
+      <button class="btn pequeno" data-acao="m-j-cmd" data-peer="${esc(peer)}" data-i="${i}" data-c="dano" ${podeEditar ? '' : 'disabled'}>Dano</button>
+      <button class="btn pequeno" data-acao="m-j-cmd" data-peer="${esc(peer)}" data-i="${i}" data-c="mental" ${podeEditar ? '' : 'disabled'}>Dano mental</button>
+      <button class="btn pequeno" data-acao="m-j-cmd" data-peer="${esc(peer)}" data-i="${i}" data-c="cura" ${podeEditar ? '' : 'disabled'}>Curar PV</button>
+      <button class="btn pequeno" data-acao="m-j-cmd" data-peer="${esc(peer)}" data-i="${i}" data-c="recupera" ${podeEditar ? '' : 'disabled'}>Recuperar ${j.pd != null ? 'PD' : 'PE'}</button>
+      <button class="btn pequeno" data-acao="m-j-recursos" data-peer="${esc(peer)}" ${podeEditar && j.acesso === 'editar' ? '' : 'disabled'}>Editar recursos</button>
+      <button class="btn pequeno" data-acao="m-j-cond" data-peer="${esc(peer)}" ${podeEditar ? '' : 'disabled'}>Condições</button></div></div>`;
 }
 function abaMesa() {
   if (mesa.papel === 'jogador') return `<section class="painel"><h2 class="faixa">Mesa online</h2><p>Você está numa mesa como <b>jogador</b> (${esc(mesa.codigo)}). Saia dela pelo botão 🌐 Mesa para abrir a sua.</p></section>`;
@@ -445,6 +447,7 @@ function defesaDe(ctx, p) {
 export function danoNoParticipante(ctx, p, valor, { mental = false } = {}) {
   if (!p || !valor) return '';
   if (p.tipo === 'jogador') {
+    if (mesa.jogadores[p.ref]?.acesso === 'consulta') return `${p.nome} está em modo de consulta`;
     const ok = comandoParaJogador(p.ref, valor > 0 ? { acao: 'dano', valor, tipo: mental ? 'mental' : 'pv' } : { acao: 'cura', valor: -valor, recurso: 'pv' });
     return ok ? `${p.nome}: ${valor > 0 ? `${valor} de dano${mental ? ' mental' : ''}` : `+${-valor} PV`} enviado` : `${p.nome} está offline`;
   }
@@ -690,16 +693,36 @@ export function acoesMestre(ctx) {
     'm-add-jogador': el => { const j = mesa.jogadores[el.dataset.peer]; if (!j || mestre.combate.participantes.some(p => p.tipo === 'jogador' && p.ref === el.dataset.peer)) return; mestre.combate.participantes.push({ uid: uid(), nome: j.nome, tipo: 'jogador', ref: el.dataset.peer, ini: null, pv: j.pv, pvMax: j.pvMax, nota: '' }); att(); },
     'm-j-cmd': el => {
       const j = mesa.jogadores[el.dataset.peer]; if (!j) return;
+      if (j.acesso === 'consulta') return ctx.avisar(`${j.nome} está em modo de consulta.`, true);
       const q = inteiro(document.getElementById('mj-q-' + el.dataset.i)?.value, 0, 99999, 0); if (!q) return ctx.avisar('Digite a quantidade.', true);
       const c = el.dataset.c;
       const cmd = c === 'dano' ? { acao: 'dano', valor: q, tipo: 'pv' } : c === 'mental' ? { acao: 'dano', valor: q, tipo: 'mental' } : c === 'cura' ? { acao: 'cura', valor: q, recurso: 'pv' } : { acao: 'cura', valor: q, recurso: j.pd != null ? 'pd' : 'pe' };
       if (!comandoParaJogador(el.dataset.peer, cmd)) return ctx.avisar(`${j.nome} está offline.`, true);
       ctx.avisar(`${j.nome}: ${c === 'cura' ? `+${q} PV` : c === 'recupera' ? `+${q} ${j.pd != null ? 'PD' : 'PE'}` : `${q} de dano${c === 'mental' ? ' mental' : ''}`} enviado.`);
     },
+    'm-j-recursos': el => {
+      const j = mesa.jogadores[el.dataset.peer];
+      if (!j?.online || j.acesso !== 'editar') return;
+      const campos = j.pd != null ? ['pv', 'pd'] : ['pv', 'pe', 'san'];
+      abrirModal(`Recursos · ${j.nome}`, `<div class="grade c2">${campos.map(k => `<label class="campo"><span>${k.toUpperCase()}</span><input type="number" min="-999" max="9999" data-m-j-recurso="${k}" value="${esc(j[k])}" data-original="${esc(j[k])}"></label>`).join('')}</div>`,
+        `<button class="btn sangue" data-acao="m-j-recursos-salvar" data-peer="${esc(el.dataset.peer)}">Aplicar alterações</button>`);
+    },
+    'm-j-recursos-salvar': el => {
+      const j = mesa.jogadores[el.dataset.peer];
+      if (!j?.online || j.acesso !== 'editar') return ctx.avisar('Edição indisponível para este jogador.', true);
+      const campos = [...document.querySelectorAll('[data-m-j-recurso]')];
+      if (campos.some(c => !c.value || !c.checkValidity())) return ctx.avisar('Informe valores inteiros válidos para os recursos.', true);
+      const recursos = Object.fromEntries(campos.filter(c => c.value !== c.dataset.original).map(c => [c.dataset.mJRecurso, Number(c.value)]));
+      if (Object.keys(recursos).length && !comandoParaJogador(el.dataset.peer, { acao: 'recursos', recursos })) return ctx.avisar('Não foi possível enviar as alterações.', true);
+      fecharModal();
+    },
     'm-j-cond': el => { const j = mesa.jogadores[el.dataset.peer]; if (!j) return;
+      if (j.acesso === 'consulta') return ctx.avisar(`${j.nome} está em modo de consulta.`, true);
       abrirModal('Condições · ' + j.nome, `<div class="grade c2">${CONDICOES.map(c => `<label class="check"><input type="checkbox" data-m-cond="${c.id}" ${(j.condicoes || []).includes(c.id) ? 'checked' : ''}><span>${esc(c.nome)}</span></label>`).join('')}</div>`,
         `<button class="btn sangue" data-acao="m-j-cond-salvar" data-peer="${esc(el.dataset.peer)}">Enviar para ${esc(j.nome)}</button>`, true); },
-    'm-j-cond-salvar': el => { const lista = [...document.querySelectorAll('[data-m-cond]:checked')].map(x => x.dataset.mCond);
+    'm-j-cond-salvar': el => {
+      if (mesa.jogadores[el.dataset.peer]?.acesso === 'consulta') return ctx.avisar('Jogador está em modo de consulta.', true);
+      const lista = [...document.querySelectorAll('[data-m-cond]:checked')].map(x => x.dataset.mCond);
       if (!comandoParaJogador(el.dataset.peer, { acao: 'condicoes', lista })) return ctx.avisar('Jogador offline.', true);
       fecharModal(); ctx.avisar('Condições enviadas.'); },
 
