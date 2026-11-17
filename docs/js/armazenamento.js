@@ -1,6 +1,6 @@
 // armazenamento.js — salva tudo no navegador (localStorage). Sem servidor, sem login.
 // Chaves: fichaoculta-fichas (agentes), fichaoculta-mestre (Área do Mestre), fichaoculta-tema, fichaoculta-rolagens.
-import { normalizar } from './regras.js?v=0.40.5';
+import { normalizar } from './regras.js?v=0.40.6';
 const CHAVE_FICHAS = 'fichaoculta-fichas';
 const ler = (k, padrao) => { try { const v = localStorage.getItem(k); return v == null ? padrao : JSON.parse(v); } catch { return padrao; } };
 const gravar = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { console.warn('Não consegui salvar', e); return false; } };
@@ -26,7 +26,10 @@ export const carregarElemento = () => {
   catch { return 'sangue'; }
 };
 // Animações: 'sistema' (segue o "reduzir movimento" do sistema) ou 'sempre' (ligadas mesmo assim)
-export const carregarAnimacoes = () => { try { return localStorage.getItem('fichaoculta-animacoes') === 'sempre' ? 'sempre' : 'sistema'; } catch { return 'sistema'; } };
+export const carregarAnimacoes = () => {
+  try { return localStorage.getItem('fichaoculta-animacoes') === 'sistema' ? 'sistema' : 'sempre'; }
+  catch { return 'sempre'; }
+};
 export const salvarAnimacoes = v => { try { localStorage.setItem('fichaoculta-animacoes', v === 'sempre' ? 'sempre' : 'sistema'); } catch {} };
 export const salvarElemento = e => { if (!ELEMENTOS_VISUAIS_VALIDOS.includes(e)) return; try { localStorage.setItem('fichaoculta-elemento', e); } catch {} };
 export const carregarRolagens = () => { const r = ler('fichaoculta-rolagens', []); return Array.isArray(r) ? r.slice(0, 60) : []; };

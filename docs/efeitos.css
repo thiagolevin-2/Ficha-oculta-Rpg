@@ -189,7 +189,7 @@
 :root[data-elemento] .painel-status .numeros-chave {grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px}
 :root[data-elemento] .painel-status > .grade.c2 {grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
 :root[data-elemento] .painel-status > .linha {justify-content:flex-end}
-@media(max-width:680px) {
+@media(max-width:1100px) {
  :root[data-elemento] .visao-agente.grade.c2 {grid-template-columns:1fr}
  :root[data-elemento] .painel-status .numeros-chave {grid-template-columns:repeat(3,minmax(0,1fr))}
  :root[data-elemento] .painel-status > .grade.c2 {grid-template-columns:1fr}

@@ -1,4 +1,4 @@
-import { MODIFICACAO, PODER_PARANORMAL, RITUAIS } from './catalogo.js?v=0.40.5';
+import { MODIFICACAO, PODER_PARANORMAL, RITUAIS } from './catalogo.js?v=0.40.6';
 export const ELEMENTOS_MALDICAO = ['conhecimento', 'energia', 'morte', 'sangue', 'medo'];
 export const PROTECAO_ELEMENTAL = 'Acessório amaldiçoado: Proteção Elemental';
 // ═══════════ amaldicoados ═══════════

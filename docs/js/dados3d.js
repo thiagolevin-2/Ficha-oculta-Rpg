@@ -65,7 +65,14 @@ function lerTemaDados(){try{const css=getComputedStyle(document.documentElement)
 let preference=null,active=null;
 try{preference=localStorage.getItem('fichaoculta-dados3d')}catch{}
 export const diceAnimationsEnabled=()=>preference==='on'||preference!=='off'&&!(motionPreference?.matches&&document.documentElement?.dataset?.animacoes!=='sempre');
-export function setDiceAnimations(enabled){preference=enabled?'on':'off';try{localStorage.setItem('fichaoculta-dados3d',preference)}catch{}if(!enabled)skipDiceAnimation()}
+export function setDiceAnimations(enabled) {
+ preference = enabled == null ? null : enabled ? 'on' : 'off';
+ try {
+  if (preference == null) localStorage.removeItem('fichaoculta-dados3d');
+  else localStorage.setItem('fichaoculta-dados3d', preference);
+ } catch {}
+ if (!diceAnimationsEnabled()) skipDiceAnimation();
+}
 export function skipDiceAnimation(){active?.finish()}
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const ease=t=>1-Math.pow(1-clamp(t,0,1),3);

@@ -1,19 +1,19 @@
-import { registrarMaldições } from './amaldicoados.js?v=0.40.5';
-import { LIVROS_DIGITALIZADOS, NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.40.5';
-import { aplicarContaminacao } from './contaminacao.js?v=0.40.5';
-import { ELEMENTOS_VISUAIS, aplicarElemento, aplicarAnimacoes, sistemaReduzMovimento, $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.40.5';
-import { normalizar, derivar } from './regras.js?v=0.40.5';
-import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, carregarAnimacoes, salvarAnimacoes, espacoUsado } from './armazenamento.js?v=0.40.5';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.40.5';
-import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.40.5';
-import { telaMestre, acoesMestre, campoMestre, htmlFeed } from './mestre.js?v=0.40.5';
-import { mesa, quandoMesaMudar, quandoMostrar, quandoComando, quandoPedirFicha, enviarFicha, resumoFicha, acessoDoMestre, rolagemNaMesa, entrarMesa, sairDaMesa, voltarSeEstavaNaMesa, normalizarCodigo, abrirMesa, codigoGuardadoDoMestre } from './mesa.js?v=0.40.5';
-import { sofrerDano, recuperar, adicionarCondicao } from './combate.js?v=0.40.5';
-import { definirRaizModal, abrirModal, fecharModal, htmlHistorico, ouvintesRolagem, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.40.5';
+import { registrarMaldições } from './amaldicoados.js?v=0.40.6';
+import { LIVROS_DIGITALIZADOS, NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.40.6';
+import { aplicarContaminacao } from './contaminacao.js?v=0.40.6';
+import { ELEMENTOS_VISUAIS, aplicarElemento, aplicarAnimacoes, sistemaReduzMovimento, $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.40.6';
+import { normalizar, derivar } from './regras.js?v=0.40.6';
+import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, carregarAnimacoes, salvarAnimacoes, espacoUsado } from './armazenamento.js?v=0.40.6';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.40.6';
+import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.40.6';
+import { telaMestre, acoesMestre, campoMestre, htmlFeed } from './mestre.js?v=0.40.6';
+import { mesa, quandoMesaMudar, quandoMostrar, quandoComando, quandoPedirFicha, enviarFicha, resumoFicha, acessoDoMestre, rolagemNaMesa, entrarMesa, sairDaMesa, voltarSeEstavaNaMesa, normalizarCodigo, abrirMesa, codigoGuardadoDoMestre } from './mesa.js?v=0.40.6';
+import { sofrerDano, recuperar, adicionarCondicao } from './combate.js?v=0.40.6';
+import { definirRaizModal, abrirModal, fecharModal, htmlHistorico, ouvintesRolagem, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.40.6';
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
 
-export const VERSAO = '0.40.5';
+export const VERSAO = '0.40.6';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -33,7 +33,7 @@ let buscaLivroDigital = '';
 async function abrirLivroDigital(id, pagina=1) {
   if (!LIVROS_DIGITALIZADOS.some(v=>v.id===id)) return;
   try {
-    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.40.5', {cache:'no-cache'});
+    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.40.6', {cache:'no-cache'});
     if (!resp.ok) throw new Error('Não foi possível carregar esta transcrição.');
     livroDigital = await resp.json(); paginaDigital = Math.min(Math.max(1, Number(pagina)||1),livroDigital.paginas.length); buscaLivroDigital = '';
     render();
@@ -44,11 +44,11 @@ async function abrirLivroDigital(id, pagina=1) {
 }
 
 async function carregarSuplementos(){
-  try { const r=await fetch('dados/suplementos.json?v=0.40.5'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
+  try { const r=await fetch('dados/suplementos.json?v=0.40.6'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
 }
 async function carregarReferenciasSAH(){
   try {
-    const r = await fetch('dados/sah_referencias.json?v=0.40.5', {cache:'no-cache'});
+    const r = await fetch('dados/sah_referencias.json?v=0.40.6', {cache:'no-cache'});
     if(r.ok) SAH_REF = await r.json();
   } catch(e){ console.warn('Índice do Sobrevivendo ao Horror não disponível', e); }
 }
@@ -289,8 +289,13 @@ quandoMudar(() => { if (estado.historicoAberto) render(); });
 // ---------- Ações gerais ----------
 // Botão do menu: animações automáticas (seguem o "reduzir movimento" do sistema) ou sempre ligadas
 function botaoAnimacoes() {
-  const sempre = estado.animacoes === 'sempre', parado = !sempre && sistemaReduzMovimento();
-  return `<button class="btn pequeno botao-animacoes${sempre ? ' ligado' : ''}" data-acao="alternar-animacoes" aria-pressed="${sempre}" title="${sempre ? 'Animações ligadas mesmo com o sistema pedindo menos movimento. Clique para voltar a seguir o sistema.' : `${parado ? 'Seu sistema pede menos movimento, então as animações estão paradas. ' : 'As animações seguem o sistema. '}Clique para deixá-las sempre ligadas.`}">${sempre ? '✦ Animações: ligadas' : parado ? '◌ Animações: paradas' : '✦ Animações: automáticas'}</button>`;
+  const dadosLigados = animacoesLigadas();
+  const sempre = estado.animacoes === 'sempre' && dadosLigados;
+  const parado = estado.animacoes !== 'sempre' && sistemaReduzMovimento();
+  const texto = sempre ? '✦ Animações: ligadas' : !dadosLigados ? '◌ Ativar animações' : '✦ Animações: automáticas';
+  const titulo = sempre ? 'Interface e dados 3D ligados. Clique para seguir a preferência de movimento do sistema.'
+    : `${parado ? 'O sistema está reduzindo o movimento. ' : ''}Clique para ativar as animações da interface e os dados 3D.`;
+  return `<button class="btn pequeno botao-animacoes${sempre ? ' ligado' : ''}" data-acao="alternar-animacoes" aria-pressed="${sempre}" title="${titulo}">${texto}</button>`;
 }
 const acoes = {
   'mesa-painel': () => { estado.mesaAberta = !estado.mesaAberta; render(); },
@@ -305,8 +310,11 @@ const acoes = {
   'mesa-entrar': async el => { await entrarMesa(el.dataset.codigo, el.dataset.id); estado.mesaAberta = true; location.hash = `#/agente/${el.dataset.id}`; },
   'mesa-sair': () => { if (!confirm('Sair da mesa online?')) return; sairDaMesa(); estado.mesaAberta = false; render(); },
   'alternar-animacoes': () => {
-    estado.animacoes = estado.animacoes === 'sempre' ? 'sistema' : 'sempre';
-    salvarAnimacoes(estado.animacoes); aplicarAnimacoes(estado.animacoes); render();
+    estado.animacoes = estado.animacoes === 'sempre' && animacoesLigadas() ? 'sistema' : 'sempre';
+    salvarAnimacoes(estado.animacoes);
+    aplicarAnimacoes(estado.animacoes);
+    ligarAnimacoes(estado.animacoes === 'sempre' ? true : null);
+    render();
     avisar(estado.animacoes === 'sempre' ? 'Animações sempre ligadas.' : sistemaReduzMovimento() ? 'Animações seguindo o sistema: ele pede menos movimento, então ficam paradas.' : 'Animações seguindo o sistema.');
   },
   ...acoesCriador(ctx), ...acoesFicha(ctx), ...acoesMestre(ctx),
@@ -334,7 +342,7 @@ const acoes = {
   },
   'exportar-todos': () => baixarArquivo(`agentes-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ tipo: 'fichaoculta-fichas', versao: 1, fichas: estado.fichas }, null, 2)),
 };
-const checks = { ...checksFicha(ctx), 'animacoes': el => { ligarAnimacoes(el.checked); avisar(el.checked ? 'Animação ligada.' : 'Animação desligada.'); } };
+const checks = { ...checksFicha(ctx), 'animacoes': el => { ligarAnimacoes(el.checked); render(); avisar(el.checked ? 'Animação ligada.' : 'Animação desligada.'); } };
 
 document.addEventListener('click', ev => {
   const alvo = ev.target.closest('[data-acao]');
