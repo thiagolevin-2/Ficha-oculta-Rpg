@@ -1304,3 +1304,54 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 .mostrado p, .mostrado-antigo p { white-space: pre-wrap; font-size: .9rem; margin: 4px 0 0; }
 .mostrado-antigo { font-size: .9rem; margin: 2px 0; }
 .mostrado-antigo summary { cursor: pointer; }
+.best-cartao .conferir { color: var(--vela); font-size: .75rem; }
+.numeros-chave .chave b.longo { font-size: 1.05rem; line-height: 1.3; }
+
+/* Anotações do mestre em post-its */
+.mural { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.postit { --pi: #f3d36b; position: relative; background: color-mix(in srgb, var(--pi) 16%, var(--painel)); border: 1px solid color-mix(in srgb, var(--pi) 55%, transparent); border-top: 6px solid var(--pi); border-radius: 4px; box-shadow: 0 6px 14px #0004; transition: transform .15s; }
+.postit:nth-child(3n+1) { transform: rotate(-.6deg); } .postit:nth-child(3n+2) { transform: rotate(.5deg); }
+.postit:hover { transform: translateY(-2px); }
+.postit.fixada { outline: 2px solid var(--pi); }
+.cor-amarelo { --pi: #e9c24a; } .cor-rosa { --pi: #e0709a; } .cor-verde { --pi: #6cbf7a; } .cor-azul { --pi: #5d9be0; } .cor-roxo { --pi: #a07ce0; }
+.postit-abrir { display: block; width: 100%; text-align: left; background: none; border: 0; color: inherit; padding: 12px 12px 4px; cursor: pointer; font: inherit; }
+.postit-abrir h3 { margin: 0; font-size: 1.05rem; }
+.postit-sub { margin: 2px 0 0; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--pi); font-family: var(--fonte-ui); }
+.postit-texto { margin: 8px 0 0; white-space: pre-wrap; font-size: .92rem; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+.postit-acoes { display: flex; justify-content: flex-end; gap: 2px; padding: 0 6px 6px; }
+.cor-opcao { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; transform: none !important; cursor: pointer; }
+.postit-leitura { max-height: 65vh; }
+[data-busca-nota][hidden] { display: none; }
+.postit:not(.fixada) [data-acao="m-nota-fixar"] { opacity: .35; filter: grayscale(1); }
+
+/* Encontros */
+.encontro { border-top-color: var(--vela); }
+.encontro.ativo { outline: 2px solid var(--sangue); }
+.encontro-atual { margin: 0 0 6px; font-family: var(--fonte-ui); letter-spacing: .06em; text-transform: uppercase; font-size: .82rem; color: var(--sangue); }
+.enc-linha { gap: 8px; align-items: center; padding: 3px 0; }
+.area-alvo { justify-content: space-between; border-bottom: 1px solid var(--linha); padding: 2px 0; }
+.acerto { color: var(--ok); } .erro { color: var(--sangue); }
+
+/* Base do Mestre x Escudo do Mestre */
+.mestre-partes { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 3fr); gap: 10px; margin-bottom: 12px; }
+.parte-mestre { border: 1px solid var(--linha); border-radius: var(--raio); padding: 6px 8px 8px; opacity: .78; }
+.parte-mestre.ativa { border-color: var(--sangue); opacity: 1; background: color-mix(in srgb, var(--sangue) 6%, transparent); }
+.parte-titulo { display: block; font-family: var(--fonte-ui); font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--sangue); margin: 0 0 4px 4px; }
+.parte-titulo small { color: var(--apagado); letter-spacing: .04em; text-transform: none; }
+.parte-mestre .abas { margin: 0; flex-wrap: wrap; }
+@media (max-width: 800px) { .mestre-partes { grid-template-columns: 1fr; } }
+.escudo-barra { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: center; padding: 8px 10px; margin-bottom: 12px; border: 1px solid var(--linha-forte); border-radius: var(--raio); background: var(--painel); }
+.escudo-barra .btn.ativo { border-color: var(--sangue); color: var(--sangue); }
+.btn.escondido-on { border-color: var(--vela); color: var(--vela); }
+.janela-flutuante { position: fixed; z-index: 40; width: 330px; max-width: calc(100vw - 16px); max-height: 62vh; display: flex; flex-direction: column; background: var(--painel); border: 1px solid var(--linha-forte); border-top: 3px solid var(--sangue); border-radius: var(--raio); box-shadow: 0 14px 32px #000a; }
+.jf-barra { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px 6px 12px; cursor: move; user-select: none; touch-action: none; border-bottom: 1px solid var(--linha); font-family: var(--fonte-ui); font-size: .85rem; }
+.jf-corpo { padding: 10px; overflow: auto; }
+.jf-lista { list-style: none; margin: 6px 0 0; padding: 0; }
+.jf-lista li { display: flex; gap: 4px; align-items: center; border-bottom: 1px solid var(--linha); padding: 3px 0; }
+.jf-item { flex: 1; text-align: left; background: none; border: 0; color: inherit; font: inherit; padding: 4px 2px; cursor: pointer; }
+.jf-item:hover { color: var(--sangue); }
+.jf-dados { display: flex; flex-wrap: wrap; gap: 4px; }
+@media (max-width: 700px) { .janela-flutuante { left: 8px !important; right: 8px; width: auto; top: auto !important; bottom: 76px; max-height: 50vh; } }
+
+/* O círculo decorativo do topo passa da borda: a página não pode rolar de lado por causa dele */
+html { overflow-x: clip; }

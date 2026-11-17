@@ -1,19 +1,19 @@
-import { registrarMaldições } from './amaldicoados.js?v=0.36.0';
-import { LIVROS_DIGITALIZADOS, NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.36.0';
-import { aplicarContaminacao } from './contaminacao.js?v=0.36.0';
-import { ELEMENTOS_VISUAIS, aplicarElemento, aplicarAnimacoes, sistemaReduzMovimento, $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.36.0';
-import { normalizar, derivar } from './regras.js?v=0.36.0';
-import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, carregarAnimacoes, salvarAnimacoes, espacoUsado } from './armazenamento.js?v=0.36.0';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.36.0';
-import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.36.0';
-import { telaMestre, acoesMestre, campoMestre, htmlFeed } from './mestre.js?v=0.36.0';
-import { mesa, quandoMesaMudar, quandoMostrar, quandoComando, quandoPedirFicha, enviarFicha, resumoFicha, rolagemNaMesa, entrarMesa, sairDaMesa, voltarSeEstavaNaMesa, normalizarCodigo, abrirMesa, codigoGuardadoDoMestre } from './mesa.js?v=0.36.0';
-import { sofrerDano, recuperar, adicionarCondicao } from './combate.js?v=0.36.0';
-import { definirRaizModal, fecharModal, htmlHistorico, ouvintesRolagem, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.36.0';
+import { registrarMaldições } from './amaldicoados.js?v=0.40.0';
+import { LIVROS_DIGITALIZADOS, NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.40.0';
+import { aplicarContaminacao } from './contaminacao.js?v=0.40.0';
+import { ELEMENTOS_VISUAIS, aplicarElemento, aplicarAnimacoes, sistemaReduzMovimento, $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.40.0';
+import { normalizar, derivar } from './regras.js?v=0.40.0';
+import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, carregarAnimacoes, salvarAnimacoes, espacoUsado } from './armazenamento.js?v=0.40.0';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.40.0';
+import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.40.0';
+import { telaMestre, acoesMestre, campoMestre, htmlFeed } from './mestre.js?v=0.40.0';
+import { mesa, quandoMesaMudar, quandoMostrar, quandoComando, quandoPedirFicha, enviarFicha, resumoFicha, rolagemNaMesa, entrarMesa, sairDaMesa, voltarSeEstavaNaMesa, normalizarCodigo, abrirMesa, codigoGuardadoDoMestre } from './mesa.js?v=0.40.0';
+import { sofrerDano, recuperar, adicionarCondicao } from './combate.js?v=0.40.0';
+import { definirRaizModal, abrirModal, fecharModal, htmlHistorico, ouvintesRolagem, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.40.0';
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
 
-export const VERSAO = '0.36.0';
+export const VERSAO = '0.40.0';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -33,7 +33,7 @@ let buscaLivroDigital = '';
 async function abrirLivroDigital(id, pagina=1) {
   if (!LIVROS_DIGITALIZADOS.some(v=>v.id===id)) return;
   try {
-    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.36.0', {cache:'no-cache'});
+    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.40.0', {cache:'no-cache'});
     if (!resp.ok) throw new Error('Não foi possível carregar esta transcrição.');
     livroDigital = await resp.json(); paginaDigital = Math.min(Math.max(1, Number(pagina)||1),livroDigital.paginas.length); buscaLivroDigital = '';
     render();
@@ -44,11 +44,11 @@ async function abrirLivroDigital(id, pagina=1) {
 }
 
 async function carregarSuplementos(){
-  try { const r=await fetch('dados/suplementos.json?v=0.36.0'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
+  try { const r=await fetch('dados/suplementos.json?v=0.40.0'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
 }
 async function carregarReferenciasSAH(){
   try {
-    const r = await fetch('dados/sah_referencias.json?v=0.36.0', {cache:'no-cache'});
+    const r = await fetch('dados/sah_referencias.json?v=0.40.0', {cache:'no-cache'});
     if(r.ok) SAH_REF = await r.json();
   } catch(e){ console.warn('Índice do Sobrevivendo ao Horror não disponível', e); }
 }
@@ -143,7 +143,7 @@ function painelMesa() {
   return `<aside class="painel-mesa" aria-label="Mesa online"><div class="titulo-secao"><h3 style="margin:0">Mesa ${esc(mesa.codigo)}</h3><button class="icone-btn" data-acao="mesa-painel" aria-label="Fechar">✕</button></div>
     <p class="apagado" style="font-size:.85rem;margin:2px 0 8px">${esc(status)}${ficha ? ` · jogando com <b>${esc(ficha.nome || 'Agente')}</b>` : mesa.papel === 'mestre' ? ' · você é o mestre' : ''}</p>
     ${mesa.erro ? `<p class="aviso-ocr">${esc(mesa.erro)}</p>` : ''}
-    <h4 class="titulo-vermelho" style="margin:6px 0 2px">Iniciativa${ini ? ` · rodada ${ini.rodada}` : ''}</h4>
+    <h4 class="titulo-vermelho" style="margin:6px 0 2px">${ini?.encontro ? `⚔ ${esc(ini.encontro)} · ` : ''}Iniciativa${ini ? ` · rodada ${ini.rodada}` : ''}</h4>
     ${ini?.ordem?.length ? `<ol class="ini-mesa">${ini.ordem.map((p, i) => `<li class="${ini.ativo && i === ini.vez ? 'vez' : ''}">${esc(p.nome)}${p.tipo === 'ameaca' ? ' <small class="apagado">ameaça</small>' : ''}</li>`).join('')}</ol>` : '<p class="apagado">Sem combate agora.</p>'}
     ${mesa.mostrados?.length ? `<h4 class="titulo-vermelho" style="margin:6px 0 2px">O mestre mostrou</h4>${mesa.mostrados.map((x, i) => i === 0
       ? `<div class="mostrado">${x.imagem ? `<img src="${esc(x.imagem)}" alt="${esc(x.nome)}">` : ''}<b>${esc(x.nome)}</b>${x.descricao ? `<p>${esc(x.descricao)}</p>` : ''}</div>`
@@ -237,7 +237,7 @@ function sobre() {
 }
 function bandeja() {
   const naFicha = estado.rota?.tela === 'ficha' && ctx.fichaAtual();
-  return `${painelMesa()}<div class="bandeja">${mesa.papel ? `<button class="btn${mesa.status === 'aberta' || mesa.status === 'conectada' ? ' mesa-on' : ''}" data-acao="mesa-painel" aria-expanded="${!!estado.mesaAberta}">🌐 Mesa</button>` : ''}${naFicha ? '<button class="btn" data-acao="janela-macros">⚡ Macros</button>' : ''}<button class="btn" data-acao="historico" aria-expanded="${estado.historicoAberto}">🎲 Rolagens</button></div>
+  return `${painelMesa()}<div class="bandeja">${mesa.papel ? `<button class="btn${mesa.status === 'aberta' || mesa.status === 'conectada' ? ' mesa-on' : ''}" data-acao="mesa-painel" aria-expanded="${!!estado.mesaAberta}">🌐 Mesa</button>` : naFicha ? '<button class="btn" data-acao="mesa-online-ficha">🌐 Entrar online</button>' : ''}${naFicha ? '<button class="btn" data-acao="janela-macros">⚡ Macros</button>' : ''}<button class="btn" data-acao="historico" aria-expanded="${estado.historicoAberto}">🎲 Rolagens</button></div>
   ${estado.historicoAberto ? `<aside class="historico" aria-label="Histórico de rolagens"><div class="titulo-secao"><h3 style="margin:0">Próxima rolagem</h3><button class="icone-btn" data-acao="historico" aria-label="Fechar">✕</button></div>
     <div class="grade c3" style="grid-template-columns:repeat(3,1fr);gap:6px"><label class="campo"><span>d20 a mais ±</span><input type="number" id="prox-dados" data-prox="dados" value="${proxima.dados}" min="-5" max="5"></label><label class="campo"><span>Bônus</span><input type="number" id="prox-bonus" data-prox="bonus" value="${proxima.bonus}"></label><label class="campo"><span>DT</span><input type="number" id="prox-dt" data-prox="dt" value="${esc(proxima.dt)}" placeholder="—"></label></div>
     <p class="apagado" style="font-size:.8rem;margin:4px 0 8px">Dados e bônus valem só para a próxima rolagem (ex.: Ataque Especial +5, ajuda de aliado +1d20). A DT fica até você apagar.</p>
@@ -269,6 +269,13 @@ function botaoAnimacoes() {
 }
 const acoes = {
   'mesa-painel': () => { estado.mesaAberta = !estado.mesaAberta; render(); },
+  // Na ficha: entra na mesa do mestre com esta ficha, só digitando o código
+  'mesa-online-ficha': () => { const f = ctx.fichaAtual(); if (!f) return;
+    abrirModal('Entrar na mesa online', `<p style="margin-top:0">Peça ao mestre o código da mesa. Você entra com a ficha <b>${esc(f.nome || 'Agente')}</b>: o mestre vê PV, ${'PE/PD'}, Sanidade, Defesa e condições, e as suas rolagens vão para o feed da mesa.</p>
+      <label class="campo"><span>Código da mesa</span><input id="mesa-codigo-ficha" placeholder="OCULTA-XXXX" autofocus autocomplete="off"></label>`,
+      `<button class="btn fantasma" data-acao="fechar-modal">Cancelar</button><button class="btn sangue" data-acao="mesa-online-ficha-ok" data-id="${esc(f.id)}">🌐 Entrar</button>`); },
+  'mesa-online-ficha-ok': async el => { const c = normalizarCodigo(document.getElementById('mesa-codigo-ficha')?.value); if (!c) return avisar('Código inválido. Use o formato OCULTA-XXXX.', true);
+    fecharModal(); await entrarMesa(c, el.dataset.id); estado.mesaAberta = true; render(); },
   'mesa-ir': () => { const c = normalizarCodigo(document.getElementById('mesa-codigo')?.value); if (!c) return avisar('Código inválido. Use o formato OCULTA-XXXX.', true); location.hash = `#/mesa/${c}`; },
   'mesa-entrar': async el => { await entrarMesa(el.dataset.codigo, el.dataset.id); estado.mesaAberta = true; location.hash = `#/agente/${el.dataset.id}`; },
   'mesa-sair': () => { if (!confirm('Sair da mesa online?')) return; sairDaMesa(); estado.mesaAberta = false; render(); },

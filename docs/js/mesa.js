@@ -75,7 +75,7 @@ export function itemDoFeed(item, quem = '') {
 // Ordem de iniciativa pública: só nomes e de quem é a vez (sem PV nem números das ameaças)
 export function iniciativaPublica(combate) {
   if (!combate) return null;
-  return { rodada: combate.rodada, ativo: !!combate.ativo, vez: combate.vez, ordem: combate.participantes.map(p => ({ nome: p.nome, tipo: p.tipo })) };
+  return { rodada: combate.rodada, ativo: !!combate.ativo, vez: combate.vez, encontro: combate.encontro?.nome || '', ordem: combate.participantes.map(p => ({ nome: p.nome, tipo: p.tipo })) };
 }
 const noFeed = item => { mesa.feed = [item, ...mesa.feed].slice(0, 60); };
 
