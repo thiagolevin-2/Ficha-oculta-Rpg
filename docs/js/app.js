@@ -1,19 +1,19 @@
-import { registrarMaldições } from './amaldicoados.js?v=0.41';
-import { LIVROS_DIGITALIZADOS, NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.41';
-import { aplicarContaminacao } from './contaminacao.js?v=0.41';
-import { ELEMENTOS_VISUAIS, aplicarElemento, aplicarAnimacoes, sistemaReduzMovimento, $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.41';
-import { normalizar, derivar } from './regras.js?v=0.41';
-import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, carregarAnimacoes, salvarAnimacoes, espacoUsado } from './armazenamento.js?v=0.41';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.41';
-import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.41';
-import { telaMestre, acoesMestre, campoMestre, htmlFeed } from './mestre.js?v=0.41';
-import { mesa, quandoMesaMudar, quandoMostrar, quandoComando, quandoPedirFicha, enviarFicha, resumoFicha, acessoDoMestre, rolagemNaMesa, entrarMesa, sairDaMesa, voltarSeEstavaNaMesa, normalizarCodigo, abrirMesa, codigoGuardadoDoMestre } from './mesa.js?v=0.41';
-import { sofrerDano, recuperar, adicionarCondicao } from './combate.js?v=0.41';
-import { definirRaizModal, abrirModal, fecharModal, htmlHistorico, ouvintesRolagem, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes, danoMedioLigado, ligarDanoMedio } from './rolagem.js?v=0.41';
+import { registrarMaldições } from './amaldicoados.js?v=0.44';
+import { LIVROS_DIGITALIZADOS, NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.44';
+import { aplicarContaminacao } from './contaminacao.js?v=0.44';
+import { ELEMENTOS_VISUAIS, aplicarElemento, aplicarAnimacoes, sistemaReduzMovimento, $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.44';
+import { normalizar, derivar } from './regras.js?v=0.44';
+import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, carregarAnimacoes, salvarAnimacoes, espacoUsado } from './armazenamento.js?v=0.44';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.44';
+import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.44';
+import { telaMestre, acoesMestre, campoMestre, htmlFeed } from './mestre.js?v=0.44';
+import { mesa, quandoMesaMudar, quandoMostrar, quandoComando, quandoPedirFicha, enviarFicha, resumoFicha, acessoDoMestre, rolagemNaMesa, entrarMesa, sairDaMesa, voltarSeEstavaNaMesa, normalizarCodigo, abrirMesa, codigoGuardadoDoMestre } from './mesa.js?v=0.44';
+import { sofrerDano, recuperar, adicionarCondicao } from './combate.js?v=0.44';
+import { definirRaizModal, abrirModal, fecharModal, htmlHistorico, ouvintesRolagem, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes, danoMedioLigado, ligarDanoMedio } from './rolagem.js?v=0.44';
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
 
-export const VERSAO = '0.41';
+export const VERSAO = '0.44';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -33,7 +33,7 @@ let buscaLivroDigital = '';
 async function abrirLivroDigital(id, pagina=1) {
   if (!LIVROS_DIGITALIZADOS.some(v=>v.id===id)) return;
   try {
-    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.41', {cache:'no-cache'});
+    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.44', {cache:'no-cache'});
     if (!resp.ok) throw new Error('Não foi possível carregar esta transcrição.');
     livroDigital = await resp.json(); paginaDigital = Math.min(Math.max(1, Number(pagina)||1),livroDigital.paginas.length); buscaLivroDigital = '';
     render();
@@ -44,11 +44,11 @@ async function abrirLivroDigital(id, pagina=1) {
 }
 
 async function carregarSuplementos(){
-  try { const r=await fetch('dados/suplementos.json?v=0.41'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
+  try { const r=await fetch('dados/suplementos.json?v=0.44'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
 }
 async function carregarReferenciasSAH(){
   try {
-    const r = await fetch('dados/sah_referencias.json?v=0.41', {cache:'no-cache'});
+    const r = await fetch('dados/sah_referencias.json?v=0.44', {cache:'no-cache'});
     if(r.ok) SAH_REF = await r.json();
   } catch(e){ console.warn('Índice do Sobrevivendo ao Horror não disponível', e); }
 }

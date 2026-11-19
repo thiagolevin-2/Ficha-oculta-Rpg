@@ -1,8 +1,8 @@
-import { condicoesEfetivas } from './combate.js?v=0.41';
-import { OPCIONAIS_LIVRES } from './catalogo.js?v=0.41';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.41';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.41';
-import { passivosDeItens, passivoAmaldicoado, AMALDICOADOS, CONJURACAO, ELEMENTOS_MALDICAO } from './amaldicoados.js?v=0.41';
+import { condicoesEfetivas } from './combate.js?v=0.44';
+import { OPCIONAIS_LIVRES } from './catalogo.js?v=0.44';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.44';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.44';
+import { passivosDeItens, passivoAmaldicoado, AMALDICOADOS, CONJURACAO, ELEMENTOS_MALDICAO } from './amaldicoados.js?v=0.44';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -232,7 +232,7 @@ export function normalizar(f) {
     rituais: lista(f.rituais, 80).map(x => { const c = ritualDoCatalogo(x?.nome) || {}; const vazio = (v, max, alt) => txt(v, max) || txt(alt, max); return ({
       formulasAvancadas: Object.fromEntries(['discente', 'verdadeiro'].map(id => [id, txt(x?.formulasAvancadas?.[id], 40).trim()])),
       custosAvancados: { discente: int(x?.custosAvancados?.discente, 0, 30, 2), verdadeiro: int(x?.custosAvancados?.verdadeiro, 0, 30, 5) },
-      tipoDados: x?.tipoDados === 'cura' || x?.tipoDados === 'dano' ? x.tipoDados : c.tipoDados || 'dano',
+      tipoDados: c.id && !x?.proprio ? c.tipoDados || 'dano' : x?.tipoDados === 'cura' || x?.tipoDados === 'dano' ? x.tipoDados : c.tipoDados || 'dano', // ritual do catálogo segue o catálogo
       rolagemExtra: FORMULA.test(txt(x?.rolagemExtra, 40)) ? txt(x?.rolagemExtra, 40) : '',
       elementos: c.elementos || [], idCatalogo: c.id || '', proprio: !c.id || !!x?.proprio,
       uid: txt(x?.uid, 60) || uid(), nome: txt(x?.nome, 80) || 'Ritual', elemento: txt(x?.elemento, 20) || 'conhecimento', circulo: int(x?.circulo ?? c.circulo, 1, 4, 1),

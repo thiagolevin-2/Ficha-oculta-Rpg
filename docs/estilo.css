@@ -1391,3 +1391,5 @@ html { overflow-x: clip; }
 .efeito-op.indisponivel { opacity: .5; cursor: not-allowed; }
 .efeito-menos { margin: 6px 0 0; padding-top: 6px; border-top: 1px dashed var(--linha); font-size: .8rem; color: var(--perigo); }
 .aviso-versatilidade { margin: 8px 0 2px; padding: 8px 10px; border-left: 3px solid var(--sangue); background: #00000026; border-radius: var(--raio); font-size: .88rem; }
+.efeito-op.requer .efeito-motivo { color: var(--vela, #e0a040); }
+.efeito-alerta { color: var(--perigo) !important; font-weight: 600; }
