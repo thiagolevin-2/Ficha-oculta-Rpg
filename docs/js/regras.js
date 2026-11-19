@@ -1,8 +1,8 @@
-import { condicoesEfetivas } from './combate.js?v=0.45';
-import { OPCIONAIS_LIVRES } from './catalogo.js?v=0.45';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.45';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.45';
-import { passivosDeItens, passivoAmaldicoado, AMALDICOADOS, CONJURACAO, ELEMENTOS_MALDICAO } from './amaldicoados.js?v=0.45';
+import { condicoesEfetivas } from './combate.js?v=0.47';
+import { OPCIONAIS_LIVRES } from './catalogo.js?v=0.47';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.47';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.47';
+import { passivosDeItens, passivoAmaldicoado, AMALDICOADOS, CONJURACAO, ELEMENTOS_MALDICAO } from './amaldicoados.js?v=0.47';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -290,6 +290,11 @@ export function normalizar(f) {
       /^(item|arma|protecao):[^\s]{1,110}$/.test(k) && ['conhecimento', 'energia', 'morte', 'sangue', 'medo'].includes(el))),
     prazosCondicao: Object.fromEntries(Object.entries(f.prazosCondicao || {}).slice(0, 40).filter(([id]) => f.condicoes?.includes(id)).map(([id, n]) => [id, int(n, 1, 99)])),
     condicoes: lista(f.condicoes, 40).filter(c => typeof c === 'string' && c.length < 30),
+    origemCondicao: Object.fromEntries(Object.entries(f.origemCondicao || {}).filter(([id]) => f.condicoes?.includes(id)).slice(0, 40).map(([id, o]) => [id, txt(o, 120)])),
+    marcadores: lista(f.marcadores, 40).filter(m => txt(m?.nome, 80)).map(m => ({
+      uid: txt(m.uid, 60) || uid(), tipo: m.tipo === 'positivo' ? 'positivo' : 'negativo', nome: txt(m.nome, 80), texto: txt(m.texto, 200), origem: txt(m.origem, 120),
+      dura: ['cena', 'turno', 'permanente'].includes(m.dura) ? m.dura : 'cena', turnos: int(m.turnos, 0, 99, 0),
+      desfazer: m.desfazer && ATRIBUTOS.some(a => a.id === m.desfazer.atributo) ? { atributo: m.desfazer.atributo, valor: int(m.desfazer.valor, -5, 5, 0) } : null })),
     ferimentos: lista(f.ferimentos, 10).filter(a => ['agi', 'for', 'int', 'pre', 'vig'].includes(a)),
     escolhas: { versatilidade: TRILHA[f.escolhas?.versatilidade] ? f.escolhas.versatilidade : '', flashback: ORIGEM[f.escolhas?.flashback] ? f.escolhas.flashback : '', forcaSaber: PERICIA[f.escolhas?.forcaSaber] ? f.escolhas.forcaSaber : '', numeroSorte: txt(f.escolhas?.numeroSorte, 20), sangueFervente: f.escolhas?.sangueFervente === 'agi' ? 'agi' : 'for', perito: (Array.isArray(f.escolhas?.perito) ? f.escolhas.perito : []).filter(id => PERICIA[id] && id !== 'luta' && id !== 'pontaria').slice(0, 2), experimento: PERICIA[f.escolhas?.experimento] ? f.escolhas.experimento : '' },
     paranormais: lista(f.paranormais, 40).filter(p => PODER_PARANORMAL[p?.id]).map(p => ({ uid: txt(p.uid, 60) || uid(), id: p.id, trocaRitualUsada: !!p.trocaRitualUsada, transcenderUid: txt(p.transcenderUid, 60), circuloAprender: int(p.circuloAprender, 0, 3), escolha: txt(p.escolha, 40), afinidade: !!p.afinidade, fonte: ['transcender', 'origem', 'outro'].includes(p.fonte) ? p.fonte : 'outro' })),

@@ -138,6 +138,26 @@ export function perderFoco(ficha) {
   if (!['atordoado', 'exausto', 'pasmo'].some(c => efetivas.has(c))) return 0;
   const n = ficha.rituaisRetidos.length; ficha.rituaisRetidos = []; return n;
 }
+// ═══════════ status (condições com origem e marcadores) ═══════════
+// Marcador: algo que vale no personagem e não é uma condição do catálogo nem um efeito com bônus automático
+// (ex.: "−1 de Intelecto permanente" de um desastre paranormal, "ação de movimento extra no próximo turno").
+// dura: 'cena' (some no Fim da cena), 'turno' (some depois de N fins de turno), 'permanente' (só sai à mão).
+// desfazer: { atributo, valor } — ao tirar o marcador, o jogador pode devolver o atributo.
+const novoUid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+export function adicionarMarcador(ficha, { tipo = 'negativo', nome, texto = '', origem = '', dura = 'cena', turnos = 0, desfazer = null }) {
+  ficha.marcadores = [...(ficha.marcadores || []), { uid: novoUid(), tipo, nome, texto, origem, dura, turnos, desfazer }].slice(-40);
+}
+// Põe a condição e guarda de onde ela veio (também na condição que ela vira, ex.: abalado → apavorado)
+export function marcarCondicao(ficha, id, origem) {
+  const antes = new Set(ficha.condicoes);
+  adicionarCondicao(ficha, id);
+  if (!origem) return;
+  ficha.origemCondicao = ficha.origemCondicao || {};
+  for (const c of ficha.condicoes) if (!antes.has(c) || c === id) ficha.origemCondicao[c] = origem;
+}
+// Tira origens de condições que não estão mais na ficha
+const limparOrigens = ficha => { for (const c of Object.keys(ficha.origemCondicao || {})) if (!ficha.condicoes.includes(c)) delete ficha.origemCondicao[c]; };
+
 export function adicionarCondicao(ficha, id) {
   const anterior = ficha.condicoes.includes(id);
   if (!anterior) { ficha.condicoes.push(id); perderFoco(ficha); return ficha.condicoes.length; }
@@ -186,6 +206,8 @@ export function encerrarTurno(ficha) {
       delete ficha.prazosCondicao[id];
     }
   }
+  limparOrigens(ficha);
+  ficha.marcadores = (ficha.marcadores || []).flatMap(m => m.dura !== 'turno' ? [m] : m.turnos > 1 ? [{ ...m, turnos: m.turnos - 1 }] : []);
 }
 
 export function fimDeCena(ficha) {
@@ -193,6 +215,8 @@ export function fimDeCena(ficha) {
   const permanentes = new Set(['doente', 'petrificado', 'envenenado', 'asfixiado', 'inconsciente', 'morrendo', 'enlouquecendo']);
   ficha.condicoes = ficha.condicoes.filter(c => permanentes.has(c) && !ficha.prazosCondicao?.[c]);
   ficha.prazosCondicao = {};
+  limparOrigens(ficha);
+  ficha.marcadores = (ficha.marcadores || []).filter(m => m.dura === 'permanente');
   ficha.turnoManualIniciado = false;
   ficha.itens = ficha.itens.filter(i => !i.expiraCena);
   ficha.gastoTurno = 0;
