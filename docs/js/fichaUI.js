@@ -1,20 +1,20 @@
-import { carregarModelosItens, salvarModelosItens } from './armazenamento.js?v=0.44';
-import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS, CONJURACAO, PROTECAO_ELEMENTAL, ELEMENTOS_MALDICAO, passivoAmaldicoado } from './amaldicoados.js?v=0.44';
-import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.44';
-import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO, quantidadeMaldicoes, categoriaEquipamento } from './regras.js?v=0.44';
-import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, perderFoco, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, media, analisar } from './combate.js?v=0.44';
-import { OPCIONAIS_LIVRES, MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.44';
-import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.44';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.44';
-import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.44';
+import { carregarModelosItens, salvarModelosItens } from './armazenamento.js?v=0.45';
+import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS, CONJURACAO, PROTECAO_ELEMENTAL, ELEMENTOS_MALDICAO, passivoAmaldicoado } from './amaldicoados.js?v=0.45';
+import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.45';
+import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO, quantidadeMaldicoes, categoriaEquipamento } from './regras.js?v=0.45';
+import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, perderFoco, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, media, analisar } from './combate.js?v=0.45';
+import { OPCIONAIS_LIVRES, MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.45';
+import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.45';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.45';
+import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.45';
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.44', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.44', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.45', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.45', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
   // Os textos do Sobrevivendo ao Horror foram conferidos com o PDF e estão em dados/textos.json (v0.23).
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
@@ -649,7 +649,7 @@ function abaRituais(f, d, ui) {
   return `${retidos}<section class="painel"><div class="titulo-secao"><h2 class="faixa sangue">Rituais conhecidos</h2>
     <div class="linha"><span class="contador marcador-rituais ${lim && qtd > lim ? 'erro' : ''}" title="Rituais conhecidos / que pode conhecer">${qtd} / ${lim || '—'} rituais</span><span class="etiqueta">DT ${d.dtRitual}</span><span class="etiqueta">Círculo máx. ${d.circuloMax}º</span>${f.poderes.filter(p => p.id === 'especialista-em-elemento' && p.escolha).map(p => `<span class="etiqueta el-${p.escolha}" style="border-color:var(--el)">Especialista em ${esc(ELEM[p.escolha]?.nome || p.escolha)}: +2 DT</span>`).join('')}${f.poderes.filter(p => p.id === 'mestre-em-elemento' && p.escolha).map(p => `<span class="etiqueta el-${p.escolha}" style="border-color:var(--el)">Mestre em ${esc(ELEM[p.escolha]?.nome || p.escolha)}: −1 ${d.pd ? 'PD' : 'PE'}</span>`).join('')}<button class="btn pequeno" data-acao="ritual-proprio">+ Ritual próprio</button></div></div>
     ${quadroCirculos(f, d)}
-    ${temOpcional(f, 'conjuracaoComplexa') ? `<div class="linha" style="margin:8px 0"><button class="btn pequeno" data-acao="ritual-desconhecido-lista">Conjurar ritual que não conheço</button><small class="apagado">Conjuração complexa · treinado em Ocultismo · DT +5 · desastre paranormal se falhar</small></div>` : ''}
+    ${temOpcional(f, 'conjuracaoComplexa') ? `<button class="btn sangue btn-desconhecido" data-acao="ritual-desconhecido-lista">${sigilo('medo', 'currentColor')}<span><b>Conjurar ritual que não conheço</b><small>Conjuração complexa · treinado em Ocultismo · DT +5 · desastre paranormal se falhar</small></span><span class="seta" aria-hidden="true">›</span></button>` : ''}
     ${!podeConjurar ? '<p class="apagado">Só ocultistas conjuram rituais desde o início (outros podem aprender por poderes, trilhas ou origem).</p>' : ''}
     ${qtd ? porCirculo.filter(g => g.itens.length).map(g => `<h3 class="titulo-vermelho">${g.c}º círculo <small class="apagado">· ${CIRCULOS[g.c - 1].custo} ${d.pd ? 'PD' : 'PE'}</small></h3><div class="rituais-compactos">${g.itens.map(([r, i]) => cartaoRitual(f, d, r, i)).join('')}</div>`).join('') : '<p class="vazio">Nenhum ritual. Marque as caixinhas na lista abaixo.</p>'}
     <p class="apagado" style="font-size:.88rem;margin-top:8px">Toque num ritual para ver tudo. Conjurar faz sozinho o teste de Ocultismo (DT 20 + custo; menos para Medo). ${f.classe === 'ocultista' && !temOpcional(f, 'patentes') ? 'Ocultista: 3 rituais de 1º círculo no início e +1 a cada NEX.' : ''}</p>
@@ -2470,13 +2470,23 @@ export function acoesFicha(ctx) {
     },
     'ritual-desconhecido-lista': () => {
       const ficha = f(), d = derivar(ficha);
-      const treinado = d.PER.ocultismo?.grau >= 1;
+      const treinado = d.PER.ocultismo?.grau >= 1, k = d.pd ? 'PD' : 'PE';
       const conhecidos = new Set(ficha.rituais.map(r => semAcento(r.nome)));
-      const lista = RITUAIS.filter(r => (r.fonte !== 'SaH' || ficha.modo === 'sah') && !conhecidos.has(semAcento(r.nome))).sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt'));
-      abrirModal('Conjurar ritual que não conheço', `<p class="apagado" style="font-size:.9rem">Sobrevivendo ao Horror, p. 117: qualquer personagem <b>treinado em Ocultismo</b> pode tentar, se tiver informações básicas sobre o ritual (viu alguém conjurá-lo com sucesso, ou tem um texto ou gravação explicando), a critério do mestre. Segue as etapas da conjuração complexa com <b>DT +5</b> no Ocultismo; se falhar, além dos custos, sofre um <b>desastre paranormal</b>.</p>
+      const lista = RITUAIS.filter(r => (r.fonte !== 'SaH' || ficha.modo === 'sah') && !conhecidos.has(semAcento(r.nome))).sort((a, b) => a.nome.localeCompare(b.nome, 'pt'));
+      // Mesmo visual do Grimório (aba Rituais): cartões na cor do elemento, com os mesmos filtros
+      abrirModal('Conjurar ritual que não conheço', `<p class="apagado" style="font-size:.9rem;margin-top:0">Sobrevivendo ao Horror, p. 117: qualquer personagem <b>treinado em Ocultismo</b> pode tentar, se tiver informações básicas sobre o ritual (viu alguém conjurá-lo com sucesso, ou tem um texto ou gravação explicando), a critério do mestre. Segue as etapas da conjuração complexa com <b>DT +5</b> no Ocultismo; se falhar, além dos custos, sofre um <b>desastre paranormal</b>.</p>
         ${treinado ? '' : '<p class="aviso-versatilidade">⚠ Você não é treinado em Ocultismo, então não pode tentar.</p>'}
-        <input type="search" placeholder="Procurar ritual…" data-filtro-modal aria-label="Procurar ritual" style="margin:8px 0">
-        <div class="lista-hab">${lista.map(r => `<div class="hab" data-busca="${esc(semAcento(r.nome + ' ' + r.elemento))}"><span class="meta"><button class="btn pequeno sangue" data-acao="conjurar-desconhecido" data-id="${r.id}" ${treinado ? '' : 'disabled'}>Conjurar</button></span>${sigilo(r.elemento)} <b>${esc(r.nome)}</b> <span class="etiqueta">${r.circulo}º · ${CIRCULOS[r.circulo - 1].custo} ${d.pd ? 'PD' : 'PE'}</span><p>${esc(r.resumo || '')}</p></div>`).join('')}</div>`,
+        <div class="linha" style="margin:10px 0 12px">
+          <input type="search" class="filtro" placeholder="Procurar ritual…" data-filtro-itens="busca" aria-label="Procurar ritual">
+          <select data-filtro-itens="fonte" style="width:auto" aria-label="Elemento"><option value="">Todos os elementos</option>${ELEMENTOS.map(e => `<option value="${e.id}">${e.nome}</option>`).join('')}</select>
+          <select data-filtro-itens="grupo" style="width:auto" aria-label="Círculo"><option value="">Todos os círculos</option>${CIRCULOS.map(c => `<option value="${c.n}">${c.n}º círculo</option>`).join('')}</select>
+        </div>
+        <div class="caixas-ritual">${lista.map(r => `<button type="button" class="caixa-ritual caixa-desconhecido el-${r.elemento}" data-acao="conjurar-desconhecido" data-id="${r.id}" data-fonte="${r.elemento}" data-grupo="${r.circulo}" data-busca="${esc(semAcento(r.nome + ' ' + (r.resumo || '')).toLowerCase())}" ${treinado ? '' : 'disabled'} aria-label="Conjurar ${esc(r.nome)} (${nomesElementos(r)}, ${r.circulo}º círculo)">
+          <span class="caixa-check" aria-hidden="true"></span>
+          ${sigilo(r.elemento, 'var(--el)')}
+          <span class="txt"><b>${esc(r.nome)}</b> <small class="dossie-txt">${nomesElementos(r)} ${r.circulo}${fonteTag(r.fonte)}</small><small>${esc(r.resumo || '')}</small><small class="custo-desconhecido">${CIRCULOS[r.circulo - 1].custo} ${k} · Ocultismo DT ${20 + CIRCULOS[r.circulo - 1].custo + 5}${r.elemento === 'medo' ? '' : ' · Custo do Paranormal'}</small></span>
+        </button>`).join('')}</div>
+        <p id="catalogo-itens-vazio" class="vazio" hidden>Nenhum ritual encontrado com esses filtros.</p>`,
         '<button class="btn fantasma" data-acao="fechar-modal">Fechar</button>', true);
     },
     'conjurar-desconhecido': el => {

@@ -1,12 +1,12 @@
-import { OPCIONAIS_LIVRES, ORIGEM, PERICIA, MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, PERICIAS, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.44';
-import { abrirModal, fecharModal } from './rolagem.js?v=0.44';
-import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.44';
-import { simboloDaRoda } from './simbolos.js?v=0.44';
-import { novaFicha, normalizar, derivar, faixaEtaria, PESOS_IDADE, tetoEtario } from './regras.js?v=0.44';
+import { OPCIONAIS_LIVRES, ORIGEM, PERICIA, MODOS, OPCIONAIS, ATRIBUTOS, CRIACAO_ATRIBUTOS, CLASSES, ORIGENS, PERICIAS, NEX, TREINAMENTO_ESPECIAL } from './catalogo.js?v=0.45';
+import { abrirModal, fecharModal } from './rolagem.js?v=0.45';
+import { esc, semAcento, sigilo, imagemOpcional, inteiro } from './util.js?v=0.45';
+import { simboloDaRoda } from './simbolos.js?v=0.45';
+import { novaFicha, normalizar, derivar, faixaEtaria, PESOS_IDADE, tetoEtario } from './regras.js?v=0.45';
 // ═══════════ origens-ui ═══════════
 let consulta;
 function carregarOrigens() {
-  consulta ||= fetch(new URL('../dados/origens-texto.json?v=0.44', import.meta.url))
+  consulta ||= fetch(new URL('../dados/origens-texto.json?v=0.45', import.meta.url))
     .then(resposta => {
       if (!resposta.ok) throw new Error('Descrições indisponíveis.');
       return resposta.json();
