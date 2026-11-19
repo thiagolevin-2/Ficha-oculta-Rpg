@@ -1,9 +1,9 @@
 // rolagem.js — rolar testes, ataques e dano; mostrar o resultado; guardar o histórico.
 // Os dados 3D (do Arcana) só MOSTRAM um resultado já sorteado: a animação não decide nada.
-import { rolarTeste, rolar, comSinal } from './combate.js?v=0.40.7';
-import { animateDice, diceAnimationsEnabled, setDiceAnimations, diceFromValues } from './dados3d.js?v=0.40.7';
-import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.40.7';
-import { esc, avisar } from './util.js?v=0.40.7';
+import { rolarTeste, rolar, media, comSinal } from './combate.js?v=0.40.8';
+import { animateDice, diceAnimationsEnabled, setDiceAnimations, diceFromValues } from './dados3d.js?v=0.40.8';
+import { carregarRolagens, salvarRolagens } from './armazenamento.js?v=0.40.8';
+import { esc, avisar } from './util.js?v=0.40.8';
 let historico = carregarRolagens();
 // modificadores da PRÓXIMA rolagem (bandeja): dados a mais/menos e bônus fixo
 export const proxima = { dados: 0, bonus: 0, dt: '' };
@@ -12,6 +12,9 @@ export const quandoMudar = fn => { aoMudar = fn; };
 export const pegarHistorico = () => historico;
 export function limparHistorico() { historico = []; salvarRolagens(historico); aoMudar(); }
 export const animacoesLigadas = () => diceAnimationsEnabled();
+// Dano médio: em vez de rolar dano, cura e efeitos, usa a média dos dados (arredondada para baixo). Vale neste navegador.
+export const danoMedioLigado = () => { try { return localStorage.getItem('fichaoculta-dano-medio') === '1'; } catch { return false; } };
+export const ligarDanoMedio = v => { try { localStorage.setItem('fichaoculta-dano-medio', v ? '1' : '0'); } catch {} };
 export const ligarAnimacoes = v => setDiceAnimations(v);
 
 // Ouvintes de rolagem: cada rolagem registrada também vai para eles (ex.: o feed da mesa online)
@@ -28,7 +31,7 @@ function registrar(item) {
 const dadosAnim = (valores, indice, lados = 20) => valores.slice(0, 12).map(v => ({ sides: lados, value: v, selected: true }));
 
 // Teste de perícia/atributo/ataque. dados: { qtd, pior } (já com condições). bonus: soma fixa.
-export async function rolarTesteUI({ titulo, quem = '', dados, bonus = 0, margem = 21, mult = 2, gruposCritico = 1, tipo = 'teste', formulaDano = '', subtitulo = '', tituloDano = '', rotuloDano = '' }) {
+export async function rolarTesteUI({ titulo, quem = '', dados, bonus = 0, margem = 21, mult = 2, gruposCritico = 1, tipo = 'teste', formulaDano = '', criticoExtra = '', subtitulo = '', tituloDano = '', rotuloDano = '' }) {
   let qtd = dados.qtd, pior = dados.pior;
   // aplica os dados extras da bandeja (no Ordem, +1D = um d20 a mais; com atributo 0 a conta inverte)
   if (proxima.dados) {
@@ -38,7 +41,7 @@ export async function rolarTesteUI({ titulo, quem = '', dados, bonus = 0, margem
   const bonusTotal = bonus + proxima.bonus;
   const dt = Number(proxima.dt) || null;
   const r = rolarTeste({ qtd, pior, bonus: bonusTotal, margem });
-  const item = { tipo, titulo, quem, valores: r.valores, indice: r.indice, pior: r.pior, bonus: bonusTotal, total: r.total, critico: tipo === 'ataque' && r.critico, dt, formulaDano, mult, gruposCritico, margem, tituloDano, rotuloDano };
+  const item = { tipo, titulo, quem, valores: r.valores, indice: r.indice, pior: r.pior, bonus: bonusTotal, total: r.total, critico: tipo === 'ataque' && r.critico, dt, formulaDano, criticoExtra, mult, gruposCritico, margem, tituloDano, rotuloDano };
   proxima.dados = 0; proxima.bonus = 0;
   await animar(item);
   registrar(item);
@@ -46,11 +49,17 @@ export async function rolarTesteUI({ titulo, quem = '', dados, bonus = 0, margem
   return item;
 }
 
-export async function rolarDanoUI({ titulo, quem = '', formula, multiplicador = 1, gruposCritico = 1, multiplicarExpressao = false, tipo = 'dano', rotulo = '' }) {
-  let r;
-  try { r = rolar(formula, { multiplicador, gruposCritico, multiplicarExpressao }); } catch (e) { avisar(e.message, true); return null; }
-  const item = { tipo, titulo, quem, formula, multiplicador, multiplicarExpressao, total: r.total, detalhe: r.detalhe, grupos: r.dados, rotulo };
-  await animar(item);
+// adicional: dados ou bônus que só entram no crítico (ex.: "1d8+2"); somam ao total sem serem multiplicados.
+// usarMedia: força (true) ou proíbe (false) o dano médio; sem valor, segue a opção "Dano médio" do navegador.
+export async function rolarDanoUI({ titulo, quem = '', formula, multiplicador = 1, gruposCritico = 1, multiplicarExpressao = false, tipo = 'dano', rotulo = '', adicional = '', usarMedia }) {
+  const porMedia = usarMedia ?? danoMedioLigado();
+  const calc = porMedia ? media : rolar;
+  let r, extra = null;
+  try { r = calc(formula, { multiplicador, gruposCritico, multiplicarExpressao }); if (adicional) extra = calc(adicional); } catch (e) { avisar(e.message, true); return null; }
+  const formulaTotal = extra ? `${formula} + ${adicional} (crítico)` : formula;
+  const detalhe = extra ? `${r.detalhe} + crítico: ${extra.detalhe}` : r.detalhe;
+  const item = { tipo, titulo, quem, formula: formulaTotal, multiplicador, multiplicarExpressao, total: r.total + (extra?.total || 0), detalhe, grupos: [...r.dados, ...(extra?.dados || [])], rotulo, media: porMedia };
+  if (!porMedia) await animar(item);
   registrar(item);
   mostrarResultado(item);
   return item;
@@ -120,12 +129,12 @@ function mostrarResultado(item) {
       ${texto ? `<div class="veredito ${classe}">${texto}</div>` : ''}</div>`;
   } else {
     const critico = item.multiplicador > 1 ? ` · crítico ×${item.multiplicador} (${item.multiplicarExpressao ? 'dano extra inteiro' : 'só os dados da arma'})` : '';
-    corpo = `<div class="resultado-grande"><div class="total">${item.total}</div><p class="dossie-txt">${esc(item.formula)}${critico}</p><p class="apagado dossie-txt">${esc(item.detalhe)}</p></div>`;
+    corpo = `<div class="resultado-grande"><div class="total">${item.total}</div><p class="dossie-txt">${esc(item.formula)}${critico}${item.media ? ' · <b>dano médio</b> (sem rolar)' : ''}</p><p class="apagado dossie-txt">${esc(item.detalhe)}</p></div>`;
   }
   const rodape = efeitoPendente?.item === item
     ? `<button class="btn fantasma" data-acao="fechar-modal">Fechar</button><button class="btn sangue" data-acao="resolver-efeito-ritual" data-token="${efeitoPendente.token}">Resolver efeito do ritual</button>`
     : item.tipo === 'ataque' && item.formulaDano
-    ? `<button class="btn" data-acao="rolar-dano-ultimo" data-crit="0">Rolar dano</button>${item.critico ? `<button class="btn sangue" data-acao="rolar-dano-ultimo" data-crit="1">Dano crítico ×${item.mult}</button>` : ''}`
+    ? `<button class="btn${item.critico ? ' fantasma' : ''}" data-acao="rolar-dano-ultimo" data-crit="0">Dano normal</button><button class="btn${item.critico ? ' sangue' : ' fantasma'}" data-acao="rolar-dano-ultimo" data-crit="1">Dano crítico ×${item.mult}${item.criticoExtra ? ` +${esc(item.criticoExtra)}` : ''}</button>`
     : item.tipo === 'ritual' && item.formulaDano
       ? `<button class="btn fantasma" data-acao="fechar-modal">Fechar</button><button class="btn sangue" data-acao="rolar-dano-ultimo" data-crit="0">Rolar ${item.rotuloDano === 'CURA' ? 'cura' : 'dano'} (${esc(item.formulaDano)})</button>`
       : `<button class="btn sangue" data-acao="fechar-modal">Fechar</button>`;

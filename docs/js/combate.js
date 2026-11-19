@@ -28,6 +28,18 @@ export function analisar(texto) {
 // Rola uma expressão de dano/efeito. Crítico no Ordem: MULTIPLICA os dados da arma (x2, x3…); bônus fixos não.
 // Multiplica os grupos da arma marcados no cálculo, inclusive Lancinante. Devolve { expr, total, detalhe, dados }.
 // A macro pode aplicar o multiplicador a todos os termos de uma parcela de dano extra.
+// Dano médio (sem rolar): cada dado vale a média (lados + 1) / 2; o total é arredondado para baixo.
+// Segue as mesmas regras de crítico de rolar(): multiplica só os grupos de dados da arma, ou a expressão inteira.
+export function media(expr, { multiplicador = 1, gruposCritico = 1, multiplicarExpressao = false } = {}) {
+  let total = 0, grupo = 0; const pedacos = [];
+  for (const t of analisar(expr)) {
+    if (t.valor != null) { const v = multiplicarExpressao ? t.valor * multiplicador : t.valor; total += t.sinal * v; pedacos.push((t.sinal < 0 ? '− ' : '+ ') + v); continue; }
+    const n = (grupo++ < gruposCritico || multiplicarExpressao) ? t.n * multiplicador : t.n;
+    const m = n * (t.lados + 1) / 2; total += t.sinal * m; pedacos.push((t.sinal < 0 ? '− ' : '+ ') + `${n}d${t.lados}≈${m}`);
+  }
+  return { expr: String(expr).replace(/\s+/g, ''), total: Math.floor(total), detalhe: pedacos.join(' ').replace(/^\+ /, '') + ' (média)', dados: [] };
+}
+
 export function rolar(expr, { multiplicador = 1, gruposCritico = 1, multiplicarExpressao = false } = {}) {
   const termos = analisar(expr);
   let total = 0, grupo = 0;
@@ -118,9 +130,17 @@ export function condicoesEfetivas(condicoes) {
   return resultado;
 }
 
+// Reter Ritual (AS #01 p. 58): atordoado, exausto e pasmo fazem perder o foco e soltar todos os rituais retidos
+// (os PE máximos voltam, os atuais não). Devolve quantos rituais foram soltos.
+export function perderFoco(ficha) {
+  if (!ficha.rituaisRetidos?.length) return 0;
+  const efetivas = condicoesEfetivas(ficha.condicoes);
+  if (!['atordoado', 'exausto', 'pasmo'].some(c => efetivas.has(c))) return 0;
+  const n = ficha.rituaisRetidos.length; ficha.rituaisRetidos = []; return n;
+}
 export function adicionarCondicao(ficha, id) {
   const anterior = ficha.condicoes.includes(id);
-  if (!anterior) return ficha.condicoes.push(id);
+  if (!anterior) { ficha.condicoes.push(id); perderFoco(ficha); return ficha.condicoes.length; }
   const seguinte = EVOLUCAO_CONDICAO[id];
   if (!seguinte) return;
   ficha.condicoes = ficha.condicoes.filter(x => x !== id);
@@ -154,6 +174,7 @@ export function resolverCondicoesDoTurno(ficha, calcular, rolarDado = dado, test
 // ═══════════ turnos ═══════════
 export function iniciarTurno(ficha) {
   ficha.gastoTurno = 0;
+  ficha.numTurno = (ficha.numTurno || 0) + 1; // separa os gastos de PE por turno
   ficha.efeitos = ficha.efeitos.filter(efeito => efeito.dura !== 'rodada');
 }
 
@@ -177,6 +198,7 @@ export function fimDeCena(ficha) {
   ficha.gastoTurno = 0;
   ficha.recursos.peTemp = 0;
   ficha.usosCena = {};
+  ficha.numCena = (ficha.numCena || 0) + 1; // separa os gastos de PE por cena
   ficha.recursos.morrendo = 0;
   ficha.recursos.enlouquecendo = 0;
 }

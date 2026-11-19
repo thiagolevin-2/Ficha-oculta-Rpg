@@ -1,5 +1,5 @@
-import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.40.7';
-import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.40.7';
+import { ITENS_ESPECIAIS, ITENS_ARQUIVOS, MATERIAL_SAH } from './equipamentos.js?v=0.40.8';
+import { ORIGENS_AS, TRILHAS_AS, PODERES_AS, PARANORMAIS_AS } from './catalogo-as.js?v=0.40.8';
 // ═══════════ catalogo ═══════════
 // catalogo.js — as regras do sistema escritas como DADOS.
 // Tudo aqui são números e nomes das regras + resumos curtos, escritos com outras palavras.
@@ -16,6 +16,8 @@ export const MODOS = {
 };
 
 // Regras opcionais do Sobrevivendo ao Horror (só aparecem no modo "sah")
+// Regras opcionais que valem nos dois modos (as outras só no Sobrevivendo ao Horror)
+export const OPCIONAIS_LIVRES = ['idade', 'municao', 'reterRitual', 'conjuracaoComplexa'];
 export const OPCIONAIS = {
   idade: { nome: 'Personagens de Idade Variada', pagina: 'LR pp. 172–174', resumo: 'A faixa etária altera atributos, origem, recursos e progressão.' },
   municao: { nome: 'Contagem de Munição', pagina: 'LR p. 174', resumo: 'Controla disparos, carregador e reserva por arma.' },
@@ -23,6 +25,8 @@ export const OPCIONAIS = {
   nivelExp: { nome: 'NEX & Nível de Experiência', pagina: 'SaH p. 98', resumo: 'A evolução da classe passa a ser por nível (1 a 20). O NEX vira só a exposição ao paranormal e começa em 0%.' },
   patentes: { nome: 'Evolução por Patentes', pagina: 'SaH p. 108', resumo: 'Em vez de 20 níveis, o agente sobe por 5 patentes. Fichas mais leves e agentes menos poderosos. Exige Determinação.' },
   progressaoNex: { nome: 'Progressão de NEX', pagina: 'SaH p. 99', resumo: 'A exposição muda o agente: em NEX 25/35/50% e nas faixas 60/75/90% do elemento escolhido ele ganha poderes e penalidades. Desligada, o NEX só é anotado.' },
+  reterRitual: { nome: 'Reter Ritual', pagina: 'AS #01 p. 58', resumo: 'Rituais de duração cena podem ser retidos: os PE ficam presos (saem dos atuais e dos máximos) e você perde 1 SAN. Ao soltar, recupera os PE máximos; com Ocultismo (DT 20 + custo), também os atuais.' },
+  conjuracaoComplexa: { nome: 'Conjuração Complexa', pagina: 'SaH pp. 114–117', resumo: 'Conjurar leva 3 etapas (símbolo, componentes, invocação), com materiais de elemento, componentes consumidos e a opção de extrapolar os limites do ritual.' },
   ferimentos: { nome: 'Ferimentos Debilitantes', pagina: 'SaH p. 105', resumo: 'Falhar contra dano massivo causa um ferimento num atributo (–1 dado nos testes dele) em vez de cair a 0 PV.' },
 };
 

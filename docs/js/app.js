@@ -1,19 +1,19 @@
-import { registrarMaldições } from './amaldicoados.js?v=0.40.7';
-import { LIVROS_DIGITALIZADOS, NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.40.7';
-import { aplicarContaminacao } from './contaminacao.js?v=0.40.7';
-import { ELEMENTOS_VISUAIS, aplicarElemento, aplicarAnimacoes, sistemaReduzMovimento, $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.40.7';
-import { normalizar, derivar } from './regras.js?v=0.40.7';
-import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, carregarAnimacoes, salvarAnimacoes, espacoUsado } from './armazenamento.js?v=0.40.7';
-import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.40.7';
-import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.40.7';
-import { telaMestre, acoesMestre, campoMestre, htmlFeed } from './mestre.js?v=0.40.7';
-import { mesa, quandoMesaMudar, quandoMostrar, quandoComando, quandoPedirFicha, enviarFicha, resumoFicha, acessoDoMestre, rolagemNaMesa, entrarMesa, sairDaMesa, voltarSeEstavaNaMesa, normalizarCodigo, abrirMesa, codigoGuardadoDoMestre } from './mesa.js?v=0.40.7';
-import { sofrerDano, recuperar, adicionarCondicao } from './combate.js?v=0.40.7';
-import { definirRaizModal, abrirModal, fecharModal, htmlHistorico, ouvintesRolagem, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes } from './rolagem.js?v=0.40.7';
+import { registrarMaldições } from './amaldicoados.js?v=0.40.8';
+import { LIVROS_DIGITALIZADOS, NOME_DO_SITE, MODOS, CLASSES, ORIGEM } from './catalogo.js?v=0.40.8';
+import { aplicarContaminacao } from './contaminacao.js?v=0.40.8';
+import { ELEMENTOS_VISUAIS, aplicarElemento, aplicarAnimacoes, sistemaReduzMovimento, $, esc, avisar, htmlMantendoFoco, definir, inteiro, numero, baixarArquivo, escolherArquivo, imagemOpcional, sigilo } from './util.js?v=0.40.8';
+import { normalizar, derivar } from './regras.js?v=0.40.8';
+import { carregarFichas, salvarFichas, carregarElemento, salvarElemento, carregarAnimacoes, salvarAnimacoes, espacoUsado } from './armazenamento.js?v=0.40.8';
+import { telaCriador, novoRascunho, acoesCriador, campoCriador, problemasDoPasso } from './criador.js?v=0.40.8';
+import { telaFicha, acoesFicha, checksFicha, carregarTextos } from './fichaUI.js?v=0.40.8';
+import { telaMestre, acoesMestre, campoMestre, htmlFeed } from './mestre.js?v=0.40.8';
+import { mesa, quandoMesaMudar, quandoMostrar, quandoComando, quandoPedirFicha, enviarFicha, resumoFicha, acessoDoMestre, rolagemNaMesa, entrarMesa, sairDaMesa, voltarSeEstavaNaMesa, normalizarCodigo, abrirMesa, codigoGuardadoDoMestre } from './mesa.js?v=0.40.8';
+import { sofrerDano, recuperar, adicionarCondicao } from './combate.js?v=0.40.8';
+import { definirRaizModal, abrirModal, fecharModal, htmlHistorico, ouvintesRolagem, quandoMudar, limparHistorico, proxima, ultimaRolagem, resolverEfeitoRitual, rolarDanoUI, animacoesLigadas, ligarAnimacoes, danoMedioLigado, ligarDanoMedio } from './rolagem.js?v=0.40.8';
 // app.js — o "maestro": estado, rotas (#/…), desenhar a tela e distribuir os cliques.
 // Ciclo (igual ao Arcana): estado → render() → clique em [data-acao] → muda o estado → salva → render().
 
-export const VERSAO = '0.40.7';
+export const VERSAO = '0.40.8';
 const estado = {
   fichas: carregarFichas(),
   rota: { tela: 'inicio' },
@@ -33,7 +33,7 @@ let buscaLivroDigital = '';
 async function abrirLivroDigital(id, pagina=1) {
   if (!LIVROS_DIGITALIZADOS.some(v=>v.id===id)) return;
   try {
-    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.40.7', {cache:'no-cache'});
+    const resp = await fetch('dados/biblioteca/'+id+'.json?v=0.40.8', {cache:'no-cache'});
     if (!resp.ok) throw new Error('Não foi possível carregar esta transcrição.');
     livroDigital = await resp.json(); paginaDigital = Math.min(Math.max(1, Number(pagina)||1),livroDigital.paginas.length); buscaLivroDigital = '';
     render();
@@ -44,11 +44,11 @@ async function abrirLivroDigital(id, pagina=1) {
 }
 
 async function carregarSuplementos(){
-  try { const r=await fetch('dados/suplementos.json?v=0.40.7'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
+  try { const r=await fetch('dados/suplementos.json?v=0.40.8'); if(r.ok) SUPLEMENTOS=await r.json(); } catch(e){ console.warn('Suplementos não disponíveis',e); }
 }
 async function carregarReferenciasSAH(){
   try {
-    const r = await fetch('dados/sah_referencias.json?v=0.40.7', {cache:'no-cache'});
+    const r = await fetch('dados/sah_referencias.json?v=0.40.8', {cache:'no-cache'});
     if(r.ok) SAH_REF = await r.json();
   } catch(e){ console.warn('Índice do Sobrevivendo ao Horror não disponível', e); }
 }
@@ -257,6 +257,7 @@ function sobre() {
     <p>As descrições de rituais e habilidades localizadas nos arquivos enviados foram transcritas para consulta pessoal. Os itens não localizados estão indicados como pendentes. Verifique o livro oficial para confirmar diagramação, tabelas e regras adicionais. A publicação pública de textos integrais pode exigir autorização dos titulares.</p>
     <h3 class="titulo-vermelho">Imagens</h3><p>Você pode colocar imagens suas na pasta <span class="dossie-txt">assets/imagens/</span> do site (veja o LEIA-ME de lá): <span class="dossie-txt">capa.jpg</span>, <span class="dossie-txt">classe-combatente.jpg</span>, <span class="dossie-txt">origem-academico.jpg</span> etc. Se o arquivo existir, ele aparece; se não, o espaço some.</p>
     <h3 class="titulo-vermelho">Dados 3D</h3><label class="check"><input type="checkbox" data-acao-check="animacoes" ${animacoesLigadas() ? 'checked' : ''}> <span>Mostrar a animação dos dados 3D</span></label>
+    <h3 class="titulo-vermelho">Dano médio</h3><label class="check"><input type="checkbox" data-acao-check="dano-medio" ${danoMedioLigado() ? 'checked' : ''}> <span>Usar o dano médio em vez de rolar (dano, cura e efeitos). Os testes de d20 continuam rolando.</span></label>
     <h3 class="titulo-vermelho">Elementos</h3><p>${[['sangue', '#c8141f', 'Sangue'], ['morte', '#8d8d8d', 'Morte'], ['conhecimento', '#d9a521', 'Conhecimento'], ['energia', '#a64dff', 'Energia'], ['medo', '#f2efe8', 'Medo']].map(([id, cor, n]) => `<span class="etiqueta" style="border-color:${cor}">${sigilo(id, cor)} ${n}</span>`).join(' ')}</p>
     <p class="apagado" style="font-size:.88rem">Os sigilos, o círculo ritual e as pinceladas deste site são desenhos originais, não os símbolos oficiais.</p></section></div>`;
 }
@@ -328,7 +329,7 @@ const acoes = {
   'historico': () => { estado.historicoAberto = !estado.historicoAberto; render(); },
   'limpar-historico': () => limparHistorico(),
   'resolver-efeito-ritual': el => resolverEfeitoRitual(el.dataset.token),
-  'rolar-dano-ultimo': el => { const u = ultimaRolagem(); if (!u) return; fecharModal(); rolarDanoUI({ titulo: u.tituloDano || u.titulo.replace(/^Ataque/, 'Dano'), quem: u.quem, formula: u.formulaDano, gruposCritico: u.gruposCritico, multiplicador: el.dataset.crit === '1' ? u.mult : 1, rotulo: u.rotuloDano || '' }); },
+  'rolar-dano-ultimo': el => { const u = ultimaRolagem(); if (!u) return; fecharModal(); rolarDanoUI({ titulo: u.tituloDano || u.titulo.replace(/^Ataque/, 'Dano'), quem: u.quem, formula: u.formulaDano, gruposCritico: u.gruposCritico, multiplicador: el.dataset.crit === '1' ? u.mult : 1, adicional: el.dataset.crit === '1' ? (u.criticoExtra || '') : '', rotulo: u.rotuloDano || '' }); },
   'importar': async () => {
     const arq = await escolherArquivo('.json,application/json'); if (!arq) return;
     if (arq.size > 3_000_000) return avisar('Arquivo grande demais.', true);
@@ -342,7 +343,7 @@ const acoes = {
   },
   'exportar-todos': () => baixarArquivo(`agentes-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ tipo: 'fichaoculta-fichas', versao: 1, fichas: estado.fichas }, null, 2)),
 };
-const checks = { ...checksFicha(ctx), 'animacoes': el => { ligarAnimacoes(el.checked); render(); avisar(el.checked ? 'Animação ligada.' : 'Animação desligada.'); } };
+const checks = { ...checksFicha(ctx), 'dano-medio': el => { ligarDanoMedio(el.checked); render(); avisar(el.checked ? 'Dano médio ligado: dano e cura usam a média.' : 'Dano médio desligado: os dados voltam a ser rolados.'); }, 'animacoes': el => { ligarAnimacoes(el.checked); render(); avisar(el.checked ? 'Animação ligada.' : 'Animação desligada.'); } };
 
 document.addEventListener('click', ev => {
   const alvo = ev.target.closest('[data-acao]');

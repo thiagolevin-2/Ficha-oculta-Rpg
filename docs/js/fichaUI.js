@@ -1,20 +1,20 @@
-import { carregarModelosItens, salvarModelosItens } from './armazenamento.js?v=0.40.7';
-import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS, CONJURACAO, PROTECAO_ELEMENTAL, ELEMENTOS_MALDICAO, passivoAmaldicoado } from './amaldicoados.js?v=0.40.7';
-import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.40.7';
-import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO, quantidadeMaldicoes, categoriaEquipamento } from './regras.js?v=0.40.7';
-import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, analisar } from './combate.js?v=0.40.7';
-import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.40.7';
-import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.7';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.40.7';
-import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.40.7';
+import { carregarModelosItens, salvarModelosItens } from './armazenamento.js?v=0.40.8';
+import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS, CONJURACAO, PROTECAO_ELEMENTAL, ELEMENTOS_MALDICAO, passivoAmaldicoado } from './amaldicoados.js?v=0.40.8';
+import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.40.8';
+import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO, quantidadeMaldicoes, categoriaEquipamento } from './regras.js?v=0.40.8';
+import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, perderFoco, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, media, analisar } from './combate.js?v=0.40.8';
+import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.40.8';
+import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.8';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.40.8';
+import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.40.8';
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.40.7', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.40.7', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.40.8', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.40.8', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
   // Os textos do Sobrevivendo ao Horror foram conferidos com o PDF e estão em dados/textos.json (v0.23).
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
@@ -232,13 +232,15 @@ function abaCombateArmas(f, d) {
     ${d.ataques.length ? `<div class="tabela-rolagem"><table class="tabela"><thead><tr><th>Arma</th><th>Ataque</th><th>Dano</th><th>Crítico</th><th class="esconde-celular">Alcance</th><th></th></tr></thead><tbody>
     ${d.ataques.map((a, i) => `<tr><td><b>${esc(a.nome)}</b><br><small>${esc(a.periciaNome)} · ${a.prof}${a.temProf ? '' : ' <span class="etiqueta alerta">sem proficiência −1d20</span>'}${a.notas?.length ? `<br><small class="apagado">${a.notas.map(esc).join(' · ')}</small>` : ''}</small></td>
       <td><button class="rolavel" data-acao="rolar-ataque" data-i="${i}" ${a.bloqueadaTamanho ? 'disabled title="Arma de duas mãos para personagem Pequeno"' : ''}><span class="d">${textoTeste(a.dados, a.bonus)}</span></button></td>
-      <td><button class="rolavel" data-acao="rolar-dano" data-i="${i}"><span class="d">${esc(a.formula)}</span></button> <small>${esc(TIPOS_DANO[a.tipo] || a.tipo)}</small></td>
+      <td>${(() => { const m = mediaAtaque(a); return `<button class="rolavel" data-acao="rolar-dano" data-i="${i}" data-crit="0" title="Dano normal · média ${m.normal}"><span class="d">${esc(a.formula)}</span></button> <small>${esc(TIPOS_DANO[a.tipo] || a.tipo)} · média ${m.normal}</small>
+        <br><button class="rolavel" data-acao="rolar-dano" data-i="${i}" data-crit="1" title="Dano crítico · média ${m.critico}"><span class="d">crítico ×${a.mult}${a.criticoExtra ? ` +${esc(a.criticoExtra)}` : ''}</span></button> <small>média ${m.critico}</small>`; })()}</td>
       <td class="num">${a.margem < 20 ? a.margem + '+' : '20'} / ×${a.mult}</td><td class="esconde-celular">${esc(a.alcance)}</td>
       <td>${temOpcional(f, 'municao') && a.capacidade ? `<small>${a.carregada}/${a.capacidade} · reserva ${a.reserva}</small> <button class="btn pequeno" data-acao="recarregar" data-i="${i}">Recarregar</button> <button class="btn pequeno" data-acao="adicionar-pacote" data-i="${i}">Usar pacote</button>` : ''}${a.automatica ? '' : `<button class="icone-btn" data-acao="editar-arma" data-i="${f.armas.findIndex(x => x.uid === a.uid)}" aria-label="Editar ${esc(a.nome)}">✎</button>`}</td></tr>`).join('')}
     </tbody></table></div>` : '<p class="vazio">Nenhuma arma. Adicione uma da lista do livro ou crie a sua.</p>'}
     <p class="apagado">Controle ações e reações na mesa. Resolva manobras, testes opostos e ataques concedidos com o outro jogador.</p>
-    <p class="apagado" style="font-size:.88rem">Corpo a corpo e arremesso somam Força no dano. No crítico, os dados da arma são multiplicados (bônus fixos não).${CLASSES[f.classe].nome === 'Combatente' ? ' Ataque Especial: gaste PE para +5 no ataque ou dano (use a bandeja de dados para somar o bônus).' : ''}</p>
+    <p class="apagado" style="font-size:.88rem">Corpo a corpo e arremesso somam Força no dano. No crítico, os dados da arma são multiplicados (bônus fixos não) e entra o extra do crítico da arma, se houver. A média é o valor de cada dado pela metade, para economizar rolagens (ligue "Dano médio" em Sobre para não rolar).${CLASSES[f.classe].nome === 'Combatente' ? ' Ataque Especial: gaste PE para +5 no ataque ou dano (use a bandeja de dados para somar o bônus).' : ''}</p>
   </section>
+  ${painelGastosPE(f, d)}
   ${abaMacros(f, d, true)}
   <div class="grade c2" style="margin-top:14px">
   <section class="painel"><div class="titulo-secao"><h2 class="faixa">Proteção</h2><button class="btn pequeno" data-acao="add-protecao">+ Proteção</button></div>
@@ -281,6 +283,39 @@ function descreverEf(ef, f) {
   return partes.join(', ');
 }
 // Todas as habilidades "usáveis" que a ficha tem agora (para o painel de Ações rápidas)
+// ---------- Gastos de PE por habilidade (Combate) ----------
+// Resume o registro gravado por gastar(): neste turno, nesta cena e no total, separado por habilidade.
+function painelGastosPE(f, d) {
+  const k = d.pd ? 'PD' : 'PE', por = new Map();
+  for (const g of f.gastosPE) {
+    const x = por.get(g.nome) || { turno: 0, cena: 0, total: 0, usos: 0 };
+    if (g.turno === f.numTurno && g.cena === f.numCena) x.turno += g.custo;
+    if (g.cena === f.numCena) x.cena += g.custo;
+    x.total += g.custo; x.usos++; por.set(g.nome, x);
+  }
+  const linhas = [...por].sort((a, b) => b[1].total - a[1].total);
+  const soma = c => linhas.reduce((s, [, x]) => s + x[c], 0);
+  return `<section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa">Gastos de ${k}</h2><div class="linha"><button class="btn pequeno sangue" data-acao="gastar-pe-escolher">Gastar ${k}…</button>${linhas.length ? `<button class="btn pequeno fantasma" data-acao="gastos-pe-limpar">Limpar registro</button>` : ''}</div></div>
+    ${linhas.length ? `<div class="tabela-rolagem"><table class="tabela"><thead><tr><th>Habilidade</th><th class="num">Turno</th><th class="num">Cena</th><th class="num">Total</th><th class="num esconde-celular">Usos</th></tr></thead><tbody>
+      ${linhas.map(([nome, x]) => `<tr><td>${esc(nome)}</td><td class="num">${x.turno || '—'}</td><td class="num">${x.cena || '—'}</td><td class="num"><b>${x.total}</b></td><td class="num esconde-celular">${x.usos}</td></tr>`).join('')}
+      <tr><td><b>Total</b></td><td class="num"><b>${soma('turno')}</b></td><td class="num"><b>${soma('cena')}</b></td><td class="num"><b>${soma('total')}</b></td><td class="esconde-celular"></td></tr>
+    </tbody></table></div>` : `<p class="vazio">Nenhum gasto registrado. Os gastos feitos pelo site (rolagens, "Usar", rituais, itens) entram aqui sozinhos; use "Gastar ${k}…" para os que você resolve na mesa.</p>`}
+    <p class="apagado" style="font-size:.88rem">"Turno" zera em Novo turno e "Cena" em Fim da cena. O registro guarda os últimos 300 gastos.</p>
+  </section>`;
+}
+// Tudo o que a ficha pode usar, com o custo sugerido (para a janela "Gastar PE…")
+function opcoesDeGastoManual(f, d) {
+  const nomes = new Map();
+  const add = (nome, fonte) => { if (nome && !nomes.has(nome) && !/^Trilha \(|^Aumento de atributo|^Grau de treinamento/.test(nome)) nomes.set(nome, fonte); };
+  for (const h of d.habilidades) add(h.nome, 'Classe');
+  for (const h of d.trilhaHabs) if (h.liberada) add(h.nome, 'Trilha');
+  if (ORIGEM[f.origem] && origemAtiva(f)) add(ORIGEM[f.origem].poder, 'Origem');
+  for (const p of f.poderes) if (PODER[p.id]) add(PODER[p.id].nome, 'Poder');
+  for (const p of f.paranormais) add(PODER_PARANORMAL[p.id]?.nome, 'Paranormal');
+  for (const r of d.rituais || []) add(`Ritual: ${r.nome}`, 'Ritual');
+  const custoRitual = n => { const r = (d.rituais || []).find(x => `Ritual: ${x.nome}` === n); return r ? [0, 1, 3, 6, 10][r.circulo] || 1 : 0; };
+  return [...nomes].map(([nome, fonte]) => ({ nome, fonte, custo: typeof USAVEIS[nome]?.custo === 'number' ? USAVEIS[nome].custo : custoRitual(nome) || 1 })).sort((a, b) => a.nome.localeCompare(b.nome, 'pt'));
+}
 function usaveisDaFicha(f, d) {
   const nomes = new Set();
   for (const h of d.habilidades) nomes.add(h.nome);
@@ -602,7 +637,11 @@ function abaRituais(f, d, ui) {
   const podeConjurar = f.classe === 'ocultista' || f.rituais.length > 0 || (f.trilha === 'esoterico');
   const porCirculo = [1, 2, 3, 4].map(c => ({ c, itens: f.rituais.map((r, i) => [r, i]).filter(([r]) => r.circulo === c) }));
   const lim = d.limiteRituais, qtd = f.rituais.length;
-  return `<section class="painel"><div class="titulo-secao"><h2 class="faixa sangue">Rituais conhecidos</h2>
+  const kR = d.pd ? 'PD' : 'PE';
+  const retidos = temOpcional(f, 'reterRitual') && f.rituaisRetidos.length ? `<section class="painel" style="margin-bottom:14px"><div class="titulo-secao"><h2 class="faixa">Rituais retidos</h2><span class="etiqueta">${d.peRetido} ${kR} retidos · máximo ${d.pd ? d.pdMax : d.pe}</span></div>
+    <div class="lista-hab">${f.rituaisRetidos.map((r, i) => `<div class="hab"><span class="meta"><button class="btn pequeno" data-acao="soltar-ritual" data-i="${i}" title="Ação livre ou reação">Soltar</button><button class="btn pequeno sangue" data-acao="soltar-ritual-calma" data-i="${i}" title="Ação padrão">Soltar com calma (Ocultismo DT ${20 + r.custo})</button></span><b>${esc(r.nome)}</b><p>${r.custo} ${kR} retidos. Enquanto estiver retido, o efeito continua.</p></div>`).join('')}</div>
+    <p class="apagado" style="font-size:.88rem">Reter Ritual (AS #01 p. 58): soltar devolve os ${kR} máximos, mas não os atuais; com calma, se passar no Ocultismo, devolve os dois. Ficar atordoado, exausto ou pasmo solta tudo. Os ${kR} retidos não contam no limite por turno.</p></section>` : '';
+  return `${retidos}<section class="painel"><div class="titulo-secao"><h2 class="faixa sangue">Rituais conhecidos</h2>
     <div class="linha"><span class="contador marcador-rituais ${lim && qtd > lim ? 'erro' : ''}" title="Rituais conhecidos / que pode conhecer">${qtd} / ${lim || '—'} rituais</span><span class="etiqueta">DT ${d.dtRitual}</span><span class="etiqueta">Círculo máx. ${d.circuloMax}º</span>${f.poderes.filter(p => p.id === 'especialista-em-elemento' && p.escolha).map(p => `<span class="etiqueta el-${p.escolha}" style="border-color:var(--el)">Especialista em ${esc(ELEM[p.escolha]?.nome || p.escolha)}: +2 DT</span>`).join('')}${f.poderes.filter(p => p.id === 'mestre-em-elemento' && p.escolha).map(p => `<span class="etiqueta el-${p.escolha}" style="border-color:var(--el)">Mestre em ${esc(ELEM[p.escolha]?.nome || p.escolha)}: −1 ${d.pd ? 'PD' : 'PE'}</span>`).join('')}<button class="btn pequeno" data-acao="ritual-proprio">+ Ritual próprio</button></div></div>
     ${quadroCirculos(f, d)}
     ${!podeConjurar ? '<p class="apagado">Só ocultistas conjuram rituais desde o início (outros podem aprender por poderes, trilhas ou origem).</p>' : ''}
@@ -1140,6 +1179,14 @@ function abaNotas(f) {
   </section>`;
 }
 
+// Dano médio de um ataque: normal e crítico (dados da arma multiplicados + extra do crítico)
+function mediaAtaque(a) {
+  try {
+    const normal = media(a.formula).total;
+    const critico = media(a.formula, { multiplicador: a.mult, gruposCritico: a.gruposCritico }).total + (a.criticoExtra ? media(a.criticoExtra).total : 0);
+    return { normal, critico };
+  } catch { return { normal: '—', critico: '—' }; }
+}
 // ---------- Janela "Gastar PE" antes de rolar (passo 9) ----------
 function janelaGasto(f, d, alvo, ops) {
   const k = d.pd ? 'PD' : 'PE';
@@ -1177,6 +1224,43 @@ function conjuracaoDoItem(f, itemUid) {
 const custoDaForma = (r, adicional, desconto) =>
   desconto ? Math.max(1, CIRCULOS[r.circulo - 1].custo + adicional - desconto) : r.custo + adicional;
 
+// ---------- Reter Ritual (AS #01 p. 58) e Conjuração Complexa (SaH pp. 114–117) ----------
+const duracaoCena = (r, cat) => /^cena\b/i.test(String(r.duracao || cat.duracao || '').trim());
+function secaoReterRitual(f, r, cat, k) {
+  if (!temOpcional(f, 'reterRitual') || !duracaoCena(r, cat)) return '';
+  return `<h3 class="titulo-vermelho">Reter Ritual</h3><label class="check hab"><input type="checkbox" id="conj-reter"><span><b>Mudar a duração para retida</b> — os ${k} gastos ficam presos (saem também do máximo) enquanto o ritual durar, e você perde 1 ${k === 'PD' ? 'PD' : 'SAN'}. Solte depois na aba Rituais.</span></label>`;
+}
+// Material de elemento na 1ª etapa: −1d20 no Ocultismo e um efeito à escolha
+const MATERIAL_ELEMENTO = {
+  sangue: ['Sangue (desenhado com sangue)', [['cura', 'Se passar no Ocultismo, recupera 2d6 PV'], ['dado', 'Ritual de dano de Sangue: +1 dado de dano'], ['cond', 'Quem falhar na resistência fica sangrando']]],
+  morte: ['Morte (cinzas ou carvão)', [['dt', 'DT para resistir +2'], ['dado', 'Ritual de dano de Morte: +1 dado de dano'], ['cond', 'Quem falhar na resistência sofre −2 em testes até o fim da cena']]],
+  conhecimento: ['Conhecimento (tinta dourada)', [['limite', 'Limite de PE no ritual +2'], ['dado', 'Ritual de dano de Conhecimento: +1 dado de dano'], ['requisito', 'Ignora um requisito de aprimoramento (ex.: afinidade)']]],
+  energia: ['Energia (luz ou fogo)', [['acao', 'Se passar no Ocultismo, ação de movimento extra no próximo turno'], ['dado', 'Ritual de dano de Energia: +1 dado de dano'], ['cond', 'Quem falhar na resistência fica ofuscado']]],
+};
+function secaoConjuracaoComplexa(f, d, r) {
+  const k = d.pd ? 'PD' : 'PE';
+  const opMat = Object.entries(MATERIAL_ELEMENTO).map(([el, [nome, efeitos]]) => efeitos.map(([id, txt]) => `<option value="${el}:${id}">${esc(nome)} · ${esc(txt)}</option>`).join('')).join('');
+  return `<h3 class="titulo-vermelho">Conjuração Complexa</h3>
+    <p class="apagado" style="font-size:.88rem">3 rodadas: 1ª símbolo, 2ª componentes, 3ª invocação. Você fica desprevenido e faz Vontade para manter a concentração ao sofrer dano (use o campo de concentração abaixo, se precisar). Se falhar no Ocultismo, o ritual <b>não funciona</b>, mas os custos são pagos.</p>
+    <div class="lista-hab">
+      <label class="campo"><span>1ª etapa · material de elemento (−1d20 no Ocultismo)</span><select id="conj-material"><option value="">Nenhum</option>${opMat}</select></label>
+      <label class="check hab"><input type="checkbox" id="conj-componente"><span><b>2ª etapa · consumir o componente</b> (ou um catalisador): +1d20 no Ocultismo. ${r.elemento === 'medo' || d.afinidade === r.elemento ? 'Você dispensa componentes neste ritual, mas pode consumir um para fortalecê-lo.' : ''}</span></label>
+      <label class="check hab"><input type="checkbox" id="conj-extrapolar"><span><b>Extrapolar os limites</b> — some sua Presença (+${f.atributos.pre}) ao limite de ${k} neste ritual e use aprimoramentos como se tivesse acesso a um círculo a mais. Mais poderoso, mais arriscado.</span></label>
+      <label class="check hab"><input type="checkbox" id="conj-desconhecido"><span><b>Ritual que você não conhece</b> — DT do Ocultismo +5; se falhar, além de pagar os custos, sofre um <b>desastre paranormal</b> (1d8).</span></label>
+    </div>`;
+}
+// Aumenta em 1 o primeiro grupo de dados de uma fórmula ("3d6+3" → "4d6+3")
+const maisUmDado = formula => formula ? formula.replace(/^(\s*)(\d*)d(\d+)/, (_, s, n, l) => `${s}${(Number(n) || 1) + 1}d${l}`) : formula;
+const DESASTRES = {
+  1: ['Consumido pelo Outro Lado', 'Você morre e se torna uma criatura do elemento do ritual (VD ≈ 4× seu NEX), controlada pelo mestre a partir da próxima rodada.', null, null],
+  2: ['Surto Elemental', 'Explosão do elemento: você e todos a até 9 m sofrem 3d12 por círculo do ritual (os outros fazem Reflexos DT do ritual +5 para metade).', null, null],
+  3: ['Assalto Psíquico', 'Você sofre 2d10 de dano mental por círculo do ritual.', null, null],
+  4: ['Decrepitude Motora', 'Perde 1 de Agilidade permanentemente e fica desprevenido até o fim da cena.', 'agi', 'desprevenido'],
+  5: ['Definhamento Muscular', 'Perde 1 de Força permanentemente e fica debilitado até o fim da cena.', 'for', 'debilitado'],
+  6: ['Oblívio Mental', 'Perde 1 de Intelecto permanentemente e fica esmorecido até o fim da cena.', 'int', 'esmorecido'],
+  7: ['Eu Perdido', 'Perde 1 de Presença permanentemente e fica alquebrado até o fim da cena.', 'pre', 'alquebrado'],
+  8: ['Dor Profunda', 'Perde 1 de Vigor permanentemente e fica enjoado até o fim da cena.', 'vig', 'enjoado'],
+};
 function janelaConjurar(ctx, f, d, i, origem = null) {
   const r = origem?.r || d.rituais[i], k = d.pd ? 'PD' : 'PE';
   if (!r) return;
@@ -1184,11 +1268,13 @@ function janelaConjurar(ctx, f, d, i, origem = null) {
   const cat = RITUAIS.find(x => semAcento(x.nome) === semAcento(r.nome)) || {};
   const tem = id => f.poderes.some(p => p.id === id);
   const afinidade = (r.elementos?.length ? r.elementos : [r.elemento]).every(el => d.afinidade === el);
+  const complexa = temOpcional(f, 'conjuracaoComplexa');
   const formas = [['basica', 'Forma básica', 0, true, '']];
   for (const [id, nome] of [['discente', 'Forma discente'], ['verdadeiro', 'Forma verdadeira']]) {
     const fo = formaRitual(r, cat, id); if (!fo) continue;
     const okCirc = !fo.circulo || d.circuloMax >= fo.circulo, okAf = !fo.afinidade || afinidade;
-    formas.push([id, nome, fo.custo, okCirc && okAf, `${fo.circulo ? `requer ${fo.circulo}º círculo` : ''}${fo.afinidade ? ' e afinidade' : ''}${!okCirc || !okAf ? ' (você ainda não pode)' : ''}`]);
+    const soExtrapolando = complexa && !okCirc && d.circuloMax + 1 >= fo.circulo; // SaH p. 116: extrapolar dá acesso a um círculo a mais
+    formas.push([id, nome, fo.custo, (okCirc || soExtrapolando) && (okAf || complexa), `${fo.circulo ? `requer ${fo.circulo}º círculo` : ''}${fo.afinidade ? ' e afinidade' : ''}${soExtrapolando ? ' (só extrapolando os limites)' : ''}${complexa && !okAf ? ' (afinidade: só com material de Conhecimento)' : ''}${!(okCirc || soExtrapolando) || (!okAf && !complexa) ? ' (você ainda não pode)' : ''}`]);
   }
   const op = [];
   if (f.trilha === 'conduite' && d.trilhaHabs.find(h => h.nome === 'Ampliar Ritual')?.liberada) op.push(['ampliar', 'Ampliar Ritual: mais alcance ou área em dobro', 2]);
@@ -1202,6 +1288,7 @@ function janelaConjurar(ctx, f, d, i, origem = null) {
     <h3 class="titulo-vermelho">Forma</h3><div class="lista-hab">${formas.map(([id, nome, c, ok, req], j) => `<label class="check hab"><input type="radio" name="conj-forma" value="${id}" data-custo="${c}" ${j === 0 ? 'checked' : ''} ${ok ? '' : 'disabled'}><span><b>${nome}</b> — total <b>${custoDaForma(r, c, desconto)} ${k}</b>${req ? ` <small class="apagado">${esc(req)}</small>` : ''}${r.proprio && id !== 'basica' && r[id] ? `<br><small>${esc(r[id])}</small>` : ''}</span></label>`).join('')}</div>
     ${op.length ? `<h3 class="titulo-vermelho">Extras</h3><div class="lista-hab">${op.map(([id, n, c]) => `<label class="check hab"><input type="checkbox" id="conj-${id}" data-custo="${c}"><span>${esc(n)} <b>+${c} ${k}</b></span></label>`).join('')}</div>` : ''}
     ${(() => { if (r.elemento === 'medo') return ''; const ops = gastosOcultismo(f, d); return ops.length ? `<h3 class="titulo-vermelho">Teste de Ocultismo (Custo do Paranormal)</h3><div class="lista-hab">${ops.map(o => `<label class="check hab"><input type="checkbox" id="conj-oc-${o.id}" data-gasto-oc="${o.id}"><span><b>${esc(o.nome)}</b> +${o.custo} ${k}: ${[o.bonus ? `+${o.bonus}` : '', o.dados ? `+${o.dados}d20` : '', o.dadoExtra ? `+${o.dadoExtra}` : ''].filter(Boolean).join(' ')} no teste${o.nota ? ` <small class="apagado">(${esc(o.nota)})</small>` : ''}</span></label>`).join('')}</div><p class="apagado" style="font-size:.82rem">Este gasto é à parte do custo do ritual: não muda a DT.</p>` : ''; })()}
+    ${secaoReterRitual(f, r, cat, k)}${complexa ? secaoConjuracaoComplexa(f, d, r) : ''}
     <div class="grade c2" style="margin-top:8px"><label class="campo"><span>Outro custo (${k})</span><input type="number" min="0" id="conj-outro" value="0"></label>
       <label class="campo"><span>Concentração: DT de Vontade (0 = sem teste)</span><input type="number" min="0" id="conj-vontade" value="0"></label></div>
     ${flagelo ? `<label class="check hab"><input type="checkbox" id="conj-flagelo"><span><b>Poder do Flagelo:</b> pagar com PV (2 PV por ${k}).</span></label>` : ''}
@@ -1309,7 +1396,8 @@ export function painelPendencias(d, compacto = false) {
 // Gasta PE (ou PD): primeiro os temporários. Devolve false se não tiver o bastante.
 // Desconta PE/PD (temporários primeiro). O limite por turno NÃO bloqueia: o site só conta o gasto do turno e
 // mostra em vermelho quando passa do limite (não há botão de cena/turno sempre à mão para zerar a conta).
-function gastar(ficha, d, custo, limite = d.limiteAcao, minimoDaAcao = custo) { // eslint-disable-line no-unused-vars
+// rotulo: nome da habilidade, ou lista [[nome, custo], …] quando vários gastos saem juntos (o resto vai como "Condição/outros")
+function gastar(ficha, d, custo, limite = d.limiteAcao, minimoDaAcao = custo, rotulo = 'Outros gastos') { // eslint-disable-line no-unused-vars
   if (!custo) return true;
   const k = d.pd ? 'pd' : 'pe';
   const total = d.atual[k] + ficha.recursos.peTemp;
@@ -1318,8 +1406,16 @@ function gastar(ficha, d, custo, limite = d.limiteAcao, minimoDaAcao = custo) { 
   ficha.recursos.peTemp -= doTemp;
   ficha.recursos[k] = d.atual[k] - (custo - doTemp);
   ficha.gastoTurno += custo;
+  registrarGasto(ficha, rotulo, custo);
   return true;
 }
+function registrarGasto(ficha, rotulo, custo) {
+  const partes = Array.isArray(rotulo) ? rotulo.filter(([, c]) => c > 0) : [[rotulo || 'Outros gastos', custo]];
+  const resto = custo - partes.reduce((s, [, c]) => s + c, 0);
+  if (resto > 0) partes.push([d0Nome(ficha), resto]);
+  ficha.gastosPE = [...(ficha.gastosPE || []), ...partes.map(([nome, c]) => ({ nome: String(nome).slice(0, 60), custo: c, turno: ficha.numTurno || 0, cena: ficha.numCena || 0 }))].slice(-300);
+}
+const d0Nome = ficha => (derivar(ficha).custoCondicao ? 'Condição (custo extra)' : 'Outros gastos');
 // Depois de qualquer rolagem, efeitos "só na próxima rolagem" se desligam sozinhos
 function consumirProximas(ctx) {
   const ficha = ctx.fichaAtual(); if (!ficha) return;
@@ -1411,21 +1507,22 @@ export function acoesFicha(ctx) {
       if (ataque && !ataqueValido(ataque)) return;
       if (alvo.id === 'reflexos' && d.reflexosFalha) return ctx.avisar('Falha automática em Reflexos.');
       const ops = opcoesGasto(ficha, d, alvo);
+      const partesGasto = [];
       let custo = 0, minimo = 0, bonus = 0, dados = 0, danoExtra = 0, troca = null, atr = null, caos = 0, carga = false, margemExtra = 0, rerrolar = false, furtivoD8 = false; const extras = [], danoDados = [], nomes = [];
       for (const o of ops) {
         if (o.id === 'ataque-especial') {
           const at = inteiro(document.getElementById('ae-ataque')?.value, 0, 8, 0), dn = inteiro(document.getElementById('ae-dano')?.value, 0, 8, 0);
           const k = Math.min(o.maxPassos, at + dn); if (!k) continue;
-          custo += o.custoPorPassos(k); minimo = Math.max(minimo, o.custoPorPassos(1)); bonus += Math.min(at, k) * o.valorPasso; danoExtra += Math.max(0, k - at) * o.valorPasso; nomes.push(`${o.nome} ${k}×`);
+          custo += o.custoPorPassos(k); minimo = Math.max(minimo, o.custoPorPassos(1)); partesGasto.push([o.nome, o.custoPorPassos(k)]); bonus += Math.min(at, k) * o.valorPasso; danoExtra += Math.max(0, k - at) * o.valorPasso; nomes.push(`${o.nome} ${k}×`);
         } else if (document.getElementById('gasto-' + o.id)?.checked) {
-          custo += o.custo; minimo = Math.max(minimo, o.custo); bonus += o.bonus || 0; dados += o.dados || 0; nomes.push(o.nome.replace(/ \(.*\)$/, ''));
+          custo += o.custo; minimo = Math.max(minimo, o.custo); partesGasto.push([o.nome.replace(/ \(.*\)$/, ''), o.custo]); bonus += o.bonus || 0; dados += o.dados || 0; nomes.push(o.nome.replace(/ \(.*\)$/, ''));
           if (o.dadoExtra) extras.push(o.dadoExtra); if (o.danoDados) danoDados.push(o.danoDados);
           if (o.troca) troca = o.troca; if (o.atr) atr = o.atr; if (o.caos) caos = o.caos; if (o.carga) carga = true; if (o.margem) margemExtra += o.margem; if (o.rerrolar) rerrolar = true; if (o.furtivoD8) furtivoD8 = true;
         }
       }
       const k = d.pd ? 'PD' : 'PE';
       if (custo) { custo += d.custoCondicao; minimo += d.custoCondicao; }
-      if (!gastar(ficha, d, custo, d.limiteAcao, minimo)) return ctx.avisar(`${k} insuficiente ou limite por turno excedido.`, true);
+      if (!gastar(ficha, d, custo, d.limiteAcao, minimo, partesGasto)) return ctx.avisar(`${k} insuficiente ou limite por turno excedido.`, true);
       if (ataque) consumirDisparo(ataque);
       if (carga) ficha.cargasAntecipacao++;
       ctx.salvarFicha(ficha);
@@ -1448,7 +1545,7 @@ export function acoesFicha(ctx) {
       } else {
         const a = d.ataques[alvo.i];
         const dadosFurtivos = danoDados.map(x => (furtivoD8 ? x.replace(/d6$/, 'd8') : x));
-        item = await rolarTesteUI({ titulo: `Ataque · ${a.nome}${sufixo}`, quem: quem(), dados: pool(a.dados, dados), bonus: a.bonus + bonus, margem: Math.max(2, a.margem - margemExtra), mult: a.mult, gruposCritico: a.gruposCritico, tipo: 'ataque', formulaDano: a.formula + (danoExtra ? `+${danoExtra}` : '') + dadosFurtivos.map(x => '+' + x).join('') });
+        item = await rolarTesteUI({ titulo: `Ataque · ${a.nome}${sufixo}`, quem: quem(), dados: pool(a.dados, dados), bonus: a.bonus + bonus, margem: Math.max(2, a.margem - margemExtra), mult: a.mult, gruposCritico: a.gruposCritico, tipo: 'ataque', criticoExtra: a.criticoExtra, formulaDano: a.formula + (danoExtra ? `+${danoExtra}` : '') + dadosFurtivos.map(x => '+' + x).join('') });
       }
       // Valer-se do Caos: o dado extra é o último rolado
       if (caos && item?.valores) {
@@ -1468,7 +1565,7 @@ export function acoesFicha(ctx) {
         const titulo = alvo.atr ? `${p.nome} · ${ATRIBUTOS.find(a => a.id === p.atrUsado).nome}` : p.nome;
         return testar({ titulo, quem: quem(), dados: p.dados, bonus: p.bonus }, p.atrUsado).then(() => { danoDaIdade(p.atrUsado); fim(); });
       }
-      else { const a = d.ataques[alvo.i]; if (!ataqueValido(a)) return; consumirDisparo(a); rolarTesteUI({ titulo: `Ataque · ${a.nome}`, quem: quem(), dados: a.dados, bonus: a.bonus, margem: a.margem, mult: a.mult, gruposCritico: a.gruposCritico, tipo: 'ataque', formulaDano: a.formula }).then(fim); }
+      else { const a = d.ataques[alvo.i]; if (!ataqueValido(a)) return; consumirDisparo(a); rolarTesteUI({ titulo: `Ataque · ${a.nome}`, quem: quem(), dados: a.dados, bonus: a.bonus, margem: a.margem, mult: a.mult, gruposCritico: a.gruposCritico, tipo: 'ataque', criticoExtra: a.criticoExtra, formulaDano: a.formula }).then(fim); }
     },
     // ----- Usar habilidade (gasta PE, liga efeito, rola o que precisar) -----
     'usar': async el => {
@@ -1485,7 +1582,7 @@ export function acoesFicha(ctx) {
             .map(i => ({ valor: String(ITENS_CATALOGO.indexOf(i)), nome: i.nome })),
           aoEscolher: valor => {
             if (ficha.itens.length >= 120) return ctx.avisar('O inventário está cheio.');
-            if (!gastar(ficha, derivar(ficha), 5 + d.custoCondicao)) return ctx.avisar('PE/PD insuficiente ou limite de turno.');
+            if (!gastar(ficha, derivar(ficha), 5 + d.custoCondicao, undefined, undefined, [[nome, 5]])) return ctx.avisar('PE/PD insuficiente ou limite de turno.');
             const item = ITENS_CATALOGO[Number(valor)];
             ficha.itens.push({ uid: uid(), nome: item.nome, categoria: item.categoria, espacos: item.espacos, qtd: 1, mods: [], expiraCena: true, nota: nome });
             fecharModal(); salvar();
@@ -1499,7 +1596,7 @@ export function acoesFicha(ctx) {
       }
       const minimo = typeof u.custo === 'number' ? custo + d.custoCondicao : 1 + d.custoCondicao;
       custo += d.custoCondicao;
-      if (custo && !gastar(ficha, d, custo, d.limiteAcao, minimo)) return ctx.avisar(`${k} insuficiente (precisa de ${custo}).`, true);
+      if (custo && !gastar(ficha, d, custo, d.limiteAcao, minimo, [[nome, custo - d.custoCondicao]])) return ctx.avisar(`${k} insuficiente (precisa de ${custo}).`, true);
       if (u.ganhaPeTemp) {
         let ganho = u.ganhaPeTemp;
         if (nome === 'Potencial Reaproveitado' && ficha.paranormais.some(p => p.id === 'potencial-reaproveitado' && p.afinidade)) ganho = 3;
@@ -1596,7 +1693,7 @@ export function acoesFicha(ctx) {
         const linhas = [], autor = ficha.nome || 'Agente';
         if (m.usaPd && m.pd > 0) {
           const dx = derivar(ficha), K = dx.pd ? 'PD' : 'PE';
-          if (!gastar(ficha, dx, m.pd)) return ctx.avisar(`${K} insuficiente para a macro (precisa de ${m.pd}).`, true);
+          if (!gastar(ficha, dx, m.pd, undefined, undefined, `Macro: ${m.nome || 'sem nome'}`)) return ctx.avisar(`${K} insuficiente para a macro (precisa de ${m.pd}).`, true);
           ctx.salvarFicha(ficha); linhas.push([`Gastou ${m.pd} ${K}`, '']);
         }
         for (const p of passos) {
@@ -1649,7 +1746,7 @@ export function acoesFicha(ctx) {
             }
             if (danos.length > 1) linhas.push([`Dano total · ${nome}`, totalDano]);
           } else if (p.tipo === 'gasto') {
-            if (!gastar(ficha, dx, p.valor)) { linhas.push([`Gastar ${p.valor} ${K}`, `sem ${K} suficiente`]); break; }
+            if (!gastar(ficha, dx, p.valor, undefined, undefined, `Macro: ${m.nome || 'sem nome'}`)) { linhas.push([`Gastar ${p.valor} ${K}`, `sem ${K} suficiente`]); break; }
             ctx.salvarFicha(ficha); linhas.push([`Gastou ${p.valor} ${K}`, '']);
           } else {
             if (!p.formula) { linhas.push(['Fórmula vazia', '—']); continue; }
@@ -1761,7 +1858,7 @@ export function acoesFicha(ctx) {
       let custo = (u.custo || 0) + (u.custoDia ? it.usosDia : 0);
       if (u.custoPorAtaque) { const n = pedir('Quantos ataques você já fez neste turno?'); if (n == null) return; custo = u.custoPorAtaque * n; }
       if (u.custoPergunta) { const n = pedir(`${titulo}: ${u.custoPergunta}?`); if (n == null) return; custo = n; }
-      if (custo) { custo += d.custoCondicao; if (!gastar(ficha, d, custo, d.limiteAcao)) return ctx.avisar(`${k} insuficiente ou limite do turno (precisa de ${custo}).`, true); msgs.push(`−${custo} ${k}`); d = derivar(ficha); }
+      if (custo) { custo += d.custoCondicao; if (!gastar(ficha, d, custo, d.limiteAcao, custo, [[`${it.nome}: ${u.nome}`, custo - d.custoCondicao]])) return ctx.avisar(`${k} insuficiente ou limite do turno (precisa de ${custo}).`, true); msgs.push(`−${custo} ${k}`); d = derivar(ficha); }
       if (u.usaCargaUm) { if (!it.carga) return ctx.avisar(`${it.nome} não tem cargas.`, true); it.carga--; }
       if ((u.usaCarga) && !it.carga) return ctx.avisar(`${it.nome} está vazio.`, true);
       // dano informado pelo jogador
@@ -2018,9 +2115,52 @@ export function acoesFicha(ctx) {
       const ops = opcoesGasto(f(), d0, { tipo: 'ataque', i });
       if (ops.length) return janelaGasto(f(), d0, { tipo: 'ataque', i }, ops);
       consumirDisparo(a);
-      testar({ titulo: `Ataque · ${a.nome}`, quem: quem(), dados: a.dados, bonus: a.bonus, margem: a.margem, mult: a.mult, gruposCritico: a.gruposCritico, tipo: 'ataque', formulaDano: a.formula }, d0.PER[a.pericia].atrUsado).then(() => { danoDaIdade(d0.PER[a.pericia].atrUsado); consumirProximas(ctx); ctx.render(); });
+      testar({ titulo: `Ataque · ${a.nome}`, quem: quem(), dados: a.dados, bonus: a.bonus, margem: a.margem, mult: a.mult, gruposCritico: a.gruposCritico, tipo: 'ataque', criticoExtra: a.criticoExtra, formulaDano: a.formula }, d0.PER[a.pericia].atrUsado).then(() => { danoDaIdade(d0.PER[a.pericia].atrUsado); consumirProximas(ctx); ctx.render(); });
     },
-    'rolar-dano': el => { const a = derivar(f()).ataques[Number(el.dataset.i)]; rolarDanoUI({ titulo: `Dano · ${a.nome}`, quem: quem(), formula: a.formula }); },
+    'gastar-pe-escolher': () => {
+      const ficha = f(), d = derivar(ficha), k = d.pd ? 'PD' : 'PE', ops = opcoesDeGastoManual(ficha, d);
+      abrirModal(`Gastar ${k}: o que você vai usar?`, `<p class="apagado">Você tem <b>${d.atual[d.pd ? 'pd' : 'pe']} ${k}</b>${ficha.recursos.peTemp ? ` + ${ficha.recursos.peTemp} temporários` : ''} · neste turno: ${ficha.gastoTurno}/${d.limitePE}. Marque o que vai usar e ajuste o custo se precisar. Os temporários são gastos primeiro.</p>
+        <input type="search" placeholder="Procurar habilidade…" data-filtro-modal aria-label="Procurar habilidade" style="margin-bottom:8px">
+        <div class="lista-hab">${ops.map((o, j) => `<label class="check hab" data-busca="${esc(semAcento(o.nome))}"><input type="checkbox" data-gasto-man="${j}"><span><b>${esc(o.nome)}</b> <small class="apagado">${esc(o.fonte)}</small></span><input type="number" min="0" max="99" value="${o.custo}" data-gasto-man-custo="${j}" aria-label="Custo de ${esc(o.nome)}" style="width:70px;margin-left:auto"></label>`).join('')}
+          <label class="check hab"><input type="checkbox" data-gasto-man="outro"><span><input data-gasto-man-nome placeholder="Outro (escreva o nome)" maxlength="60" style="width:100%"></span><input type="number" min="0" max="99" value="1" data-gasto-man-custo="outro" aria-label="Custo do outro gasto" style="width:70px;margin-left:auto"></label></div>`,
+        `<button class="btn fantasma" data-acao="fechar-modal">Cancelar</button><button class="btn sangue" data-acao="gastar-pe-confirmar">Gastar</button>`, true);
+      window.__opsGastoManual = ops;
+    },
+    'gastar-pe-confirmar': () => {
+      const ficha = f(), d = derivar(ficha), k = d.pd ? 'PD' : 'PE', ops = window.__opsGastoManual || [];
+      const partes = [...document.querySelectorAll('[data-gasto-man]:checked')].map(c => {
+        const j = c.dataset.gastoMan, custo = inteiro(document.querySelector(`[data-gasto-man-custo="${j}"]`)?.value, 0, 99, 0);
+        const nome = j === 'outro' ? (document.querySelector('[data-gasto-man-nome]')?.value.trim() || 'Outros gastos') : ops[Number(j)]?.nome;
+        return [nome, custo];
+      }).filter(([n, c]) => n && c > 0);
+      const total = partes.reduce((s, [, c]) => s + c, 0);
+      if (!total) return ctx.avisar('Marque o que vai usar (com custo maior que 0).', true);
+      if (!gastar(ficha, d, total, d.limiteAcao, total, partes)) return ctx.avisar(`${k} insuficiente (precisa de ${total}).`, true);
+      fecharModal(); salvar(); ctx.avisar(`−${total} ${k}: ${partes.map(([n, c]) => `${n} ${c}`).join(', ')}.`);
+    },
+    'gastos-pe-limpar': () => { if (!confirm('Limpar todo o registro de gastos?')) return; f().gastosPE = []; salvar(); },
+    'soltar-ritual': el => {
+      const ficha = f(), r = ficha.rituaisRetidos[Number(el.dataset.i)]; if (!r) return;
+      ficha.rituaisRetidos.splice(Number(el.dataset.i), 1); salvar();
+      ctx.avisar(`${r.nome} solto: +${r.custo} ${derivar(ficha).pd ? 'PD' : 'PE'} máximos (os atuais voltam com descanso).`);
+    },
+    'soltar-ritual-calma': async el => {
+      const ficha = f(), d = derivar(ficha), i = Number(el.dataset.i), r = ficha.rituaisRetidos[i]; if (!r) return;
+      const oc = d.PER.ocultismo, dt = 20 + r.custo;
+      proxima.dt = String(dt);
+      let t; try { t = await rolarTesteUI({ titulo: `Soltar ${r.nome} com calma · Ocultismo DT ${dt}`, quem: quem(), dados: oc.dados, bonus: oc.bonus }); } finally { proxima.dt = ''; }
+      const fx = f(), j = fx.rituaisRetidos.findIndex(x => x.uid === r.uid); if (j < 0) return;
+      fx.rituaisRetidos.splice(j, 1);
+      const k = d.pd ? 'pd' : 'pe';
+      if (t && t.total >= dt) { const dx = derivar(fx); recuperar(fx, dx, k, r.custo); }
+      salvar();
+      ctx.avisar(t && t.total >= dt ? `Passou (${t.total}): ${r.nome} solto com calma, +${r.custo} ${k.toUpperCase()} máximos e atuais.` : `Falhou (${t?.total}): ${r.nome} solto, só os ${k.toUpperCase()} máximos voltaram.`);
+    },
+    'rolar-dano': el => {
+      const a = derivar(f()).ataques[Number(el.dataset.i)]; if (!a) return;
+      const crit = el.dataset.crit === '1';
+      rolarDanoUI({ titulo: `${crit ? 'Dano crítico' : 'Dano'} · ${a.nome}`, quem: quem(), formula: a.formula, multiplicador: crit ? a.mult : 1, gruposCritico: a.gruposCritico, adicional: crit ? a.criticoExtra : '' });
+    },
     'ritual-aprender': el => {
       const ficha = f(); const r = RITUAIS.find(x => x.id === el.dataset.id); if (!r) return;
       const problema = problemaAoAprender(ficha, derivar(ficha), r);
@@ -2080,7 +2220,7 @@ export function acoesFicha(ctx) {
       const r = el.dataset.itemUid ? conjuracaoDoItem(ficha, el.dataset.itemUid)?.r : d.rituais[Number(el.dataset.i)];
       if (!r || !/sustentad/i.test(r.duracao)) return;
       const custo = 1 + d.custoCondicao;
-      if (!gastar(ficha, d, custo, d.limiteRitual, 0)) return ctx.avisar('Sem recurso ou limite de gasto para sustentar.', true);
+      if (!gastar(ficha, d, custo, d.limiteRitual, 0, `Sustentar ${r.nome}`)) return ctx.avisar('Sem recurso ou limite de gasto para sustentar.', true);
       salvar(); ctx.avisar(`Sustentou ${r.nome} neste turno.`);
     },
     'conjurar': el => {
@@ -2096,19 +2236,29 @@ export function acoesFicha(ctx) {
     'conjurar-confirmar': async el => {
       const ficha = f(), d = derivar(ficha), i = Number(el.dataset.i), k = d.pd ? 'pd' : 'pe', K = k.toUpperCase();
       const origem = el.dataset.itemUid ? conjuracaoDoItem(ficha, el.dataset.itemUid) : null;
-      const r = el.dataset.itemUid ? (origem?.cat.id === el.dataset.ritualId ? origem?.r : null) : d.rituais[i];
-      if (!r || d.semAcoes) return ctx.avisar('A conjuração está indisponível.', true);
+      const r0 = el.dataset.itemUid ? (origem?.cat.id === el.dataset.ritualId ? origem?.r : null) : d.rituais[i];
+      if (!r0 || d.semAcoes) return ctx.avisar('A conjuração está indisponível.', true);
+      // Conjuração Complexa (SaH pp. 114–117)
+      const complexa = temOpcional(ficha, 'conjuracaoComplexa');
+      const [matEl, matEf] = complexa ? (document.getElementById('conj-material')?.value || '').split(':') : [];
+      const extrapolar = complexa && !!document.getElementById('conj-extrapolar')?.checked;
+      const componente = complexa && !!document.getElementById('conj-componente')?.checked;
+      const desconhecido = complexa && !!document.getElementById('conj-desconhecido')?.checked;
+      const reter = temOpcional(ficha, 'reterRitual') && !!document.getElementById('conj-reter')?.checked;
+      const elementosR = r0.elementos?.length ? r0.elementos : [r0.elemento];
+      const r = matEl === 'morte' && matEf === 'dt' ? { ...r0, dt: r0.dt + 2 } : r0;
       const alvoMental = document.getElementById('conj-recurso')?.value === 'mental';
       const forma = document.querySelector('[name="conj-forma"]:checked');
       const catR = RITUAIS.find(x => semAcento(x.nome) === semAcento(r.nome)) || {};
       const alvoId = ritualDeToque(r, catR) ? '' : document.getElementById('conj-alvo')?.value;
       const formaId = forma?.value || 'basica';
       const avancada = ['discente', 'verdadeiro'].includes(formaId) ? formaRitual(r, catR, formaId) : null;
-      if (formaId !== 'basica' && (!avancada || avancada.circulo > d.circuloMax ||
-        (avancada.afinidade && !(r.elementos?.length ? r.elementos : [r.elemento]).every(el => el === d.afinidade)))) {
+      if (formaId !== 'basica' && (!avancada || avancada.circulo > d.circuloMax + (extrapolar ? 1 : 0) ||
+        (avancada.afinidade && !(matEl === 'conhecimento' && matEf === 'requisito') && !elementosR.every(el => el === d.afinidade)))) {
         return ctx.avisar('Pré-requisitos da forma avançada não cumpridos.', true);
       }
-      const formulaD = formulaDaForma(r, catR, formaId);
+      const formulaBase = formulaDaForma(r, catR, formaId);
+      const formulaD = matEf === 'dado' && r.tipoDados !== 'cura' && elementosR.includes(matEl) ? maisUmDado(formulaBase) : formulaBase;
       if (formulaD) {
         try { analisar(formulaD); } catch (e) { return ctx.avisar(`Fórmula do ritual: ${e.message}`, true); }
       }
@@ -2119,8 +2269,8 @@ export function acoesFicha(ctx) {
       const opsOc = r.elemento === 'medo' ? [] : gastosOcultismo(ficha, d).filter(o => marcadosOc.has(o.id));
       const gastoOc = opsOc.reduce((s, o) => s + o.custo, 0);
       if (document.getElementById('conj-flagelo')?.checked) { const pv = custo * 2; if (d.atual.pv <= pv) return ctx.avisar('PV insuficientes.', true); ficha.recursos.pv = d.atual.pv - pv; ficha.gastoTurno += custo; }
-      else if (!gastar(ficha, d, custo + gastoOc, d.limiteRitual, 0)) return ctx.avisar(`${K} insuficiente (precisa de ${custo + gastoOc}).`, true);
-      if (gastoOc && document.getElementById('conj-flagelo')?.checked && !gastar(ficha, derivar(ficha), gastoOc)) return ctx.avisar(`${K} insuficiente para ${opsOc.map(o => o.nome).join(', ')}.`, true);
+      else if (!gastar(ficha, d, custo + gastoOc, d.limiteRitual + (extrapolar ? ficha.atributos.pre : 0) + (matEl === 'conhecimento' && matEf === 'limite' ? 2 : 0), 0, [[`Ritual: ${r.nome}`, custo - d.custoCondicao], ...opsOc.map(o => [o.nome, o.custo])])) return ctx.avisar(`${K} insuficiente (precisa de ${custo + gastoOc}).`, true);
+      if (gastoOc && document.getElementById('conj-flagelo')?.checked && !gastar(ficha, derivar(ficha), gastoOc, undefined, undefined, opsOc.map(o => [o.nome, o.custo]))) return ctx.avisar(`${K} insuficiente para ${opsOc.map(o => o.nome).join(', ')}.`, true);
       ctx.salvarFicha(ficha); fecharModal(); ctx.render();
       const nomeForma = forma?.value === 'discente' ? ' (discente)' : forma?.value === 'verdadeiro' ? ' (verdadeira)' : '';
       const rotuloD = r.tipoDados === 'cura' ? 'CURA' : 'DANO';
@@ -2161,6 +2311,11 @@ export function acoesFicha(ctx) {
           adicionarCondicao(atual, condicao);
           if (perfil.turnos) atual.prazosCondicao[condicao] = Math.max(atual.prazosCondicao[condicao] || 0, perfil.turnos);
         }
+        if (!passou && p && matEf === 'cond') {
+          const cm = { sangue: 'sangrando', energia: 'ofuscado' }[matEl];
+          if (cm) { adicionarCondicao(atual, cm); mensagem = [mensagem, CONDICOES.find(c => c.id === cm)?.nome].filter(Boolean).join(' · '); }
+          else if (matEl === 'morte') mensagem = [mensagem, '−2 em testes até o fim da cena'].filter(Boolean).join(' · ');
+        }
         if (formulaD) {
           const resultado = await rolarFormula(alvo.nome);
           if (!resultado) return;
@@ -2180,6 +2335,30 @@ export function acoesFicha(ctx) {
       const presencaMedo = catR.id === 'presenca-do-medo';
       const capturar = catR.id === 'capturar-momento';
       const temResolucao = !!(alvoId || formulaD || r.rolagemExtra || presencaMedo || capturar);
+      const aposConjurar = async () => {
+        const fx = f(), dx = derivar(fx), notas = [];
+        if (reter) {
+          fx.rituaisRetidos = [...(fx.rituaisRetidos || []), { uid: uid(), nome: r.nome, custo }].slice(-20);
+          if (dx.pd) fx.recursos.pd = dx.atual.pd - 1; else fx.recursos.san = dx.atual.san - 1;
+          notas.push(`ritual retido (${custo} ${K} presos, −1 ${dx.pd ? 'PD' : 'SAN'})`);
+        }
+        if (matEl === 'sangue' && matEf === 'cura') {
+          const c = await rolarDanoUI({ titulo: `${r.nome} · material de Sangue`, quem: fx.nome, formula: '2d6', rotulo: 'CURA' });
+          if (c) { const fy = f(); recuperar(fy, derivar(fy), 'pv', c.total); ctx.salvarFicha(fy); notas.push(`+${c.total} PV`); }
+          ctx.salvarFicha(f()); ctx.render();
+        } else { ctx.salvarFicha(fx); ctx.render(); }
+        if (matEl === 'energia' && matEf === 'acao') notas.push('ação de movimento extra no próximo turno');
+        if (notas.length) ctx.avisar(`${r.nome}: ${notas.join(' · ')}.`);
+      };
+      const desastre = async () => {
+        const fx = f(), circ = r.circulo || 1, n = rolar('1d8').total, [nome, txt, atr, cond] = DESASTRES[n];
+        let extra = '';
+        if (atr) { fx.atributos[atr] = Math.max(0, (fx.atributos[atr] || 0) - 1); adicionarCondicao(fx, cond); }
+        ctx.salvarFicha(fx); ctx.render();
+        if (n === 3) { const t = await rolarDanoUI({ titulo: `Desastre paranormal · ${nome}`, quem: fx.nome, formula: `${2 * circ}d10`, rotulo: 'DANO' }); if (t) { const fy = f(); sofrerDano(fy, derivar(fy), t.total, { tipo: 'mental' }); ctx.salvarFicha(fy); ctx.render(); extra = ` (${t.total} de dano mental)`; } }
+        if (n === 2) { const t = await rolarDanoUI({ titulo: `Desastre paranormal · ${nome}`, quem: fx.nome, formula: `${3 * circ}d12`, rotulo: 'DANO' }); if (t) { const fy = f(); sofrerDano(fy, derivar(fy), t.total, { tipo: 'pv' }); ctx.salvarFicha(fy); ctx.render(); extra = ` (${t.total} de dano em você)`; } }
+        abrirModal(`Desastre paranormal · ${n} · ${esc(nome)}`, `<p>${esc(txt)}${esc(extra)}</p><p class="apagado" style="font-size:.88rem">Sobrevivendo ao Horror, p. 117–118. ${atr ? 'O atributo e a condição já foram aplicados na ficha (remova a condição no fim da cena).' : ''}</p>`, '<button class="btn" data-acao="fechar-modal">Fechar</button>');
+      };
       const resolver = async () => {
         if (capturar) ctx.avisar(formaId === 'basica' ? 'Símbolo criado para captar imagens e sons.' : 'Símbolo criado. Use a rolagem da forma correspondente quando decidir explodi-lo na mesa.');
         else if (presencaMedo) await acoesFicha(ctx)['presenca-dano']();
@@ -2191,11 +2370,11 @@ export function acoesFicha(ctx) {
       if (dtVontade) { const pv = d.PER.vontade; const t = await rolarTesteUI({ titulo: `Concentração · ${r.nome}`, quem: quem(), dados: pv.dados, bonus: pv.bonus }); if (t.total < dtVontade) { ctx.avisar(`Falhou na concentração (${t.total} < ${dtVontade}): o ritual não funciona e os ${K} foram perdidos.`, true); return; } }
       // O Custo do Paranormal (menos Medo)
       if (r.elemento !== 'medo') {
-        const oc = d.PER.ocultismo, dt = 20 + custo;
+        const oc = d.PER.ocultismo, dt = 20 + custo + (desconhecido ? 5 : 0);
         const armadura = ficha.protecoes.filter(p => p.vestida).some(p => p.peso === 'pesada') ? -2 : ficha.protecoes.filter(p => p.vestida).some(p => p.peso === 'leve') ? -1 : 0;
-        const base = oc.dados.pior ? 2 - oc.dados.qtd : oc.dados.qtd, q = base + armadura + opsOc.reduce((s, o) => s + (o.dados || 0), 0);
+        const base = oc.dados.pior ? 2 - oc.dados.qtd : oc.dados.qtd, q = base + armadura + opsOc.reduce((s, o) => s + (o.dados || 0), 0) - (matEl ? 1 : 0) + (componente ? 1 : 0);
         let bonusOc = opsOc.reduce((s, o) => s + (o.bonus || 0), 0);
-        const notasOc = opsOc.map(o => o.nome);
+        const notasOc = [...opsOc.map(o => o.nome), ...(matEl ? [`material de ${matEl} −1d20`] : []), ...(componente ? ['componente +1d20'] : []), ...(desconhecido ? ['ritual desconhecido DT +5'] : [])];
         for (const o of opsOc) if (o.dadoExtra) { const x = rolar(o.dadoExtra).total; bonusOc += x; notasOc.push(`${o.dadoExtra}=${x}`); }
         proxima.dt = String(dt);
         const t = await testar({ titulo: `Custo do Paranormal · ${r.nome}${nomeForma}${notasOc.length ? ` (${notasOc.join(', ')})` : ''}`, quem: quem(), dados: q >= 1 ? { qtd: q, pior: false } : { qtd: 2 - q, pior: true }, bonus: oc.bonus + bonusOc }, oc.atrUsado, ficha, dt);
@@ -2208,11 +2387,19 @@ export function acoesFicha(ctx) {
             if (dx.pd) fx.recursos.pd--; else fx.recursos.san--;
           }
           ctx.salvarFicha(fx); ctx.render();
+          if (complexa) {
+            // Conjuração complexa: falhar significa que o ritual não funciona (custos pagos mesmo assim)
+            ctx.avisar(`Falhou no Ocultismo (${t.total} < ${dt}): −${custo} ${dx.pd ? 'PD' : 'Sanidade'}${perm ? ' e −1 de Sanidade permanente' : ''}. Na conjuração complexa o ritual não funciona.`, true);
+            if (desconhecido) await desastre();
+            return;
+          }
           ctx.avisar(`Falhou no Ocultismo (${t.total} < ${dt}): −${custo} ${dx.pd ? 'PD' : 'Sanidade'}${perm ? ' e −1 de Sanidade permanente' : ''}. O ritual funciona mesmo assim.`, true);
+          await aposConjurar();
           if (temResolucao) oferecerEfeitoRitual(t, resolver);
           return;
         }
         ctx.avisar(`${r.nome}${nomeForma} conjurado: −${custo} ${K}. Passou no Ocultismo (${t.total}).`);
+        await aposConjurar();
       } else {
         const fx = ficha, dx = derivar(fx);
         const perda = forma?.value === 'verdadeiro' ? 3 : forma?.value === 'discente' ? 2 : 1;
@@ -2221,6 +2408,7 @@ export function acoesFicha(ctx) {
         fx.penalidadeSanPermanente += perda;
         ctx.salvarFicha(fx); ctx.render();
         ctx.avisar(`${r.nome}${nomeForma}: −${custo} ${K} de conjuração e −${custo} ${recurso.toUpperCase()}, mais ${perda} permanente.`);
+        await aposConjurar();
       }
       if (temResolucao) await resolver();
     },
@@ -2258,7 +2446,7 @@ export function acoesFicha(ctx) {
     'condicao': el => { const ficha = f(); const id = el.dataset.id; if (ficha.condicoes.includes(id)) {
         ficha.condicoes = ficha.condicoes.filter(c => c !== id);
         delete ficha.prazosCondicao[id];
-      } else ficha.condicoes.push(id);
+      } else { ficha.condicoes.push(id); const n = perderFoco(ficha); if (n) ctx.avisar(`Perdeu o foco: ${n} ritual(is) retido(s) soltos. Os ${derivar(ficha).pd ? 'PD' : 'PE'} máximos voltaram; os atuais não.`, true); }
       salvar(); },
     'rolar-ferimento': () => { const ficha = f(); const n = d(6); const atr = FERIMENTOS[n - 1]; if (atr) { ficha.ferimentos.push(atr); salvar(); } ctx.avisar(`1d6 = ${n}: ${atr ? 'ferimento em ' + ATRIBUTOS.find(a => a.id === atr).nome : 'ferimento superficial (nenhum atributo)'}.`); },
     'remover': el => { const ficha = f(); const lista = ficha[el.dataset.lista]; const i = Number(el.dataset.i); const nome = lista[i]?.nome || ''; if (['poderes', 'protecoes', 'habilidadesProprias', 'itens'].includes(el.dataset.lista) && nome && !confirm(`Remover "${nome}"?`)) return; if (['armas', 'protecoes', 'itens'].includes(el.dataset.lista)) registrarMaldições(ficha);
@@ -2324,7 +2512,21 @@ export function acoesFicha(ctx) {
           <label class="campo"><span>Elemento</span><select data-maldicao="elemento">${['', 'sangue', 'morte', 'conhecimento', 'energia'].map(e => `<option value="${e}" ${a.maldicao?.elemento === e ? 'selected' : ''}>${e ? e[0].toUpperCase() + e.slice(1) : '—'}</option>`).join('')}</select></label>
           <label class="campo"><span>Dano extra (ex.: 1d6)</span><input data-maldicao="dados" value="${esc(a.maldicao?.dados || '')}" placeholder="preenche sozinho"></label>
           <label class="campo" style="grid-column:1/-1"><span>Efeito da maldição</span><textarea data-maldicao="texto">${esc(a.maldicao?.texto || '')}</textarea></label></div></div>
-        ${f().trilha === 'aniquilador' ? `<label class="check"><input type="checkbox" data-modal-arma-check="favorita" ${a.favorita ? 'checked' : ''}><span>Arma favorita (Aniquilador)</span></label>` : ''}
+        <div style="grid-column:1/-1">
+          <h3 class="titulo-vermelho">Crítico</h3>
+          <div class="grade c2">${c('criticoExtra', 'Extra só no crítico (ex.: 1d8, 2d6+2)', 'text', 'placeholder="vazio = nada a mais"')}
+          <p class="apagado" style="font-size:.88rem;margin:0">No crítico, os dados da arma são multiplicados por ×${a.mult}. Coloque aqui dados ou bônus que só entram no crítico (poderes, maldições, itens); eles somam sem multiplicar.</p></div>
+        </div>
+        <div style="grid-column:1/-1">
+          <h3 class="titulo-vermelho">Por que a categoria diminuiu</h3>
+          ${(() => { const at = derivar(f()).ataques.find(x => x.uid === a.uid); return at ? `<p class="apagado" style="font-size:.88rem">Categoria com modificações e maldições: <b>${cat(at.categoriaSemReducao)}</b>${at.reducoesCategoria.length ? ` · reduções: ${at.reducoesCategoria.map(([n, v]) => `${esc(n)} −${v}`).join(', ')} · conta como <b>${cat(at.categoriaEfetiva)}</b>` : ' · sem redução'} (salve para atualizar).</p>` : ''; })()}
+          <div class="lista-hab">
+          ${f().trilha === 'aniquilador' ? `<label class="check hab"><input type="checkbox" data-modal-arma-check="favorita" ${a.favorita ? 'checked' : ''}><span><b>Arma favorita (Aniquilador)</b> <small class="apagado">A Favorita −I; Técnica Secreta −II; Máquina de Matar −III</small></span></label>` : ''}
+          ${f().poderes.some(p => p.id === 'ferramentas-paranormais') ? `<label class="check hab"><input type="checkbox" data-modal-arma-reducao="ferramentas-paranormais" ${(a.reducaoMotivos || []).includes('ferramentas-paranormais') ? 'checked' : ''}><span><b>Ferramentas Paranormais</b> <small class="apagado">item paranormal: −I</small></span></label>` : ''}
+          </div>
+          <div class="grade c2">${c('reducaoOutraNome', 'Outro motivo (ex.: presente do mestre, patente)', 'text', 'maxlength="60"')}${s('reducaoOutra', 'Reduz quantas categorias', [[0, 'nenhuma'], [1, '−I'], [2, '−II'], [3, '−III'], [4, '−IV']])}</div>
+          <p class="apagado" style="font-size:.85rem">"Ferramenta Favorita" (Engenheiro) e "Mochila de Utilidades" não valem para armas.</p>
+        </div>
         ${ORIGEM[f().origem]?.id === 'operario' ? `<label class="check"><input type="checkbox" data-modal-arma-check="ferramenta" ${a.ferramenta ? 'checked' : ''}><span>Ferramenta de Trabalho (Operário): +1 ataque, dano e margem</span></label>` : ''}
         ${f().trilha === 'atirador' ? `<label class="check"><input type="checkbox" data-modal-arma-check="balasLongas" ${a.balasLongas ? 'checked' : ''}><span>Usa balas longas (Mira de Elite: +Intelecto no dano)</span></label>` : ''}${c('nota', 'Anotação (modificações, maldições…)')}</div>`,
         `<button class="btn perigo" data-acao="remover-arma" data-i="${i}">Remover</button><span class="espaco"></span><button class="btn sangue" data-acao="salvar-arma" data-i="${i}">Salvar</button>`, true);
@@ -2333,6 +2535,8 @@ export function acoesFicha(ctx) {
       const ficha = f(), i = Number(el.dataset.i), a = { ...ficha.armas[i] };
       document.querySelectorAll('[data-modal-arma]').forEach(inp => { a[inp.dataset.modalArma] = inp.type === 'number' ? Number(inp.value) : inp.value; });
       document.querySelectorAll('[data-modal-arma-check]').forEach(inp => { a[inp.dataset.modalArmaCheck] = inp.checked; });
+      a.reducaoMotivos = [...document.querySelectorAll('[data-modal-arma-reducao]:checked')].map(x => x.dataset.modalArmaReducao);
+      a.reducaoOutra = Number(a.reducaoOutra) || 0;
       const mal = {}; document.querySelectorAll('[data-maldicao]').forEach(x => { mal[x.dataset.maldicao] = x.value; });
       if (mal.tipo && !mal.dados) mal.dados = MALDICOES_ARMA.find(m => m.id === mal.tipo)?.dados || '';
       a.maldicao = mal;
