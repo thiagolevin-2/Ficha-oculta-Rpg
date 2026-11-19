@@ -1,20 +1,20 @@
-import { carregarModelosItens, salvarModelosItens } from './armazenamento.js?v=0.40.8';
-import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS, CONJURACAO, PROTECAO_ELEMENTAL, ELEMENTOS_MALDICAO, passivoAmaldicoado } from './amaldicoados.js?v=0.40.8';
-import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.40.8';
-import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO, quantidadeMaldicoes, categoriaEquipamento } from './regras.js?v=0.40.8';
-import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, perderFoco, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, media, analisar } from './combate.js?v=0.40.8';
-import { MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.40.8';
-import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.8';
-import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.40.8';
-import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.40.8';
+import { carregarModelosItens, salvarModelosItens } from './armazenamento.js?v=0.41';
+import { registrarMaldições, cobrarMaldição, AMALDICOADOS, NOMES_AMALDICOADOS, CONJURACAO, PROTECAO_ELEMENTAL, ELEMENTOS_MALDICAO, passivoAmaldicoado } from './amaldicoados.js?v=0.41';
+import { abrirOrigem, pentagramaAtributos } from './criador.js?v=0.41';
+import { parametrosFabricacao, perfilRitual, podeResolverRitual, problemaAoAprender, viaPoder, circuloDeAprender, faixaEtaria, temPeso, origemAtiva, PESOS_IDADE, aumentoPermitido, tetoEtario, derivar, normalizar, poderesParaFicha, cumpreRequisito, ehSobrevivente, temOpcional, usaPD, nexSeparado, opcoesGasto, periciaComAtributo, poderesDeOutrasClasses, TIPOS_EFEITO_ITEM, LIMITE_DANOS_EXTRAS_MACRO, quantidadeMaldicoes, categoriaEquipamento } from './regras.js?v=0.41';
+import { sofrerDano, recuperar, resolverCondicoesDoTurno, adicionarCondicao, perderFoco, iniciarTurno, encerrarTurno, fimDeCena, textoTeste, d, rolar, media, analisar } from './combate.js?v=0.41';
+import { OPCIONAIS_LIVRES, MODOS, OPCIONAIS, ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, CLASSES, ORIGEM, TRILHAS, TRILHA, PODER, ELEMENTOS, CIRCULOS, ARMAS, PROTECOES, ITENS_GERAIS, ITENS_CATALOGO, ITEM_INFO, CONDICOES, PATENTES, RITUAIS, TIPOS_DANO, FERIMENTOS, EXPOSICOES, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, PODERES, ORIGENS, TREINAMENTO_ESPECIAL, MODIFICACOES, MODIFICACAO, MALDICOES_ARMA, CRIACAO_ATRIBUTOS, EFEITOS_INSANIDADE, EFEITOS_MEDO } from './catalogo.js?v=0.41';
+import { MOD_ACESSORIOS, moverPacoteParaReserva, PASSIVOS_ITENS } from './equipamentos.js?v=0.41';
+import { esc, comSinal, romano, sigilo, semAcento, inteiro, numero, uid, imagemOpcional, reduzirImagem, escolherArquivo, baixarArquivo } from './util.js?v=0.41';
+import { rolarTesteUI, rolarDanoUI, oferecerEfeitoRitual, abrirModal, fecharModal, proxima } from './rolagem.js?v=0.41';
 // fichaUI.js — as telas da ficha do agente e as ações delas.
 
 // Textos transcritos dos livros fornecidos pelo usuário, para consulta pessoal. Os não localizados permanecem pendentes.
 let TEXTOS = {};
 let FONTES_SAH = {rituais:{},habilidades:{}};
 export async function carregarTextos() {
-  try { const r = await fetch('dados/textos.json?v=0.40.8', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
-  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.40.8', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
+  try { const r = await fetch('dados/textos.json?v=0.41', { cache: 'no-cache' }); if (r.ok) TEXTOS = await r.json(); } catch {}
+  try { const r = await fetch('dados/sah_referencias_verificadas.json?v=0.41', {cache:'no-cache'}); if (r.ok) FONTES_SAH = await r.json(); } catch {}
   // Os textos do Sobrevivendo ao Horror foram conferidos com o PDF e estão em dados/textos.json (v0.23).
 }
 // Textos do Sobrevivendo ao Horror tirados do OCR (não revisados): aparecem com aviso, separados dos textos conferidos.
@@ -435,20 +435,23 @@ function versatilidadeEscolhida(f, d) {
 }
 function quadroVersatilidade(f, d) {
   if (!d.versatilidade) return '';
-  const v = versatilidadeEscolhida(f, d);
-  return `<div class="quadro-versatilidade${v ? ' escolhida' : ''}"><div class="linha"><b>Versatilidade (NEX 50%)</b><span class="espaco"></span><button class="btn pequeno${v ? '' : ' sangue'}" data-acao="versatilidade">${v ? 'Trocar' : 'Escolher'}</button></div>
-    ${v ? `<p class="quadro-versatilidade-escolha"><b>${esc(v.titulo)}</b> <span class="etiqueta">${esc(v.sub)}</span></p>${v.texto ? `<p class="apagado" style="font-size:.9rem">${esc(v.texto)}</p>` : ''}`
-      : '<p class="apagado">Ainda não escolhida: um poder de classe a mais <b>ou</b> a 1ª habilidade de outra trilha da sua classe.</p>'}</div>`;
+  const v = versatilidadeEscolhida(f, d), iv = f.poderes.findIndex(x => x.deVersatilidade);
+  const aviso = !v ? '<p class="aviso-versatilidade">⚠ Você chegou a NEX 50% e ganhou a <b>Versatilidade</b>: escolha <b>um poder de classe a mais</b> <b>ou</b> a 1ª habilidade de uma trilha da sua classe que não é a sua. Ela fica separada dos poderes de classe e não ocupa vaga deles.</p>'
+    : v.tipo === 'antigo' ? '<p class="aviso-versatilidade">⚠ Um dos poderes de classe da lista passa das vagas e provavelmente veio da Versatilidade. Toque em <b>É da Versatilidade</b> no poder certo para separá-lo.</p>' : '';
+  return `<div class="quadro-versatilidade${v && v.tipo !== 'antigo' ? ' escolhida' : ''}"><div class="linha"><b>Versatilidade (NEX 50%)</b><span class="espaco"></span><button class="btn pequeno${v ? '' : ' sangue'}" data-acao="versatilidade">${v ? 'Trocar' : 'Escolher'}</button>${v?.tipo === 'poder' && iv >= 0 ? `<button class="icone-btn" data-acao="remover" data-lista="poderes" data-i="${iv}" aria-label="Remover o poder da Versatilidade">✕</button>` : ''}</div>
+    ${aviso}${v && v.tipo !== 'antigo' ? `<p class="quadro-versatilidade-escolha"><b>${esc(v.titulo)}</b> <span class="etiqueta">${esc(v.sub)}</span></p>${v.texto ? `<p class="apagado" style="font-size:.9rem">${esc(v.texto)}</p>` : ''}` : ''}</div>`;
 }
 
 // ---------- Aba PODERES (poderes de classe/gerais e paranormais) ----------
 function abaPoderes(f, d) {
   dAtual = d;
   const transcender = registrosTranscender(f);
+  const nPoderesClasse = f.poderes.filter(p => !(d.transcenderSeparado && p.id === 'transcender') && !p.deVersatilidade).length;
+  const versEscolha = d.versatilidade ? versatilidadeEscolhida(f, d) : null, versOk = !!versEscolha && versEscolha.tipo !== 'antigo', versAntiga = versEscolha?.tipo === 'antigo';
   return `<div class="poderes-aba">
-  ${d.versatilidade ? `<div style="margin-top:14px">${quadroVersatilidade(f, d)}</div>` : ''}
-  <section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa">Poderes de classe</h2><span class="contador ${f.poderes.filter(p => !(d.transcenderSeparado && p.id === 'transcender')).length > d.slotsPoder + (d.versatilidade ? 1 : 0) ? 'erro' : ''}">${f.poderes.filter(p => !(d.transcenderSeparado && p.id === 'transcender')).length} / ${d.slotsPoder}${d.versatilidade ? ' +1' : ''}</span></div>
-    <div class="lista-hab">${f.poderes.map((p, i) => { if (p.id === 'transcender') return d.transcenderSeparado ? '' : entradaTranscender(p, transcender.get(p.uid), i); const def = PODER[p.id]; return def ? hab(def.nome + (p.escolha ? ` (${ELEM[p.escolha]?.nome || p.escolha})` : ''), def.resumo, `${PODERES_COM_ESCOLHA.includes(p.id) && !p.escolha ? `<button class="btn pequeno sangue" data-acao="poder-escolha" data-i="${i}">Escolher ${p.id.includes('elemento') ? 'elemento' : p.id === 'foco-em-pericia' ? 'perícia' : 'ritual'}</button>` : ''}${p.via ? `<span class="etiqueta">via ${esc(p.via)}</span>` : ''}${def.req ? `<small class="apagado">${esc(def.req)}</small>` : ''}${fonteTag(def.fonte)}<button class="icone-btn" data-acao="remover" data-lista="poderes" data-i="${i}" aria-label="Remover ${esc(def.nome)}">✕</button>`, 'poder-' + p.uid, f) : hab(p.nome, p.resumo, `<button class="icone-btn" data-acao="remover" data-lista="poderes" data-i="${i}" aria-label="Remover">✕</button>`, 'poder-' + p.uid, f); }).join('') || '<p class="apagado">Nenhum poder escolhido.</p>'}</div>
+  ${d.versatilidade ? `<section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa">Versatilidade</h2><span class="contador ${versOk ? '' : 'erro'}">${versOk ? 1 : 0} / 1</span></div>${quadroVersatilidade(f, d)}${(() => { const i = f.poderes.findIndex(p => p.deVersatilidade && p.id === 'transcender'); return i >= 0 && !d.transcenderSeparado ? `<div class="lista-hab" style="margin-top:8px">${entradaTranscender(f.poderes[i], transcender.get(f.poderes[i].uid), i)}</div>` : ''; })()}</section>` : ''}
+  <section class="painel" style="margin-top:14px"><div class="titulo-secao"><h2 class="faixa">Poderes de classe</h2><span class="contador ${nPoderesClasse > d.slotsPoder ? 'erro' : ''}">${nPoderesClasse} / ${d.slotsPoder}</span></div>
+    <div class="lista-hab">${f.poderes.map((p, i) => { if (p.deVersatilidade && !(p.id === 'transcender' && d.transcenderSeparado)) return ''; const marcarV = versAntiga ? `<button class="btn pequeno" data-acao="marcar-versatilidade" data-i="${i}">É da Versatilidade</button>` : ''; if (p.id === 'transcender') return d.transcenderSeparado ? '' : entradaTranscender(p, transcender.get(p.uid), i); const def = PODER[p.id]; return def ? hab(def.nome + (p.escolha ? ` (${ELEM[p.escolha]?.nome || p.escolha})` : ''), def.resumo, `${PODERES_COM_ESCOLHA.includes(p.id) && !p.escolha ? `<button class="btn pequeno sangue" data-acao="poder-escolha" data-i="${i}">Escolher ${p.id.includes('elemento') ? 'elemento' : p.id === 'foco-em-pericia' ? 'perícia' : 'ritual'}</button>` : ''}${p.via ? `<span class="etiqueta">via ${esc(p.via)}</span>` : ''}${def.req ? `<small class="apagado">${esc(def.req)}</small>` : ''}${fonteTag(def.fonte)}${marcarV}<button class="icone-btn" data-acao="remover" data-lista="poderes" data-i="${i}" aria-label="Remover ${esc(def.nome)}">✕</button>`, 'poder-' + p.uid, f) : hab(p.nome, p.resumo, `${marcarV}<button class="icone-btn" data-acao="remover" data-lista="poderes" data-i="${i}" aria-label="Remover">✕</button>`, 'poder-' + p.uid, f); }).join('') || '<p class="apagado">Nenhum poder escolhido.</p>'}</div>
     <div class="linha" style="margin-top:10px"><button class="btn" data-acao="escolher-poder">+ Escolher poder</button><button class="btn fantasma" data-acao="poder-proprio">+ Poder próprio (homebrew)</button></div>
     <p class="apagado" style="font-size:.88rem;margin-top:6px">${f.modo === 'sah' ? 'No Sobrevivendo ao Horror, poderes gerais podem ser escolhidos no lugar de um poder de classe. ' : ''}Escolher <b>Transcender</b> abre a janela de poderes paranormais.</p>
   </section>
@@ -1168,7 +1171,7 @@ function abaNotas(f) {
   </section>${blocoInterludio(f)}
   <section class="painel" style="margin-top:14px"><h2 class="faixa">Regras desta ficha</h2>
     <p><span class="etiqueta ${f.modo === 'sah' ? 'sah' : 'lr'}">${esc(MODOS[f.modo].nome)}</span></p>
-    ${`<div class="opcionais">${Object.entries(OPCIONAIS).filter(([k]) => f.modo === 'sah' || ['idade', 'municao'].includes(k)).map(([k, o]) => `<label class="check opcional"><input type="checkbox" data-acao-check="opcional" data-k="${k}" ${f.opcionais[k] ? 'checked' : ''}><span><b>${esc(o.nome)}</b><small>${esc(o.resumo)}</small></span></label>`).join('')}</div>`}
+    ${`<div class="opcionais">${Object.entries(OPCIONAIS).filter(([k]) => f.modo === 'sah' || OPCIONAIS_LIVRES.includes(k)).map(([k, o]) => `<label class="check opcional"><input type="checkbox" data-acao-check="opcional" data-k="${k}" ${f.opcionais[k] ? 'checked' : ''}><span><b>${esc(o.nome)}</b><small>${esc(o.resumo)}</small></span></label>`).join('')}</div>`}
       ${f.opcionais.idade ? `<div class="painel"><h3>${faixaEtaria(f)?.nome || 'Idade inválida ou em branco'}</h3>
       ${faixaEtaria(f)?.origem ? `<p>Benefícios da origem: ${f.beneficiosOrigem.length}/${faixaEtaria(f).origem}. <button class="btn pequeno" data-acao="revisar-origem-idade">Revisar benefícios</button></p>` : ''}
       ${faixaEtaria(f)?.peso ? `<p>${f.pesosIdade.length}/${faixaEtaria(f).peso} desvantagens</p><div class="grade c2">${Object.entries(PESOS_IDADE).map(([id, [nome, efeito]]) => `<label class="check hab"><input type="checkbox" data-acao-check="peso-idade" data-id="${id}" ${f.pesosIdade.includes(id) ? 'checked' : ''} ${f.pesosIdade.length >= faixaEtaria(f).peso && !f.pesosIdade.includes(id) ? 'disabled' : ''}><span><b>${nome}</b> <small>${efeito}</small></span></label>`).join('')}</div>` : ''}
@@ -1230,24 +1233,105 @@ function secaoReterRitual(f, r, cat, k) {
   if (!temOpcional(f, 'reterRitual') || !duracaoCena(r, cat)) return '';
   return `<h3 class="titulo-vermelho">Reter Ritual</h3><label class="check hab"><input type="checkbox" id="conj-reter"><span><b>Mudar a duração para retida</b> — os ${k} gastos ficam presos (saem também do máximo) enquanto o ritual durar, e você perde 1 ${k === 'PD' ? 'PD' : 'SAN'}. Solte depois na aba Rituais.</span></label>`;
 }
-// Material de elemento na 1ª etapa: −1d20 no Ocultismo e um efeito à escolha
+// 1ª etapa da Conjuração Complexa (SaH pp. 115–116): efeito elemental no símbolo, −1d20 no Ocultismo
+// [id, efeito, quando se aplica, requisito ('dano' = o ritual causa dano do elemento; 'resistencia' = tem teste de resistência)]
 const MATERIAL_ELEMENTO = {
-  sangue: ['Sangue (desenhado com sangue)', [['cura', 'Se passar no Ocultismo, recupera 2d6 PV'], ['dado', 'Ritual de dano de Sangue: +1 dado de dano'], ['cond', 'Quem falhar na resistência fica sangrando']]],
-  morte: ['Morte (cinzas ou carvão)', [['dt', 'DT para resistir +2'], ['dado', 'Ritual de dano de Morte: +1 dado de dano'], ['cond', 'Quem falhar na resistência sofre −2 em testes até o fim da cena']]],
-  conhecimento: ['Conhecimento (tinta dourada)', [['limite', 'Limite de PE no ritual +2'], ['dado', 'Ritual de dano de Conhecimento: +1 dado de dano'], ['requisito', 'Ignora um requisito de aprimoramento (ex.: afinidade)']]],
-  energia: ['Energia (luz ou fogo)', [['acao', 'Se passar no Ocultismo, ação de movimento extra no próximo turno'], ['dado', 'Ritual de dano de Energia: +1 dado de dano'], ['cond', 'Quem falhar na resistência fica ofuscado']]],
+  sangue: { nome: 'Sangue', material: 'sangue', claro: '#f2708d', escuro: '#b3121f', efeitos: [
+    ['cura', 'Recuperar 2d6 PV', 'Você recupera os PV se passar no teste de Ocultismo.', ''],
+    ['dado', '+1 dado de dano de Sangue', 'O ritual precisa causar dano de Sangue.', 'dano'],
+    ['cond', 'Causar Sangrando', 'Afeta quem falhar no teste de resistência do ritual.', 'resistencia']] },
+  morte: { nome: 'Morte', material: 'cinzas ou carvão', claro: '#c3b5df', escuro: '#3a3a3a', efeitos: [
+    ['dt', '+2 na DT de resistência', 'O ritual precisa ter teste de resistência. O bônus vai na DT que o alvo enfrenta.', 'resistencia'],
+    ['dado', '+1 dado de dano de Morte', 'O ritual precisa causar dano de Morte.', 'dano'],
+    ['cond', '−2 em testes até o fim da cena', 'Afeta quem falhar no teste de resistência do ritual.', 'resistencia']] },
+  conhecimento: { nome: 'Conhecimento', material: 'tinta dourada', claro: '#e9c96b', escuro: '#9a7210', efeitos: [
+    ['limite', '+2 no limite de PE do ritual', 'Aumenta quanto você pode gastar nesta conjuração.', ''],
+    ['dado', '+1 dado de dano de Conhecimento', 'O ritual precisa causar dano de Conhecimento.', 'dano'],
+    ['requisito', 'Ignorar um requisito de aprimoramento', 'Ignora um requisito de uma forma do ritual, como afinidade ou círculo.', '']] },
+  energia: { nome: 'Energia', material: 'desenho luminoso ou incendiado', claro: '#c28afa', escuro: '#7b2cbf', efeitos: [
+    ['acao', 'Uma ação de movimento extra', 'Você recebe a ação no próximo turno se passar no teste de Ocultismo.', ''],
+    ['dado', '+1 dado de dano de Energia', 'O ritual precisa causar dano de Energia.', 'dano'],
+    ['cond', 'Causar Ofuscado', 'Afeta quem falhar no teste de resistência do ritual.', 'resistencia']] },
 };
-function secaoConjuracaoComplexa(f, d, r) {
+const efeitoElemental = (el, ef) => MATERIAL_ELEMENTO[el]?.efeitos.find(e => e[0] === ef);
+// Tipo de dano de cada ritual por forma (básica|discente|verdadeira), tirado do texto dos livros. Vazio = herda a básica.
+const TIPO_DANO_RITUAL = {
+  'perturbacao': '|conhecimento|', 'tecer-ilusao': '||conhecimento', 'eletrocussao': 'eletricidade|energia|energia', 'polarizacao-caotica': '|impacto|',
+  'consumir-manancial': '||morte', 'decadencia': 'morte', 'chamas-do-caos': 'fogo|energia|', 'contencao-fantasmagorica': '||energia', 'eco-espiral': 'morte',
+  'paradoxo': 'morte', 'descarnar': 'sangue', 'flagelo-de-sangue': 'sangue', 'hemofagia': 'sangue', 'transfigurar-agua': 'energia', 'transfigurar-terra': 'impacto',
+  'poeira-da-podridao': 'morte', 'ferver-sangue': 'sangue', 'purgatorio': 'sangue', 'vomitar-pestes': 'sangue', 'inexistir': 'conhecimento',
+  'deflagracao-de-energia': 'energia', 'convocar-o-algoz': 'morte', 'fim-inevitavel': 'morte', 'conhecendo-o-medo': 'mental', 'lamina-do-medo': 'medo',
+  'presenca-do-medo': 'mental', 'rajada-caotica': 'energia', 'capturar-momento': '|morte|morte', 'backup': '||energia', 'esfolar': 'corte',
+  'sede-de-adrenalina': 'impacto', 'fedor-putrido': 'morte', 'desfazer-sinapses': 'conhecimento', 'tremeluzir': 'energia', 'amaldicoar-arma': 'variavel',
+};
+// '' = não causa dano nesta forma; '?' = causa, mas o tipo não está no texto disponível (confira no livro)
+function tipoDanoRitual(r, cat, formaId) {
+  const formula = formulaDaForma(r, cat, formaId);
+  if (!formula || r.tipoDados === 'cura') return '';
+  const t = TIPO_DANO_RITUAL[cat.id];
+  if (t == null) return r.proprio ? (r.elemento || '?') : '?';
+  const [b, dsc, v] = t.split('|');
+  return (formaId === 'discente' ? dsc : formaId === 'verdadeiro' ? v : '') || b || '?';
+}
+const temResistencia = (r, cat) => !!String(r.resistencia || cat.resistencia || '').trim();
+function secaoConjuracaoComplexa(f, d, r, cat) {
   const k = d.pd ? 'PD' : 'PE';
-  const opMat = Object.entries(MATERIAL_ELEMENTO).map(([el, [nome, efeitos]]) => efeitos.map(([id, txt]) => `<option value="${el}:${id}">${esc(nome)} · ${esc(txt)}</option>`).join('')).join('');
+  const tatuagem = f.poderes.some(p => p.id === 'tatuagem-ritualistica');
+  const mesclar = f.trilha === 'conduite' && !!d.trilhaHabs.find(h => h.nome === 'Anular Ritual')?.liberada;
+  const tipoInput = mesclar ? 'checkbox' : 'radio';
+  const caixas = Object.entries(MATERIAL_ELEMENTO).map(([el, m]) => `<div class="caixa-elemento" style="--el-claro:${m.claro};--el-escuro:${m.escuro}">
+      <div class="caixa-elemento-topo">${sigilo(el)}<b>${esc(m.nome)}</b><small>${esc(m.material)}</small></div>
+      ${m.efeitos.map(([id, nome, quando, req]) => `<label class="efeito-op"><input type="${tipoInput}" name="conj-efeito" value="${el}:${id}" data-req="${req}" data-acao-check="conj-etapa"><span>
+        <span class="efeito-mais">+ ${esc(nome)}</span><small class="apagado">${esc(quando)}</small><small class="efeito-motivo"></small></span></label>`).join('')}
+      <p class="efeito-menos">− 1d20 no teste de Ocultismo para conjurar</p></div>`).join('');
   return `<h3 class="titulo-vermelho">Conjuração Complexa</h3>
     <p class="apagado" style="font-size:.88rem">3 rodadas: 1ª símbolo, 2ª componentes, 3ª invocação. Você fica desprevenido e faz Vontade para manter a concentração ao sofrer dano (use o campo de concentração abaixo, se precisar). Se falhar no Ocultismo, o ritual <b>não funciona</b>, mas os custos são pagos.</p>
     <div class="lista-hab">
-      <label class="campo"><span>1ª etapa · material de elemento (−1d20 no Ocultismo)</span><select id="conj-material"><option value="">Nenhum</option>${opMat}</select></label>
+      ${tatuagem ? `<label class="check hab"><input type="checkbox" id="conj-tatuagem" data-acao-check="conj-etapa"><span><b>Tatuagem Ritualística · pular a 1ª etapa</b> — só para o ritual tatuado. Se pular, não pode adicionar efeito elemental.</span></label>` : ''}
+      <label class="check hab"><input type="checkbox" id="conj-efeito-el" data-acao-check="conj-etapa"><span><b>1ª etapa · Adicionar efeito elemental ao símbolo</b> — Escolha um efeito. Você rola 1d20 a menos no teste de Ocultismo para conjurar.</span></label>
+      <div class="janela-efeitos" id="conj-efeitos" data-mesclar="${mesclar ? 1 : 0}" hidden>
+        ${mesclar ? '<p class="apagado" style="font-size:.85rem;margin:0 0 8px"><b>Mesclar Elemento</b> (substitui Anular Ritual na conjuração complexa): você pode escolher um segundo efeito de outro elemento. O poder não fala em segunda penalidade, então continua −1d20.</p>' : ''}
+        <div class="efeitos-grade">${caixas}</div>
+        <p class="apagado" id="conj-efeito-resumo" style="font-size:.85rem;margin:8px 0 0">Escolha um efeito. A penalidade de −1d20 só entra depois da escolha.</p>
+        <p class="apagado" style="font-size:.78rem;margin:4px 0 0">Sobrevivendo ao Horror, pp. 115–116. O dado extra vale pelo tipo de dano que o ritual causa na forma escolhida, não pelo elemento do ritual.</p>
+      </div>
       <label class="check hab"><input type="checkbox" id="conj-componente"><span><b>2ª etapa · consumir o componente</b> (ou um catalisador): +1d20 no Ocultismo. ${r.elemento === 'medo' || d.afinidade === r.elemento ? 'Você dispensa componentes neste ritual, mas pode consumir um para fortalecê-lo.' : ''}</span></label>
       <label class="check hab"><input type="checkbox" id="conj-extrapolar"><span><b>Extrapolar os limites</b> — some sua Presença (+${f.atributos.pre}) ao limite de ${k} neste ritual e use aprimoramentos como se tivesse acesso a um círculo a mais. Mais poderoso, mais arriscado.</span></label>
       <label class="check hab"><input type="checkbox" id="conj-desconhecido"><span><b>Ritual que você não conhece</b> — DT do Ocultismo +5; se falhar, além de pagar os custos, sofre um <b>desastre paranormal</b> (1d8).</span></label>
     </div>`;
+}
+// Atualiza a janela de efeitos elementais quando muda a caixinha, a forma ou a escolha (sem redesenhar o modal)
+function atualizarEtapaSimbolo() {
+  const box = document.getElementById('conj-efeitos'), liga = document.getElementById('conj-efeito-el');
+  if (!box || !liga) return;
+  const tat = document.getElementById('conj-tatuagem');
+  liga.disabled = !!tat?.checked; if (tat?.checked) liga.checked = false;
+  box.hidden = !liga.checked;
+  const forma = document.querySelector('[name="conj-forma"]:checked');
+  const tipo = forma?.dataset.tipoDano || '', comRes = forma?.dataset.resistencia === '1', mesclar = box.dataset.mesclar === '1';
+  const ops = [...box.querySelectorAll('[name="conj-efeito"]')];
+  if (!liga.checked) ops.forEach(o => { o.checked = false; });
+  for (const o of ops) {
+    const [el] = o.value.split(':'), req = o.dataset.req;
+    let motivo = '', nota = '';
+    if (req === 'dano') {
+      if (!tipo) motivo = 'Nesta forma o ritual não causa dano.';
+      else if (tipo === '?') nota = 'Confira no livro se o dano deste ritual é deste tipo.';
+      else if (tipo !== el && tipo !== 'variavel') motivo = `Nesta forma o dano é de ${tipo}.`;
+    }
+    if (req === 'resistencia' && !comRes) motivo = 'Este ritual não tem teste de resistência.';
+    o.disabled = !!motivo; if (motivo) o.checked = false;
+    const lbl = o.closest('.efeito-op'); lbl?.classList.toggle('indisponivel', !!motivo);
+    const m = lbl?.querySelector('.efeito-motivo'); if (m) m.textContent = motivo || nota;
+  }
+  if (mesclar) { // até 2 efeitos, de elementos diferentes
+    const marcados = ops.filter(o => o.checked);
+    for (const o of ops) if (!o.checked && !o.closest('.efeito-op')?.classList.contains('indisponivel'))
+      o.disabled = marcados.length >= 2 || marcados.some(m => m.value.split(':')[0] === o.value.split(':')[0]);
+  }
+  const escolhidos = ops.filter(o => o.checked).map(o => efeitoElemental(...o.value.split(':'))?.[1]).filter(Boolean);
+  const resumo = document.getElementById('conj-efeito-resumo');
+  if (resumo) resumo.textContent = escolhidos.length ? `Escolhido: ${escolhidos.join(' + ')}. Penalidade: −1d20 no teste de Ocultismo.` : 'Escolha um efeito. A penalidade de −1d20 só entra depois da escolha.';
 }
 // Aumenta em 1 o primeiro grupo de dados de uma fórmula ("3d6+3" → "4d6+3")
 const maisUmDado = formula => formula ? formula.replace(/^(\s*)(\d*)d(\d+)/, (_, s, n, l) => `${s}${(Number(n) || 1) + 1}d${l}`) : formula;
@@ -1273,8 +1357,11 @@ function janelaConjurar(ctx, f, d, i, origem = null) {
   for (const [id, nome] of [['discente', 'Forma discente'], ['verdadeiro', 'Forma verdadeira']]) {
     const fo = formaRitual(r, cat, id); if (!fo) continue;
     const okCirc = !fo.circulo || d.circuloMax >= fo.circulo, okAf = !fo.afinidade || afinidade;
-    const soExtrapolando = complexa && !okCirc && d.circuloMax + 1 >= fo.circulo; // SaH p. 116: extrapolar dá acesso a um círculo a mais
-    formas.push([id, nome, fo.custo, (okCirc || soExtrapolando) && (okAf || complexa), `${fo.circulo ? `requer ${fo.circulo}º círculo` : ''}${fo.afinidade ? ' e afinidade' : ''}${soExtrapolando ? ' (só extrapolando os limites)' : ''}${complexa && !okAf ? ' (afinidade: só com material de Conhecimento)' : ''}${!(okCirc || soExtrapolando) || (!okAf && !complexa) ? ' (você ainda não pode)' : ''}`]);
+    // Conjuração complexa: extrapolar dá um círculo a mais; o efeito de Conhecimento ignora um requisito (SaH pp. 115–116)
+    const faltasExtrap = (fo.circulo && d.circuloMax + 1 < fo.circulo ? 1 : 0) + (okAf ? 0 : 1);
+    const pode = okCirc && okAf || complexa && (faltasExtrap <= 1 || !okCirc + !okAf <= 1);
+    const notas = complexa && !(okCirc && okAf) ? [!okCirc && d.circuloMax + 1 >= fo.circulo ? 'extrapolando os limites' : '', 'ou ignorando um requisito com tinta dourada'].filter(Boolean).join(' ') : '';
+    formas.push([id, nome, fo.custo, pode, `${fo.circulo ? `requer ${fo.circulo}º círculo` : ''}${fo.afinidade ? ' e afinidade' : ''}${notas ? ` (só ${notas})` : ''}${!pode ? ' (você ainda não pode)' : ''}`]);
   }
   const op = [];
   if (f.trilha === 'conduite' && d.trilhaHabs.find(h => h.nome === 'Ampliar Ritual')?.liberada) op.push(['ampliar', 'Ampliar Ritual: mais alcance ou área em dobro', 2]);
@@ -1285,10 +1372,10 @@ function janelaConjurar(ctx, f, d, i, origem = null) {
   const armadura = f.protecoes.filter(p => p.vestida).some(p => p.peso === 'pesada') ? 2 : f.protecoes.filter(p => p.vestida).some(p => p.peso === 'leve') ? 1 : 0;
   abrirModal(`Conjurar · ${r.nome}`, `${origem ? `<p>Conjuração de ${esc(origem.item.nome)}${desconto ? ` · −1 ${k} por conhecer o ritual, com mínimo de 1 ${k}` : ''}.</p>` : ''}<p>${esc(cat.execucao ? `Execução ${cat.execucao} · alcance ${cat.alcance || '—'} · ${cat.alvo || cat.area || cat.efeitoArea || ''} · ${cat.duracao || ''}` : '')}</p>
     ${ritualDeToque(r, cat) ? '<p class="apagado">Confirme o toque e aplique o efeito ao alvo na mesa. Os dados do ritual são rolados normalmente.</p>' : podeResolverRitual(cat.id, r.formula || Object.values(r.formulasAvancadas || {}).find(Boolean), r.resistencia) ? `<label class="campo"><span>Alvo para resolver resistência e dano</span><select id="conj-alvo"><option value="">Apenas conjurar</option>${opcoesAlvos(ctx, f).replace(' selected', '')}</select></label><label class="campo"><span>Recurso do alvo</span><select id="conj-recurso"><option value="pv">PV</option><option value="mental">Sanidade / PD</option></select></label>` : ''}
-    <h3 class="titulo-vermelho">Forma</h3><div class="lista-hab">${formas.map(([id, nome, c, ok, req], j) => `<label class="check hab"><input type="radio" name="conj-forma" value="${id}" data-custo="${c}" ${j === 0 ? 'checked' : ''} ${ok ? '' : 'disabled'}><span><b>${nome}</b> — total <b>${custoDaForma(r, c, desconto)} ${k}</b>${req ? ` <small class="apagado">${esc(req)}</small>` : ''}${r.proprio && id !== 'basica' && r[id] ? `<br><small>${esc(r[id])}</small>` : ''}</span></label>`).join('')}</div>
+    <h3 class="titulo-vermelho">Forma</h3><div class="lista-hab">${formas.map(([id, nome, c, ok, req], j) => `<label class="check hab"><input type="radio" name="conj-forma" value="${id}" data-custo="${c}" data-tipo-dano="${esc(tipoDanoRitual(r, cat, id))}" data-resistencia="${temResistencia(r, cat) ? 1 : 0}" data-acao-check="conj-etapa" ${j === 0 ? 'checked' : ''} ${ok ? '' : 'disabled'}><span><b>${nome}</b> — total <b>${custoDaForma(r, c, desconto)} ${k}</b>${req ? ` <small class="apagado">${esc(req)}</small>` : ''}${r.proprio && id !== 'basica' && r[id] ? `<br><small>${esc(r[id])}</small>` : ''}</span></label>`).join('')}</div>
     ${op.length ? `<h3 class="titulo-vermelho">Extras</h3><div class="lista-hab">${op.map(([id, n, c]) => `<label class="check hab"><input type="checkbox" id="conj-${id}" data-custo="${c}"><span>${esc(n)} <b>+${c} ${k}</b></span></label>`).join('')}</div>` : ''}
     ${(() => { if (r.elemento === 'medo') return ''; const ops = gastosOcultismo(f, d); return ops.length ? `<h3 class="titulo-vermelho">Teste de Ocultismo (Custo do Paranormal)</h3><div class="lista-hab">${ops.map(o => `<label class="check hab"><input type="checkbox" id="conj-oc-${o.id}" data-gasto-oc="${o.id}"><span><b>${esc(o.nome)}</b> +${o.custo} ${k}: ${[o.bonus ? `+${o.bonus}` : '', o.dados ? `+${o.dados}d20` : '', o.dadoExtra ? `+${o.dadoExtra}` : ''].filter(Boolean).join(' ')} no teste${o.nota ? ` <small class="apagado">(${esc(o.nota)})</small>` : ''}</span></label>`).join('')}</div><p class="apagado" style="font-size:.82rem">Este gasto é à parte do custo do ritual: não muda a DT.</p>` : ''; })()}
-    ${secaoReterRitual(f, r, cat, k)}${complexa ? secaoConjuracaoComplexa(f, d, r) : ''}
+    ${secaoReterRitual(f, r, cat, k)}${complexa ? secaoConjuracaoComplexa(f, d, r, cat) : ''}
     <div class="grade c2" style="margin-top:8px"><label class="campo"><span>Outro custo (${k})</span><input type="number" min="0" id="conj-outro" value="0"></label>
       <label class="campo"><span>Concentração: DT de Vontade (0 = sem teste)</span><input type="number" min="0" id="conj-vontade" value="0"></label></div>
     ${flagelo ? `<label class="check hab"><input type="checkbox" id="conj-flagelo"><span><b>Poder do Flagelo:</b> pagar com PV (2 PV por ${k}).</span></label>` : ''}
@@ -2240,25 +2327,36 @@ export function acoesFicha(ctx) {
       if (!r0 || d.semAcoes) return ctx.avisar('A conjuração está indisponível.', true);
       // Conjuração Complexa (SaH pp. 114–117)
       const complexa = temOpcional(ficha, 'conjuracaoComplexa');
-      const [matEl, matEf] = complexa ? (document.getElementById('conj-material')?.value || '').split(':') : [];
+      const ligaEl = complexa && !!document.getElementById('conj-efeito-el')?.checked && !document.getElementById('conj-tatuagem')?.checked;
+      const efs = ligaEl ? [...document.querySelectorAll('[name="conj-efeito"]:checked')].map(o => o.value.split(':')) : [];
+      if (ligaEl && !efs.length) return ctx.avisar('Escolha um efeito elemental ou desmarque "Adicionar efeito elemental ao símbolo".', true);
+      const temEf = (el, ef) => efs.some(([a, b]) => (!el || a === el) && b === ef);
       const extrapolar = complexa && !!document.getElementById('conj-extrapolar')?.checked;
       const componente = complexa && !!document.getElementById('conj-componente')?.checked;
       const desconhecido = complexa && !!document.getElementById('conj-desconhecido')?.checked;
       const reter = temOpcional(ficha, 'reterRitual') && !!document.getElementById('conj-reter')?.checked;
       const elementosR = r0.elementos?.length ? r0.elementos : [r0.elemento];
-      const r = matEl === 'morte' && matEf === 'dt' ? { ...r0, dt: r0.dt + 2 } : r0;
+      const r = temEf('morte', 'dt') ? { ...r0, dt: r0.dt + 2 } : r0;
       const alvoMental = document.getElementById('conj-recurso')?.value === 'mental';
       const forma = document.querySelector('[name="conj-forma"]:checked');
       const catR = RITUAIS.find(x => semAcento(x.nome) === semAcento(r.nome)) || {};
       const alvoId = ritualDeToque(r, catR) ? '' : document.getElementById('conj-alvo')?.value;
       const formaId = forma?.value || 'basica';
       const avancada = ['discente', 'verdadeiro'].includes(formaId) ? formaRitual(r, catR, formaId) : null;
-      if (formaId !== 'basica' && (!avancada || avancada.circulo > d.circuloMax + (extrapolar ? 1 : 0) ||
-        (avancada.afinidade && !(matEl === 'conhecimento' && matEf === 'requisito') && !elementosR.every(el => el === d.afinidade)))) {
+      const faltas = avancada ? (avancada.circulo > d.circuloMax + (extrapolar ? 1 : 0) ? 1 : 0) + (avancada.afinidade && !elementosR.every(el => el === d.afinidade) ? 1 : 0) : 0;
+      if (formaId !== 'basica' && (!avancada || faltas > (temEf('conhecimento', 'requisito') ? 1 : 0))) {
         return ctx.avisar('Pré-requisitos da forma avançada não cumpridos.', true);
       }
       const formulaBase = formulaDaForma(r, catR, formaId);
-      const formulaD = matEf === 'dado' && r.tipoDados !== 'cura' && elementosR.includes(matEl) ? maisUmDado(formulaBase) : formulaBase;
+      // valida os efeitos elementais na versão final do ritual (forma escolhida), antes de gastar e rolar
+      const tipoFinal = tipoDanoRitual(r0, catR, formaId);
+      for (const [el, ef] of efs) {
+        const [, nomeEf, , req] = efeitoElemental(el, ef) || [];
+        if (req === 'dano' && (!tipoFinal || (tipoFinal !== el && !['variavel', '?'].includes(tipoFinal)))) return ctx.avisar(`"${nomeEf}" não vale aqui: nesta forma o ritual ${tipoFinal ? `causa dano de ${tipoFinal}` : 'não causa dano'}.`, true);
+        if (req === 'resistencia' && !temResistencia(r0, catR)) return ctx.avisar(`"${nomeEf}" não vale aqui: o ritual não tem teste de resistência.`, true);
+      }
+      let formulaD = formulaBase;
+      for (const [, ef] of efs) if (ef === 'dado') formulaD = maisUmDado(formulaD);
       if (formulaD) {
         try { analisar(formulaD); } catch (e) { return ctx.avisar(`Fórmula do ritual: ${e.message}`, true); }
       }
@@ -2269,7 +2367,7 @@ export function acoesFicha(ctx) {
       const opsOc = r.elemento === 'medo' ? [] : gastosOcultismo(ficha, d).filter(o => marcadosOc.has(o.id));
       const gastoOc = opsOc.reduce((s, o) => s + o.custo, 0);
       if (document.getElementById('conj-flagelo')?.checked) { const pv = custo * 2; if (d.atual.pv <= pv) return ctx.avisar('PV insuficientes.', true); ficha.recursos.pv = d.atual.pv - pv; ficha.gastoTurno += custo; }
-      else if (!gastar(ficha, d, custo + gastoOc, d.limiteRitual + (extrapolar ? ficha.atributos.pre : 0) + (matEl === 'conhecimento' && matEf === 'limite' ? 2 : 0), 0, [[`Ritual: ${r.nome}`, custo - d.custoCondicao], ...opsOc.map(o => [o.nome, o.custo])])) return ctx.avisar(`${K} insuficiente (precisa de ${custo + gastoOc}).`, true);
+      else if (!gastar(ficha, d, custo + gastoOc, d.limiteRitual + (extrapolar ? ficha.atributos.pre : 0) + (temEf('conhecimento', 'limite') ? 2 : 0), 0, [[`Ritual: ${r.nome}`, custo - d.custoCondicao], ...opsOc.map(o => [o.nome, o.custo])])) return ctx.avisar(`${K} insuficiente (precisa de ${custo + gastoOc}).`, true);
       if (gastoOc && document.getElementById('conj-flagelo')?.checked && !gastar(ficha, derivar(ficha), gastoOc, undefined, undefined, opsOc.map(o => [o.nome, o.custo]))) return ctx.avisar(`${K} insuficiente para ${opsOc.map(o => o.nome).join(', ')}.`, true);
       ctx.salvarFicha(ficha); fecharModal(); ctx.render();
       const nomeForma = forma?.value === 'discente' ? ' (discente)' : forma?.value === 'verdadeiro' ? ' (verdadeira)' : '';
@@ -2311,10 +2409,11 @@ export function acoesFicha(ctx) {
           adicionarCondicao(atual, condicao);
           if (perfil.turnos) atual.prazosCondicao[condicao] = Math.max(atual.prazosCondicao[condicao] || 0, perfil.turnos);
         }
-        if (!passou && p && matEf === 'cond') {
-          const cm = { sangue: 'sangrando', energia: 'ofuscado' }[matEl];
+        if (!passou && p) for (const [el, ef] of efs) {
+          if (ef !== 'cond') continue;
+          const cm = { sangue: 'sangrando', energia: 'ofuscado' }[el];
           if (cm) { adicionarCondicao(atual, cm); mensagem = [mensagem, CONDICOES.find(c => c.id === cm)?.nome].filter(Boolean).join(' · '); }
-          else if (matEl === 'morte') mensagem = [mensagem, '−2 em testes até o fim da cena'].filter(Boolean).join(' · ');
+          else if (el === 'morte') mensagem = [mensagem, '−2 em testes até o fim da cena'].filter(Boolean).join(' · ');
         }
         if (formulaD) {
           const resultado = await rolarFormula(alvo.nome);
@@ -2342,12 +2441,12 @@ export function acoesFicha(ctx) {
           if (dx.pd) fx.recursos.pd = dx.atual.pd - 1; else fx.recursos.san = dx.atual.san - 1;
           notas.push(`ritual retido (${custo} ${K} presos, −1 ${dx.pd ? 'PD' : 'SAN'})`);
         }
-        if (matEl === 'sangue' && matEf === 'cura') {
+        if (temEf('sangue', 'cura')) {
           const c = await rolarDanoUI({ titulo: `${r.nome} · material de Sangue`, quem: fx.nome, formula: '2d6', rotulo: 'CURA' });
           if (c) { const fy = f(); recuperar(fy, derivar(fy), 'pv', c.total); ctx.salvarFicha(fy); notas.push(`+${c.total} PV`); }
           ctx.salvarFicha(f()); ctx.render();
         } else { ctx.salvarFicha(fx); ctx.render(); }
-        if (matEl === 'energia' && matEf === 'acao') notas.push('ação de movimento extra no próximo turno');
+        if (temEf('energia', 'acao')) notas.push('ação de movimento extra no próximo turno');
         if (notas.length) ctx.avisar(`${r.nome}: ${notas.join(' · ')}.`);
       };
       const desastre = async () => {
@@ -2372,9 +2471,9 @@ export function acoesFicha(ctx) {
       if (r.elemento !== 'medo') {
         const oc = d.PER.ocultismo, dt = 20 + custo + (desconhecido ? 5 : 0);
         const armadura = ficha.protecoes.filter(p => p.vestida).some(p => p.peso === 'pesada') ? -2 : ficha.protecoes.filter(p => p.vestida).some(p => p.peso === 'leve') ? -1 : 0;
-        const base = oc.dados.pior ? 2 - oc.dados.qtd : oc.dados.qtd, q = base + armadura + opsOc.reduce((s, o) => s + (o.dados || 0), 0) - (matEl ? 1 : 0) + (componente ? 1 : 0);
+        const base = oc.dados.pior ? 2 - oc.dados.qtd : oc.dados.qtd, q = base + armadura + opsOc.reduce((s, o) => s + (o.dados || 0), 0) - (efs.length ? 1 : 0) + (componente ? 1 : 0);
         let bonusOc = opsOc.reduce((s, o) => s + (o.bonus || 0), 0);
-        const notasOc = [...opsOc.map(o => o.nome), ...(matEl ? [`material de ${matEl} −1d20`] : []), ...(componente ? ['componente +1d20'] : []), ...(desconhecido ? ['ritual desconhecido DT +5'] : [])];
+        const notasOc = [...opsOc.map(o => o.nome), ...(efs.length ? [`efeito elemental −1d20`] : []), ...(componente ? ['componente +1d20'] : []), ...(desconhecido ? ['ritual desconhecido DT +5'] : [])];
         for (const o of opsOc) if (o.dadoExtra) { const x = rolar(o.dadoExtra).total; bonusOc += x; notasOc.push(`${o.dadoExtra}=${x}`); }
         proxima.dt = String(dt);
         const t = await testar({ titulo: `Custo do Paranormal · ${r.nome}${nomeForma}${notasOc.length ? ` (${notasOc.join(', ')})` : ''}`, quem: quem(), dados: q >= 1 ? { qtd: q, pior: false } : { qtd: 2 - q, pior: true }, bonus: oc.bonus + bonusOc }, oc.atrUsado, ficha, dt);
@@ -2795,6 +2894,7 @@ export function acoesFicha(ctx) {
     },
     'escolher-opcao': el => { const e = escolhaPendente; if (!e?.aoEscolher) return; escolhaPendente = null; e.aoEscolher(el.dataset.valor); },
     'confirmar-multipla': () => { const e = escolhaPendente; if (!e?.aoConfirmar) return; const ids = [...document.querySelectorAll('[data-multi]:checked')].map(c => c.dataset.multi); if (e.max && ids.length > e.max) return ctx.avisar(`Escolha no máximo ${e.max}.`, true); if (!ids.length) return ctx.avisar('Marque pelo menos uma opção.', true); escolhaPendente = null; e.aoConfirmar(ids); },
+    'marcar-versatilidade': el => { const fx = f(), p = fx.poderes[Number(el.dataset.i)]; if (!p) return; for (const x of fx.poderes) x.deVersatilidade = false; p.deVersatilidade = true; fx.escolhas.versatilidade = ''; salvar(); ctx.avisar('Poder separado como Versatilidade.'); },
     // Versatilidade (NEX 50%): poder de classe OU 1ª habilidade de outra trilha da sua classe
     'versatilidade': () => { try {
       const ficha = f();
@@ -2870,6 +2970,7 @@ export function acoesFicha(ctx) {
 export function checksFicha(ctx) {
   const f = () => ctx.fichaAtual();
   return {
+    'conj-etapa': () => atualizarEtapaSimbolo(),
     // A caixinha do grimório não muda sozinha: abre a pré-visualização, e "Aprender"/"Esquecer" decidem.
     'ritual-catalogo': el => {
       const ficha = f(); const r = RITUAIS.find(x => x.id === el.dataset.id); if (!r) return;

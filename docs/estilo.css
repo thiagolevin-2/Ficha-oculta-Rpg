@@ -1370,3 +1370,24 @@ button.roda-circulo:focus-visible { outline: 3px solid var(--vela); outline-offs
 html { overflow-x: clip; }
 
 #catalogo-itens-vazio[hidden] { display: none; }
+
+/* Conjuração complexa · 1ª etapa: janela de efeitos elementais (uma caixinha por elemento) */
+.janela-efeitos { border: 1px solid var(--linha-forte); border-radius: var(--raio); padding: 10px; background: var(--campo); }
+.janela-efeitos[hidden] { display: none; }
+.efeitos-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.caixa-elemento { --el: var(--el-claro); border: 1px solid color-mix(in srgb, var(--el) 55%, transparent); border-left: 4px solid var(--el); border-radius: var(--raio); padding: 10px 12px; background: linear-gradient(105deg, color-mix(in srgb, var(--el) 14%, transparent), transparent 70%); min-width: 0; }
+:root[data-tema="papel"] .caixa-elemento { --el: var(--el-escuro); }
+.caixa-elemento-topo { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; margin-bottom: 4px; color: var(--el); }
+.caixa-elemento-topo b { white-space: nowrap; }
+.caixa-elemento-topo .sigilo { --cor: var(--el); width: 20px; height: 20px; }
+.caixa-elemento-topo small { flex-basis: 100%; color: var(--apagado); font-size: .75rem; }
+.efeito-op { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; border-top: 1px dashed var(--linha); cursor: pointer; }
+.efeito-op > span { display: grid; gap: 2px; min-width: 0; }
+.efeito-op input { margin-top: 3px; flex: none; }
+.efeito-mais { font-weight: 600; color: var(--tinta); }
+.efeito-op small { font-size: .78rem; line-height: 1.3; }
+.efeito-motivo { color: var(--perigo); }
+.efeito-motivo:empty { display: none; }
+.efeito-op.indisponivel { opacity: .5; cursor: not-allowed; }
+.efeito-menos { margin: 6px 0 0; padding-top: 6px; border-top: 1px dashed var(--linha); font-size: .8rem; color: var(--perigo); }
+.aviso-versatilidade { margin: 8px 0 2px; padding: 8px 10px; border-left: 3px solid var(--sangue); background: #00000026; border-radius: var(--raio); font-size: .88rem; }

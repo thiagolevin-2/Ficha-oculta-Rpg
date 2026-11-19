@@ -1,8 +1,8 @@
-import { condicoesEfetivas } from './combate.js?v=0.40.8';
-import { OPCIONAIS_LIVRES } from './catalogo.js?v=0.40.8';
-import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.40.8';
-import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.40.8';
-import { passivosDeItens, passivoAmaldicoado, AMALDICOADOS, CONJURACAO, ELEMENTOS_MALDICAO } from './amaldicoados.js?v=0.40.8';
+import { condicoesEfetivas } from './combate.js?v=0.41';
+import { OPCIONAIS_LIVRES } from './catalogo.js?v=0.41';
+import { ATRIBUTOS, PERICIAS, PERICIA, GRAUS, NEX, nivelDoNex, CLASSES, ORIGEM, TRILHA, PODER, PODERES, VIRARAM_GERAIS, PATENTES, patenteDosPP, PROG_PATENTE, CIRCULOS, DESLOCAMENTO_BASE, EFEITO_CONDICAO, CRIACAO_ATRIBUTOS, PROTECOES, ALTERACOES_GERAIS, ALTERACOES_ELEMENTO, PODERES_PARANORMAIS, PODER_PARANORMAL, USAVEIS, TROCAS_PERICIA, MODIFICACAO, RITUAIS } from './catalogo.js?v=0.41';
+import { CAPACIDADE_ARMAS, MOD_ACESSORIOS, PASSIVOS_ITENS } from './equipamentos.js?v=0.41';
+import { passivosDeItens, passivoAmaldicoado, AMALDICOADOS, CONJURACAO, ELEMENTOS_MALDICAO } from './amaldicoados.js?v=0.41';
 // ═══════════ aprendizado ═══════════
 export const RITUAIS_DE_TRILHA = {
   'canalizar-o-medo': 'conduite',
@@ -741,7 +741,15 @@ export function derivar(f, { armaUid, periciaAtaque, atributoDano, ritualExtra }
   const somaAtr = ATRIBUTOS.reduce((s, a) => s + f.atributos[a.id], 0);
   const esperado = 5 + pontosCriacao + slotsAtributo;
   if (somaAtr > esperado + (Object.values(f.atributos).some(v => v === 0) ? 1 : 0)) avisos.push(`Atributos somam ${somaAtr}; o esperado é até ${esperado} (+1 se um atributo estiver em 0).`);
-  if (poderesEscolhidos > slotsPoder + (versatilidade ? 1 : 0) + (ORIGEM[f.origem]?.id === 'cultista' ? 1 : 0)) avisos.push(`Você tem ${poderesEscolhidos} poderes; o nível atual dá direito a ${slotsPoder}${versatilidade ? ' (+1 da versatilidade)' : ''}.`);
+  // Versatilidade (NEX 50%) é contada à parte dos poderes de classe
+  const conta = p => (!p.via || p.via === 'vivencia') && p.id !== 'proprio' && !(transcenderSeparado && p.id === 'transcender');
+  const usouVersatilidade = versatilidade && (!!TRILHA[f.escolhas.versatilidade] || f.poderes.some(p => p.deVersatilidade));
+  const poderesDeClasse = poderesEscolhidos - (f.poderes.some(p => p.deVersatilidade && conta(p)) ? 1 : 0);
+  const cultista = ORIGEM[f.origem]?.id === 'cultista' ? 1 : 0;
+  if (poderesDeClasse > slotsPoder + cultista + (versatilidade && !usouVersatilidade ? 1 : 0)) avisos.push(`Você tem ${poderesDeClasse} poderes de classe; o nível atual dá direito a ${slotsPoder}${versatilidade ? ' (a Versatilidade é contada à parte)' : ''}.`);
+  if (versatilidade && !usouVersatilidade) avisos.push(poderesDeClasse > slotsPoder + cultista
+    ? 'Versatilidade (NEX 50%): você tem um poder de classe além das vagas. Se ele veio da Versatilidade, marque-o na aba Poderes com "É da Versatilidade".'
+    : 'Versatilidade (NEX 50%) ainda não escolhida: um poder de classe a mais OU a 1ª habilidade de outra trilha da sua classe.');
   if (!f.trilha && trilhaLiberada(f, 2)) avisos.push('Escolha sua trilha.');
   if (!f.origem) avisos.push('Escolha uma origem.');
 
